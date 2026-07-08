@@ -1,0 +1,43 @@
+schema: spec-driven
+
+context: |
+  Project: Poke-Arcana — a tarot deck reimagined with Pokemon instead of the
+  traditional 78 cards.
+
+  Tech stack: Astro 7 (static output, no SSR/auth/DB), Bun (package manager +
+  scripts), TypeScript, Tailwind CSS v4 via @tailwindcss/vite (not the
+  deprecated @astrojs/tailwind integration). Deployed to Vercel with no
+  adapter (static dist/, zero-config detection of Bun via bun.lock).
+
+  Data: Pokemon data comes from PokeAPI, fetched at BUILD time by a
+  standalone Bun script (scripts/sync-pokedex.ts), never at runtime. The
+  script's output is a committed JSON file read by Astro's Content Layer
+  `file()` loader — astro build never touches the network. Re-running the
+  sync script and committing the regenerated JSON is a required manual step
+  whenever the Pokedex ID range changes.
+
+  Domain rule: arcana assignment is ALGORITHMIC/DETERMINISTIC, not
+  hand-curated, so widening the Pokedex range (e.g. adding later
+  generations) never requires redesigning the mapping. Legendary/Mythical
+  Pokemon become Major Arcana (22 archetypes, chosen via a stable hash of
+  the Pokedex ID). Everyone else becomes Minor Arcana: suit is a weighted
+  vote over the Pokemon's type(s) against a fixed type->suit table (4
+  suits: Cups/Wands/Swords/Pentacles), and rank (Ace..King, 14 per suit) is
+  a base-stat-total percentile computed within that suit's population.
+
+  Interactivity rule: the card draw/reveal UI is a plain Web Component
+  (vanilla TypeScript custom element), not a React/Svelte/Vue island —
+  the shuffle+flip state is local to one component instance, so a
+  framework runtime would be pure overhead versus Astro's "ship zero JS by
+  default" default.
+
+  v1 scope: Gen 1 only (Pokedex #1-151). Conventions: kebab-case file
+  names, no comments unless explaining a non-obvious constraint.
+
+rules:
+  proposal:
+    - Keep the proposal focused on why this change (or sub-change) matters and what's in/out of scope; do not restate the full design here.
+  design:
+    - Design must stay consistent with the arcana algorithm and data-pipeline rules in context above unless the change is explicitly proposing to alter them.
+  tasks:
+    - Break tasks into concrete, independently-verifiable steps (e.g. one task per script/module/page), not vague phases.
