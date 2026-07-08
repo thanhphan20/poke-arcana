@@ -23,51 +23,16 @@ const payload = cards.map((c) => ({
 
 <spread-reveal data-default-spread="3">
   <script type="application/json" set:html={JSON.stringify(payload)} />
-
-  <p data-pick-status class="pick-status" aria-live="polite" hidden></p>
-
-  <div data-pick-grid class="pick-grid" role="group" aria-label="Face-down cards — choose your cards" hidden></div>
-
   <div data-results class="spread-results"></div>
 </spread-reveal>
 
 <style>
-  .pick-status {
-    margin: 30px 0 0;
-    font-family: 'Cinzel', serif;
-    font-size: 13px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: #a78bfa;
-  }
-
-  .pick-grid {
-    margin: 18px auto 0;
-    max-width: 900px;
-    max-height: 420px;
-    overflow-y: auto;
-    overflow-x: hidden;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(42px, 1fr));
-    gap: 7px;
-    padding: 18px 14px;
-    border-radius: 18px;
-    border: 1px solid rgba(203, 168, 90, 0.16);
-    background: radial-gradient(120% 120% at 50% 0%, rgba(124, 92, 255, 0.08), transparent 60%), rgba(11, 7, 20, 0.35);
-    transition: opacity 0.5s ease, transform 0.5s ease;
-  }
-  .pick-grid.is-complete {
-    opacity: 0;
-    transform: scale(0.98);
-    pointer-events: none;
-  }
-
   .spread-results {
-    margin-top: 40px;
-    min-height: 200px;
+    margin-top: 52px;
+    min-height: 340px;
     display: flex;
     flex-wrap: wrap;
-    align-items: flex-start;
+    align-items: center;
     justify-content: center;
     gap: 26px;
     perspective: 1400px;

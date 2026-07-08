@@ -35,12 +35,8 @@ function escapeHtml(value: string): string {
 class SpreadReveal extends HTMLElement {
   private deck: SpreadCard[] = [];
   private results!: HTMLElement;
-  private pickGrid!: HTMLElement;
-  private pickStatus!: HTMLElement;
   private spreadSize = 3;
-  private hasShuffled = false;
-  private order: number[] = [];
-  private picks: number[] = [];
+  private hasDrawn = false;
   private slots: Slot[] = [];
   private timers: number[] = [];
 
@@ -57,17 +53,12 @@ class SpreadReveal extends HTMLElement {
       }
     }
 
-    const results = this.querySelector<HTMLElement>('[data-results]');
-    const pickGrid = this.querySelector<HTMLElement>('[data-pick-grid]');
-    const pickStatus = this.querySelector<HTMLElement>('[data-pick-status]');
-    if (!results || !pickGrid || !pickStatus) return;
-    this.results = results;
-    this.pickGrid = pickGrid;
-    this.pickStatus = pickStatus;
+    const container = this.querySelector<HTMLElement>('[data-results]');
+    if (!container) return;
+    this.results = container;
 
     this.onDocumentClick = this.onDocumentClick.bind(this);
     document.addEventListener('click', this.onDocumentClick);
-    this.pickGrid.addEventListener('click', this.onPickGridClick.bind(this));
 
     this.syncSpreadButtons();
     this.syncDrawLabel();
@@ -90,15 +81,8 @@ class SpreadReveal extends HTMLElement {
     }
 
     if (target.closest('[data-draw]')) {
-      this.shuffleAndSpread();
+      this.draw();
     }
-  }
-
-  private onPickGridClick(event: Event) {
-    const target = event.target as HTMLElement | null;
-    const button = target?.closest<HTMLButtonElement>('.pick-card');
-    if (!button || button.disabled || this.picks.length >= this.spreadSize) return;
-    this.pickCard(button);
   }
 
   private clearTimers() {
@@ -106,6 +90,7 @@ class SpreadReveal extends HTMLElement {
     this.timers = [];
   }
 
+  /** Update the pill group's active state to match the current spread size. */
   private syncSpreadButtons() {
     const buttons = document.querySelectorAll<HTMLElement>('[data-spread]');
     buttons.forEach((btn) => {
@@ -116,48 +101,47 @@ class SpreadReveal extends HTMLElement {
 
   private syncDrawLabel() {
     const btn = document.querySelector<HTMLElement>('[data-draw]');
-    if (btn) btn.textContent = this.hasShuffled ? 'Reshuffle' : 'Shuffle the Deck';
+    if (btn) btn.textContent = this.hasDrawn ? 'Draw Again' : 'Shuffle & Draw';
   }
 
-  /** Changing the spread size always resets the reading — a fresh shuffle is required. */
+  /** Changing the spread size resets any drawn cards. */
   private setSpread(n: number) {
     if (n === this.spreadSize) return;
     this.spreadSize = n;
-    this.resetReading();
-    this.hasShuffled = false;
+    this.clearTimers();
+    this.slots = [];
+    this.results.replaceChildren();
+    this.hasDrawn = false;
     this.syncSpreadButtons();
     this.syncDrawLabel();
   }
 
-  private resetReading() {
+  private draw() {
+    if (this.deck.length === 0) return;
     this.clearTimers();
     this.slots = [];
-    this.picks = [];
-    this.order = [];
     this.results.replaceChildren();
-    this.pickGrid.replaceChildren();
-    this.pickGrid.hidden = true;
-    this.pickGrid.classList.remove('is-complete');
-    this.pickStatus.hidden = true;
-  }
 
-  /** Shuffle the whole deck and lay it out face-down for the visitor to choose from. */
-  private shuffleAndSpread() {
-    if (this.deck.length === 0) return;
-    this.resetReading();
+    const n = Math.min(this.spreadSize, this.deck.length);
+    const picked = this.shuffledIndices().slice(0, n);
+    const positions = SPREAD_POSITIONS[this.spreadSize] ?? [];
 
-    this.order = this.shuffledIndices();
     const fragment = document.createDocumentFragment();
-    this.order.forEach((deckIndex) => {
-      fragment.appendChild(this.buildPickCard(deckIndex));
+    picked.forEach((deckIndex, i) => {
+      const slot = this.buildSlot(this.deck[deckIndex], positions[i] ?? '', i);
+      this.slots.push(slot.state);
+      fragment.appendChild(slot.el);
     });
-    this.pickGrid.appendChild(fragment);
-    this.pickGrid.hidden = false;
-    this.pickStatus.hidden = false;
+    this.results.appendChild(fragment);
 
-    this.hasShuffled = true;
+    // Auto-flip reveal with a stagger: card i reveals at 350 + i*260 ms.
+    this.slots.forEach((_, i) => {
+      const id = window.setTimeout(() => this.setRevealed(i, true), 350 + i * 260);
+      this.timers.push(id);
+    });
+
+    this.hasDrawn = true;
     this.syncDrawLabel();
-    this.updateStatus();
   }
 
   /** Fisher–Yates over deck indices. */
@@ -168,57 +152,6 @@ class SpreadReveal extends HTMLElement {
       [indices[i], indices[j]] = [indices[j], indices[i]];
     }
     return indices;
-  }
-
-  private buildPickCard(deckIndex: number): HTMLButtonElement {
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.className = 'pick-card';
-    button.dataset.deckIndex = String(deckIndex);
-    button.setAttribute('aria-label', 'Choose this card');
-    const rot = (Math.random() * 10 - 5).toFixed(1);
-    button.style.setProperty('--pick-rot', `${rot}deg`);
-    button.innerHTML = '<span class="pick-card__inner"><span class="pick-card__sigil">✦</span></span>';
-    return button;
-  }
-
-  private pickCard(button: HTMLButtonElement) {
-    const deckIndex = Number.parseInt(button.dataset.deckIndex ?? '', 10);
-    const card = this.deck[deckIndex];
-    if (!card) return;
-
-    button.classList.add('is-picked');
-    button.disabled = true;
-    button.setAttribute('aria-label', `Chosen: ${card.name}`);
-    this.picks.push(deckIndex);
-
-    const position = SPREAD_POSITIONS[this.spreadSize]?.[this.picks.length - 1] ?? '';
-    const slot = this.buildSlot(card, position);
-    this.slots.push(slot.state);
-    this.results.appendChild(slot.el);
-
-    const revealIndex = this.slots.length - 1;
-    const id = window.setTimeout(() => this.setRevealed(revealIndex, true), REDUCED_MOTION ? 0 : 150);
-    this.timers.push(id);
-
-    this.updateStatus();
-
-    if (this.picks.length >= this.spreadSize) {
-      this.pickGrid.classList.add('is-complete');
-      const hideId = window.setTimeout(() => {
-        this.pickGrid.hidden = true;
-      }, REDUCED_MOTION ? 0 : 520);
-      this.timers.push(hideId);
-    }
-  }
-
-  private updateStatus() {
-    if (this.picks.length >= this.spreadSize) {
-      this.pickStatus.textContent = 'Your reading is complete.';
-      return;
-    }
-    const noun = this.spreadSize === 1 ? 'card' : 'cards';
-    this.pickStatus.textContent = `Choose ${this.spreadSize} ${noun} — ${this.picks.length}/${this.spreadSize} chosen`;
   }
 
   private slotWidth(): string {
@@ -235,7 +168,7 @@ class SpreadReveal extends HTMLElement {
     slot.label.style.color = revealed ? '#e3cf95' : '#5a5273';
   }
 
-  private buildSlot(card: SpreadCard, position: string) {
+  private buildSlot(card: SpreadCard, position: string, index: number) {
     const wrapper = document.createElement('div');
     wrapper.style.cssText = `width:${this.slotWidth()};text-align:center;`;
 
@@ -260,7 +193,7 @@ class SpreadReveal extends HTMLElement {
       "margin-top:12px;font-family:'Cinzel',serif;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#5a5273;";
     label.textContent = position;
 
-    const index = this.slots.length;
+    // Click toggles this card's flip state.
     flip.addEventListener('click', () => this.setRevealed(index, !this.slots[index]?.revealed));
 
     wrapper.append(flip, label);
