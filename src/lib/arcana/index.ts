@@ -1,10 +1,10 @@
 import type { ArcanaResult, PokemonRaw, Suit } from './types';
-import { majorArcanaFor } from './majorArcana';
+import { majorArcanaForRank } from './majorArcana';
 import { resolveSuit, suitLabel } from './suits';
 import { RANKS, rankIndexForPercentile } from './ranks';
 
 export * from './types';
-export { MAJOR_ARCANA, majorArcanaFor, stableHash } from './majorArcana';
+export { MAJOR_ARCANA, majorArcanaForRank } from './majorArcana';
 export { TYPE_SUIT_TABLE, SUITS, resolveSuit, suitLabel } from './suits';
 export { RANKS, rankIndexForPercentile } from './ranks';
 
@@ -18,12 +18,11 @@ export { RANKS, rankIndexForPercentile } from './ranks';
 export function assignArcana(pokemon: PokemonRaw[]): Map<number, ArcanaResult> {
   const results = new Map<number, ArcanaResult>();
 
-  for (const p of pokemon) {
-    if (p.isLegendary || p.isMythical) {
-      const { majorNumber, name } = majorArcanaFor(p.id);
-      results.set(p.id, { kind: 'major', majorNumber, name });
-    }
-  }
+  const legendaries = pokemon.filter((p) => p.isLegendary || p.isMythical).sort((a, b) => a.id - b.id);
+  legendaries.forEach((p, rank) => {
+    const { majorNumber, name } = majorArcanaForRank(rank);
+    results.set(p.id, { kind: 'major', majorNumber, name });
+  });
 
   const bySuit = new Map<Suit, PokemonRaw[]>();
   for (const p of pokemon) {
