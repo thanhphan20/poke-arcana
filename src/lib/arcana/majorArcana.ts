@@ -7,19 +7,12 @@ export const MAJOR_ARCANA = [
 ] as const;
 
 /**
- * Well-mixed integer hash (murmur-style finalizer) keyed only on a Pokemon's
- * own Pokedex id. Keyed on id alone so the mapping is stable under dataset
- * growth: adding later generations never changes an existing Pokemon's arcana.
+ * Assign a Major Arcana name to the Nth legendary/mythical Pokémon (sorted by
+ * Pokédex ID). Rank is the 0-based position of this Pokémon within the sorted
+ * legendary population; arcana slot = rank % 22, ensuring no collisions when
+ * the population size is ≤ 22.
  */
-export function stableHash(id: number): number {
-  let h = (id ^ 0x9e3779b9) >>> 0;
-  h = Math.imul(h ^ (h >>> 16), 0x85ebca6b);
-  h = Math.imul(h ^ (h >>> 13), 0xc2b2ae35);
-  h = (h ^ (h >>> 16)) >>> 0;
-  return h;
-}
-
-export function majorArcanaFor(pokedexId: number): { majorNumber: number; name: string } {
-  const majorNumber = stableHash(pokedexId) % MAJOR_ARCANA.length;
+export function majorArcanaForRank(rank: number): { majorNumber: number; name: string } {
+  const majorNumber = rank % MAJOR_ARCANA.length;
   return { majorNumber, name: MAJOR_ARCANA[majorNumber] };
 }
