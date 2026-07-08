@@ -1,0 +1,37 @@
+@import "tailwindcss";
+
+@theme {
+  /* Mystical dark palette */
+  --color-void: #0b0714;
+  --color-nocturne: #150e2b;
+  --color-arcane: #1e1440;
+  --color-amethyst: #7c5cff;
+  --color-amethyst-soft: #a78bfa;
+  --color-gilt: #e8c66b;
+  --color-gilt-soft: #f3dfa2;
+  --color-moonlight: #e9e4f5;
+  --color-mist: #a89fc4;
+
+  /* Suit accents */
+  --color-cups: #4fb6e0;
+  --color-wands: #f0803c;
+  --color-swords: #b98cff;
+  --color-pentacles: #6bbf7b;
+
+  --font-display: "Cinzel", "Georgia", serif;
+  --font-body: "Inter", system-ui, sans-serif;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+body {
+  background:
+    radial-gradient(circle at 20% -10%, color-mix(in srgb, var(--color-arcane) 60%, transparent), transparent 55%),
+    radial-gradient(circle at 85% 10%, color-mix(in srgb, var(--color-amethyst) 22%, transparent), transparent 45%),
+    var(--color-void);
+  color: var(--color-moonlight);
+  font-family: var(--font-body);
+  min-height: 100vh;
+}

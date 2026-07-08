@@ -1,0 +1,26 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SpreadControls from '../components/spread/SpreadControls.astro';
+import SpreadReveal from '../components/spread/SpreadReveal.astro';
+
+const cards = await getCollection('pokemonCards');
+---
+
+<BaseLayout title="A Reading — Poké-Arcana" description="Draw a spread from the Poké-Arcana.">
+  <section class="text-center">
+    <h1 class="font-display text-4xl text-gilt">A Reading</h1>
+    <p class="mx-auto mt-4 max-w-xl text-mist">
+      Still your mind and choose a spread. The deck is shuffled anew each time — draw one card, three, or ten, then watch
+      them turn.
+    </p>
+  </section>
+
+  <div class="mt-10">
+    <SpreadControls />
+  </div>
+
+  <div class="mt-12">
+    <SpreadReveal cards={cards} />
+  </div>
+</BaseLayout>

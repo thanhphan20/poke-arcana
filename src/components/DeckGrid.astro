@@ -1,0 +1,85 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import TarotCard from './TarotCard.astro';
+
+interface Props {
+  cards: CollectionEntry<'pokemonCards'>[];
+}
+
+const { cards } = Astro.props;
+
+const filters = [
+  { key: 'all', label: 'All' },
+  { key: 'major', label: 'Major' },
+  { key: 'cups', label: 'Cups' },
+  { key: 'wands', label: 'Wands' },
+  { key: 'swords', label: 'Swords' },
+  { key: 'pentacles', label: 'Pentacles' },
+] as const;
+---
+
+<div class="deck">
+  <div class="mb-8 flex flex-wrap gap-2" role="group" aria-label="Filter cards">
+    {
+      filters.map((f) => (
+        <button
+          type="button"
+          data-filter={f.key}
+          class:list={[
+            'deck-chip rounded-full border px-4 py-1.5 text-sm transition',
+            f.key === 'all'
+              ? 'border-gilt bg-gilt/15 text-gilt'
+              : 'border-amethyst/40 text-mist hover:border-amethyst hover:text-moonlight',
+          ]}
+          aria-pressed={f.key === 'all' ? 'true' : 'false'}
+        >
+          {f.label}
+        </button>
+      ))
+    }
+  </div>
+
+  <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+    {
+      cards.map((entry) => (
+        <div
+          class="deck-item"
+          data-kind={entry.data.arcana.kind}
+          data-suit={entry.data.arcana.suit ?? ''}
+        >
+          <TarotCard card={entry.data} href={'/deck/' + entry.data.slug} />
+        </div>
+      ))
+    }
+  </div>
+</div>
+
+<script>
+  const root = document.currentScript?.closest('.deck') ?? document;
+  const chips = Array.from(root.querySelectorAll<HTMLButtonElement>('.deck-chip'));
+  const items = Array.from(root.querySelectorAll<HTMLElement>('.deck-item'));
+
+  function apply(filter: string) {
+    for (const item of items) {
+      const kind = item.dataset.kind;
+      const suit = item.dataset.suit;
+      let visible = true;
+      if (filter === 'major') visible = kind === 'major';
+      else if (filter !== 'all') visible = kind === 'minor' && suit === filter;
+      item.classList.toggle('hidden', !visible);
+    }
+    for (const chip of chips) {
+      const active = chip.dataset.filter === filter;
+      chip.setAttribute('aria-pressed', active ? 'true' : 'false');
+      chip.classList.toggle('border-gilt', active);
+      chip.classList.toggle('bg-gilt/15', active);
+      chip.classList.toggle('text-gilt', active);
+      chip.classList.toggle('border-amethyst/40', !active);
+      chip.classList.toggle('text-mist', !active);
+    }
+  }
+
+  for (const chip of chips) {
+    chip.addEventListener('click', () => apply(chip.dataset.filter ?? 'all'));
+  }
+</script>

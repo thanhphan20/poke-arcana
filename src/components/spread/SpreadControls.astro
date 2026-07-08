@@ -1,0 +1,21 @@
+---
+const buttons = [
+  { count: 1, label: 'Draw One' },
+  { count: 3, label: 'Draw Three' },
+  { count: 10, label: 'Draw Ten' },
+];
+---
+
+<div class="flex flex-wrap justify-center gap-4">
+  {
+    buttons.map((btn) => (
+      <button
+        type="button"
+        data-draw={btn.count}
+        class="rounded-lg border border-gilt/40 bg-arcane/60 px-6 py-3 font-display text-sm tracking-wide text-gilt-soft shadow-lg shadow-black/40 transition hover:-translate-y-0.5 hover:border-gilt hover:bg-amethyst/20 hover:text-gilt hover:shadow-amethyst/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-amethyst"
+      >
+        {btn.label}
+      </button>
+    ))
+  }
+</div>

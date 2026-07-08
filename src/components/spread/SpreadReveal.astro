@@ -1,0 +1,123 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  cards: CollectionEntry<'pokemonCards'>[];
+}
+
+const { cards } = Astro.props;
+
+const suitColor: Record<string, string> = {
+  cups: 'var(--color-cups)',
+  wands: 'var(--color-wands)',
+  swords: 'var(--color-swords)',
+  pentacles: 'var(--color-pentacles)',
+};
+
+const payload = cards.map((c) => ({
+  id: c.data.id,
+  slug: c.data.slug,
+  name: c.data.name,
+  arcanaName: c.data.arcana.name,
+  accent: c.data.arcana.kind === 'major' ? 'var(--color-gilt)' : suitColor[c.data.arcana.suit ?? 'cups'],
+  sprite: c.data.sprite,
+}));
+---
+
+<spread-reveal>
+  <script type="application/json" set:html={JSON.stringify(payload)} />
+  <div
+    data-results
+    class="grid grid-cols-2 gap-5 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5"
+  >
+  </div>
+</spread-reveal>
+
+<style>
+  [data-results] {
+    perspective: 1000px;
+  }
+
+  .spread-card {
+    aspect-ratio: 5 / 7;
+  }
+
+  .spread-card__inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    transition: transform 0.7s cubic-bezier(0.4, 0.2, 0.2, 1);
+  }
+
+  .spread-card.flipped .spread-card__inner {
+    transform: rotateY(180deg);
+  }
+
+  .spread-card__face {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.75rem;
+    border: 1px solid;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    overflow: hidden;
+  }
+
+  .spread-card__back {
+    border-color: color-mix(in srgb, var(--color-gilt) 30%, transparent);
+    background-color: var(--color-nocturne);
+    background-image: radial-gradient(
+      circle at 50% 50%,
+      color-mix(in srgb, var(--color-amethyst) 25%, transparent),
+      transparent 70%
+    );
+    color: color-mix(in srgb, var(--color-gilt) 70%, transparent);
+  }
+
+  .spread-card__back svg {
+    width: 66%;
+    height: 66%;
+  }
+
+  .spread-card__front {
+    transform: rotateY(180deg);
+    gap: 0.4rem;
+    padding: 0.75rem;
+    background-color: color-mix(in srgb, var(--color-arcane) 60%, transparent);
+    border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+  }
+
+  .spread-card__sprite {
+    width: 70%;
+    height: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 0 12px color-mix(in srgb, var(--accent) 40%, transparent));
+  }
+
+  .spread-card__name {
+    font-family: var(--font-display);
+    font-size: 0.8rem;
+    text-transform: capitalize;
+    color: var(--color-moonlight);
+    text-align: center;
+  }
+
+  .spread-card__arcana {
+    font-size: 0.7rem;
+    color: var(--accent);
+    text-align: center;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .spread-card__inner {
+      transition-duration: 0.01ms;
+    }
+  }
+</style>
+
+<script src="./spread-reveal.ts"></script>

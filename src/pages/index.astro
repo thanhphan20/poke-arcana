@@ -1,0 +1,42 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import TarotCard from '../components/TarotCard.astro';
+
+const all = await getCollection('pokemonCards');
+const featuredIds = [150, 6, 94, 151];
+const featured = featuredIds
+  .map((id) => all.find((c) => c.data.id === id))
+  .filter((c): c is NonNullable<typeof c> => Boolean(c));
+---
+
+<BaseLayout title="Poké-Arcana — a tarot deck of Pokémon">
+  <section class="mx-auto max-w-3xl py-16 text-center sm:py-24">
+    <p class="text-xs uppercase tracking-[0.4em] text-amethyst-soft">The Cartomancer's Pokédex</p>
+    <h1 class="mt-5 font-display text-5xl leading-tight text-gilt sm:text-6xl">Poké-Arcana</h1>
+    <p class="mx-auto mt-6 max-w-xl text-lg text-mist">
+      Every Pokémon reimagined as a card of the tarot. The legendary and the mythical rise to the Major Arcana; the
+      rest fall into four elemental suits, ranked by their strength. Browse the full deck, or draw a spread and let
+      the cards speak.
+    </p>
+    <div class="mt-10 flex flex-wrap justify-center gap-4">
+      <a
+        href="/deck"
+        class="rounded-full border border-gilt/40 bg-gilt/10 px-6 py-3 text-sm font-medium text-gilt-soft transition hover:bg-gilt/20"
+        >Browse the Deck</a
+      >
+      <a
+        href="/reading"
+        class="rounded-full border border-amethyst/50 bg-amethyst/15 px-6 py-3 text-sm font-medium text-moonlight transition hover:bg-amethyst/25"
+        >Draw a Reading</a
+      >
+    </div>
+  </section>
+
+  <section class="pb-16">
+    <h2 class="mb-6 text-center text-xs uppercase tracking-[0.3em] text-mist">Cards drawn from the deck</h2>
+    <div class="mx-auto grid max-w-3xl grid-cols-2 gap-4 sm:grid-cols-4">
+      {featured.map((card) => <TarotCard card={card.data} href={`/deck/${card.data.slug}`} />)}
+    </div>
+  </section>
+</BaseLayout>

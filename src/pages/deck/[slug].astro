@@ -1,0 +1,105 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+export const getStaticPaths = (async () => {
+  const cards = await getCollection('pokemonCards');
+  return cards.map((entry) => ({
+    params: { slug: entry.data.slug },
+    props: { card: entry.data },
+  }));
+}) satisfies GetStaticPaths;
+
+const { card } = Astro.props;
+const { arcana } = card;
+
+const suitColor: Record<string, string> = {
+  cups: 'var(--color-cups)',
+  wands: 'var(--color-wands)',
+  swords: 'var(--color-swords)',
+  pentacles: 'var(--color-pentacles)',
+};
+const accent = arcana.kind === 'major' ? 'var(--color-gilt)' : suitColor[arcana.suit ?? 'cups'];
+
+const romanNumerals = ['0', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII', 'XIII', 'XIV', 'XV', 'XVI', 'XVII', 'XVIII', 'XIX', 'XX', 'XXI'];
+const roman = arcana.kind === 'major' ? romanNumerals[arcana.majorNumber ?? 0] : null;
+
+const typeColor: Record<string, string> = {
+  normal: '#a8a878', fire: '#f08030', water: '#6890f0', electric: '#f8d030',
+  grass: '#78c850', ice: '#98d8d8', fighting: '#c03028', poison: '#a040a0',
+  ground: '#e0c068', flying: '#a890f0', psychic: '#f85888', bug: '#a8b820',
+  rock: '#b8a038', ghost: '#705898', dragon: '#7038f8', dark: '#705848',
+  steel: '#b8b8d0', fairy: '#ee99ac',
+};
+---
+
+<BaseLayout
+  title={`${card.name} — Poké-Arcana`}
+  description={`${card.name}, the ${arcana.name} of the Poké-Arcana.`}
+>
+  <a href="/deck" class="inline-block text-sm text-mist transition hover:text-gilt-soft">&larr; Back to the deck</a>
+
+  <article class="mt-6 grid gap-10 md:grid-cols-2">
+    <div
+      class="flex items-center justify-center rounded-2xl border bg-arcane/60 p-8 shadow-lg shadow-black/40"
+      style={`border-color: color-mix(in srgb, ${accent} 45%, transparent);`}
+    >
+      <img
+        src={card.sprite}
+        alt={card.name}
+        class="h-full w-full max-w-sm object-contain drop-shadow-[0_0_24px_rgba(124,92,255,0.3)]"
+      />
+    </div>
+
+    <div>
+      <div class="flex items-center gap-3 text-xs uppercase tracking-widest text-mist">
+        <span>#{String(card.id).padStart(3, '0')}</span>
+        <span>{card.genus}</span>
+      </div>
+
+      <h1 class="mt-2 font-display text-4xl capitalize text-moonlight">{card.name}</h1>
+
+      <div class="mt-4 rounded-xl border border-white/5 bg-nocturne/50 p-4">
+        {
+          arcana.kind === 'major' ? (
+            <>
+              <p class="text-xs uppercase tracking-widest text-mist">Major Arcana</p>
+              <p class="mt-1 font-display text-2xl" style={`color: ${accent};`}>
+                {roman && <span class="mr-2">{roman}</span>}
+                {arcana.name}
+              </p>
+            </>
+          ) : (
+            <>
+              <p class="text-xs uppercase tracking-widest text-mist">Minor Arcana &middot; <span class="capitalize">{arcana.suit}</span></p>
+              <p class="mt-1 font-display text-2xl" style={`color: ${accent};`}>{arcana.name}</p>
+            </>
+          )
+        }
+      </div>
+
+      <div class="mt-5 flex flex-wrap gap-2">
+        {
+          card.types.map((t) => (
+            <span
+              class="rounded-full px-3 py-1 text-xs font-medium capitalize text-white"
+              style={`background: color-mix(in srgb, ${typeColor[t] ?? '#888'} 80%, black);`}
+            >
+              {t}
+            </span>
+          ))
+        }
+      </div>
+
+      <p class="mt-5 leading-relaxed text-moonlight/90">{card.flavorText}</p>
+
+      <dl class="mt-6 flex gap-8 border-t border-white/5 pt-5">
+        <div>
+          <dt class="text-xs uppercase tracking-widest text-mist">Base Stat Total</dt>
+          <dd class="mt-1 font-display text-3xl text-gilt">{card.bst}</dd>
+        </div>
+      </dl>
+    </div>
+  </article>
+</BaseLayout>
