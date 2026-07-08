@@ -9,6 +9,10 @@ interface Props {
 const { title = 'Poké-Arcana', description = 'A tarot deck divined from Pokémon.' } = Astro.props;
 const path = Astro.url.pathname;
 const isActive = (href: string) => path === href || (href !== '/' && path.startsWith(href));
+const navPill = (active: boolean) =>
+  active
+    ? 'color:#0b0714; background:linear-gradient(160deg,#e3cf95,#c39a45);'
+    : 'color:#c8bfe0; background:transparent;';
 ---
 
 <!doctype html>
@@ -18,34 +22,142 @@ const isActive = (href: string) => path === href || (href !== '/' && path.starts
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="description" content={description} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cinzel+Decorative:wght@400;700;900&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap"
+      rel="stylesheet"
+    />
     <title>{title}</title>
   </head>
-  <body class="flex min-h-screen flex-col">
-    <header class="border-b border-white/5">
-      <nav class="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
-        <a href="/" class="font-display text-xl tracking-wide text-gilt">Poké-Arcana</a>
-        <div class="flex gap-6 text-sm">
-          <a
-            href="/deck"
-            class:list={['transition hover:text-gilt-soft', isActive('/deck') ? 'text-gilt' : 'text-mist']}
-            >The Deck</a
-          >
-          <a
-            href="/reading"
-            class:list={['transition hover:text-gilt-soft', isActive('/reading') ? 'text-gilt' : 'text-mist']}
-            >A Reading</a
-          >
+  <body>
+    <div class="starfield" aria-hidden="true"></div>
+
+    <header class="site-header">
+      <nav class="site-nav">
+        <a href="/" class="brand">
+          <span class="brand__mark">✦</span>
+          <span class="brand__name">Poké&#8209;Arcana</span>
+        </a>
+        <div class="site-nav__links">
+          <a href="/deck" class="nav-pill" style={navPill(isActive('/deck'))}>The Deck</a>
+          <a href="/reading" class="nav-pill" style={navPill(isActive('/reading'))}>A Reading</a>
         </div>
       </nav>
     </header>
 
-    <main class="mx-auto w-full max-w-6xl flex-1 px-6 py-10">
+    <main class="site-main">
       <slot />
     </main>
 
-    <footer class="border-t border-white/5 px-6 py-8 text-center text-xs text-mist/70">
-      Card data from <a href="https://pokeapi.co" class="underline hover:text-mist">PokéAPI</a>. Pokémon © Nintendo /
-      Game Freak. A fan project.
+    <footer class="site-footer">
+      <p>
+        Card data from <a href="https://pokeapi.co" target="_blank" rel="noopener">PokéAPI</a>. Pokémon © Nintendo /
+        Game Freak. A fan divination.
+      </p>
     </footer>
   </body>
 </html>
+
+<style>
+  .starfield {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.5;
+    z-index: 0;
+    background-image:
+      radial-gradient(1px 1px at 20% 30%, #cba85a 50%, transparent),
+      radial-gradient(1px 1px at 70% 20%, #a78bfa 50%, transparent),
+      radial-gradient(1px 1px at 40% 70%, #e3cf95 50%, transparent),
+      radial-gradient(1px 1px at 85% 60%, #c3b6d8 50%, transparent),
+      radial-gradient(1px 1px at 55% 45%, #cba85a 50%, transparent),
+      radial-gradient(1px 1px at 10% 80%, #a78bfa 50%, transparent),
+      radial-gradient(1px 1px at 92% 88%, #e3cf95 50%, transparent);
+    background-size: 100% 100%;
+  }
+
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    backdrop-filter: blur(8px);
+    background: linear-gradient(180deg, rgba(11, 7, 20, 0.9), rgba(11, 7, 20, 0.4));
+    border-bottom: 1px solid rgba(203, 168, 90, 0.18);
+  }
+  .site-nav {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 28px;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    text-decoration: none;
+  }
+  .brand__mark {
+    display: inline-flex;
+    width: 30px;
+    height: 30px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(203, 168, 90, 0.55);
+    border-radius: 50%;
+    color: #cba85a;
+    font-size: 14px;
+  }
+  .brand__name {
+    font-family: 'Cinzel Decorative', serif;
+    font-weight: 700;
+    font-size: 19px;
+    letter-spacing: 0.06em;
+    color: #e3cf95;
+  }
+  .site-nav__links {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .nav-pill {
+    padding: 8px 16px;
+    border-radius: 999px;
+    font-family: 'Cinzel', serif;
+    font-size: 12.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: all 0.3s;
+  }
+
+  .site-main {
+    position: relative;
+    z-index: 10;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 28px;
+    min-height: 60vh;
+  }
+
+  .site-footer {
+    position: relative;
+    z-index: 10;
+    border-top: 1px solid rgba(203, 168, 90, 0.14);
+    padding: 30px 28px;
+    text-align: center;
+  }
+  .site-footer p {
+    margin: 0;
+    font-size: 13px;
+    color: #8f86ac;
+  }
+  .site-footer a {
+    color: #cba85a;
+  }
+  .site-footer a:hover {
+    color: #e3cf95;
+  }
+</style>

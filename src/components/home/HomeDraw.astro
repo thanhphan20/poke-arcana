@@ -1,0 +1,198 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import TarotCard from '../TarotCard.astro';
+
+type CardData = CollectionEntry<'pokemonCards'>['data'];
+
+interface DeckCard {
+  id: number;
+  slug: string;
+  name: string;
+  sprite: string;
+  arcana: { kind: 'major' | 'minor'; name: string; suit?: string; majorNumber?: number };
+}
+
+interface Props {
+  deck: DeckCard[];
+  featured: CardData[];
+}
+
+const { deck, featured } = Astro.props;
+
+// Featured fan transforms (design renderVals fanTf / z-index).
+const fan = [
+  { transform: 'rotate(-13deg) translate(-118px,18px)', z: 2 },
+  { transform: 'rotate(-4.5deg) translate(-40px,-6px)', z: 3 },
+  { transform: 'rotate(4.5deg) translate(40px,-6px)', z: 3 },
+  { transform: 'rotate(13deg) translate(118px,18px)', z: 2 },
+];
+---
+
+<div
+  class="home-draw"
+  style="position:relative; min-height:470px; display:flex; flex-direction:column; align-items:center; justify-content:center;"
+>
+  <!-- resting deck: tap to draw -->
+  <div
+    class="home-draw__fan-state"
+    style="display:flex; flex-direction:column; align-items:center; animation:pa-rise .9s ease both;"
+  >
+    <button
+      type="button"
+      class="home-draw__fan"
+      data-draw
+      aria-label="Draw a card"
+      style="appearance:none; border:none; background:none; padding:0; cursor:pointer; position:relative; width:100%; height:380px;"
+    >
+      {
+        featured.map((card, i) => (
+          <div
+            style={`position:absolute; width:186px; left:calc(50% - 95px); top:70px; transform:${fan[i].transform}; z-index:${fan[i].z}; filter:drop-shadow(0 20px 30px rgba(0,0,0,.55)); pointer-events:none;`}
+          >
+            <TarotCard card={card} />
+          </div>
+        ))
+      }
+    </button>
+    <button
+      type="button"
+      class="home-draw__pill"
+      data-draw
+      style="margin-top:14px; display:inline-flex; align-items:center; gap:9px; padding:11px 24px; border-radius:999px; cursor:pointer; font-family:'Cinzel',serif; font-size:12px; letter-spacing:.16em; text-transform:uppercase; color:#0b0714; background:linear-gradient(160deg,#e3cf95,#c39a45); border:none; box-shadow:0 8px 22px -8px rgba(203,168,90,.6);"
+      >✦ &nbsp;Draw a Card&nbsp; ✦</button
+    >
+    <p style="margin:12px 0 0; font-size:14px; font-style:italic; color:#8f86ac;">
+      Tap the deck and let one card find you.
+    </p>
+  </div>
+
+  <!-- drawn card reveal (filled by JS) -->
+  <div class="home-draw__reveal-state" hidden></div>
+
+  <script type="application/json" data-home-deck set:html={JSON.stringify(deck)}></script>
+</div>
+
+<script>
+  import { cardTheme, uiAccent, arcanaMeaning, ROMAN } from '../../lib/arcana/meanings';
+
+  interface DeckCard {
+    id: number;
+    slug: string;
+    name: string;
+    sprite: string;
+    arcana: { kind: 'major' | 'minor'; name: string; suit?: any; majorNumber?: number };
+  }
+
+  const esc = (s: string) =>
+    s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
+  function cardFaceHtml(card: DeckCard): string {
+    const arc = card.arcana;
+    const isMajor = arc.kind === 'major';
+    const theme = cardTheme(arc);
+    const kicker = isMajor ? ROMAN[arc.majorNumber ?? 0] ?? '✦' : arc.suit ?? '';
+    const paddedId = `№ ${String(card.id).padStart(3, '0')}`;
+    return `
+      <div class="arcana-card" style="--accent:${theme.accent}; --wash:${theme.wash};">
+        <div class="arcana-card__paper">
+          <div class="arcana-card__grain"></div>
+          <div class="arcana-card__keyline"></div>
+          <span class="arcana-card__flourish" style="top:5px;left:7px">✦</span>
+          <span class="arcana-card__flourish" style="top:5px;right:7px">✦</span>
+          <span class="arcana-card__flourish" style="bottom:5px;left:7px">✦</span>
+          <span class="arcana-card__flourish" style="bottom:5px;right:7px">✦</span>
+          <div class="arcana-card__kicker">${esc(String(kicker))}</div>
+          <div class="arcana-card__vignette">
+            <div class="arcana-card__rays"></div>
+            <div class="arcana-card__horizon"></div>
+            <img class="arcana-card__sprite" src="${esc(card.sprite)}" alt="${esc(card.name)}" loading="lazy">
+          </div>
+          <div class="arcana-card__banner">
+            <span class="arcana-card__star">✦</span>
+            <span class="arcana-card__arcana">${esc(arc.name)}</span>
+            <span class="arcana-card__star">✦</span>
+          </div>
+          <div class="arcana-card__footer">
+            <span class="arcana-card__name">${esc(card.name)}</span>
+            <span class="arcana-card__id">${esc(paddedId)}</span>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  const cardBackHtml = `
+    <div class="card-back">
+      <div class="card-back__field">
+        <div class="card-back__ring"><span class="card-back__sigil">✦</span></div>
+      </div>
+    </div>`;
+
+  function revealHtml(card: DeckCard): string {
+    const accent = uiAccent(card.arcana);
+    const meaning = arcanaMeaning(card.arcana);
+    return `
+      <div style="display:flex; flex-direction:column; align-items:center; animation:pa-rise .5s ease both;">
+        <div style="perspective:1400px;">
+          <div class="home-draw__flip" style="position:relative; width:236px; aspect-ratio:63/100; transform-style:preserve-3d; transition:transform .85s cubic-bezier(.4,.1,.2,1); transform:rotateY(180deg);">
+            <div style="position:absolute; inset:0; backface-visibility:hidden; transform:rotateY(180deg);">
+              ${cardBackHtml}
+            </div>
+            <div style="position:absolute; inset:0; backface-visibility:hidden;">
+              ${cardFaceHtml(card)}
+            </div>
+          </div>
+        </div>
+        <div style="max-width:300px; text-align:center; margin-top:22px; min-height:78px;">
+          <p style="margin:0; font-family:'Cinzel',serif; font-weight:600; font-size:20px; letter-spacing:.04em; color:${accent};">${esc(card.arcana.name)}</p>
+          <p style="margin:8px 0 0; font-size:15px; line-height:1.5; font-style:italic; color:#c8bfe0;">${esc(meaning)}</p>
+        </div>
+        <div style="display:flex; gap:12px; margin-top:20px;">
+          <button type="button" data-draw-again style="padding:10px 22px; border-radius:999px; cursor:pointer; font-family:'Cinzel',serif; font-size:11.5px; letter-spacing:.14em; text-transform:uppercase; color:#e9e4f5; border:1px solid rgba(167,139,250,.5); background:rgba(124,92,255,.12);">Draw Again</button>
+          <a href="/reading" style="padding:10px 22px; border-radius:999px; text-decoration:none; font-family:'Cinzel',serif; font-size:11.5px; letter-spacing:.14em; text-transform:uppercase; color:#0b0714; background:linear-gradient(160deg,#e3cf95,#c39a45);">Full Reading →</a>
+        </div>
+      </div>`;
+  }
+
+  function init(root: HTMLElement) {
+    const dataEl = root.querySelector<HTMLScriptElement>('script[data-home-deck]');
+    const fanState = root.querySelector<HTMLElement>('.home-draw__fan-state');
+    const revealState = root.querySelector<HTMLElement>('.home-draw__reveal-state');
+    if (!dataEl || !fanState || !revealState) return;
+
+    let deck: DeckCard[] = [];
+    try {
+      deck = JSON.parse(dataEl.textContent || '[]');
+    } catch {
+      deck = [];
+    }
+    if (!deck.length) return;
+
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function draw() {
+      const card = deck[Math.floor(Math.random() * deck.length)];
+      fanState.hidden = true;
+      revealState.hidden = false;
+      revealState.innerHTML = revealHtml(card);
+
+      const flip = revealState.querySelector<HTMLElement>('.home-draw__flip');
+      if (flip) {
+        if (reduce) {
+          flip.style.transition = 'none';
+          flip.style.transform = 'rotateY(0deg)';
+        } else {
+          window.setTimeout(() => {
+            flip.style.transform = 'rotateY(0deg)';
+          }, 380);
+        }
+      }
+
+      const again = revealState.querySelector<HTMLElement>('[data-draw-again]');
+      again?.addEventListener('click', draw);
+    }
+
+    root.querySelectorAll<HTMLElement>('[data-draw]').forEach((btn) => btn.addEventListener('click', draw));
+  }
+
+  document.querySelectorAll<HTMLElement>('.home-draw').forEach(init);
+</script>

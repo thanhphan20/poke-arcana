@@ -1,42 +1,135 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import TarotCard from '../components/TarotCard.astro';
+import HomeDraw from '../components/home/HomeDraw.astro';
+import { SUIT_META, MAJOR_COLOR } from '../lib/arcana/meanings';
 
 const all = await getCollection('pokemonCards');
+
 const featuredIds = [150, 6, 94, 151];
 const featured = featuredIds
   .map((id) => all.find((c) => c.data.id === id))
-  .filter((c): c is NonNullable<typeof c> => Boolean(c));
+  .filter((c): c is NonNullable<typeof c> => Boolean(c))
+  .map((c) => c.data);
+
+const deck = all
+  .map((c) => c.data)
+  .slice()
+  .sort((a, b) => a.id - b.id)
+  .map((d) => ({
+    id: d.id,
+    slug: d.slug,
+    name: d.name,
+    sprite: d.sprite,
+    arcana: {
+      kind: d.arcana.kind,
+      name: d.arcana.name,
+      suit: d.arcana.suit,
+      majorNumber: d.arcana.majorNumber,
+    },
+  }));
+
+const suitCards = [
+  SUIT_META.cups,
+  SUIT_META.wands,
+  SUIT_META.swords,
+  SUIT_META.pentacles,
+  { color: MAJOR_COLOR, glyph: '✦', name: 'Major', desc: 'The 22 archetypes' },
+];
 ---
 
 <BaseLayout title="Poké-Arcana — a tarot deck of Pokémon">
-  <section class="mx-auto max-w-3xl py-16 text-center sm:py-24">
-    <p class="text-xs uppercase tracking-[0.4em] text-amethyst-soft">The Cartomancer's Pokédex</p>
-    <h1 class="mt-5 font-display text-5xl leading-tight text-gilt sm:text-6xl">Poké-Arcana</h1>
-    <p class="mx-auto mt-6 max-w-xl text-lg text-mist">
-      Every Pokémon reimagined as a card of the tarot. The legendary and the mythical rise to the Major Arcana; the
-      rest fall into four elemental suits, ranked by their strength. Browse the full deck, or draw a spread and let
-      the cards speak.
-    </p>
-    <div class="mt-10 flex flex-wrap justify-center gap-4">
-      <a
-        href="/deck"
-        class="rounded-full border border-gilt/40 bg-gilt/10 px-6 py-3 text-sm font-medium text-gilt-soft transition hover:bg-gilt/20"
-        >Browse the Deck</a
-      >
-      <a
-        href="/reading"
-        class="rounded-full border border-amethyst/50 bg-amethyst/15 px-6 py-3 text-sm font-medium text-moonlight transition hover:bg-amethyst/25"
-        >Draw a Reading</a
-      >
+  <section class="hero">
+    <div class="hero__grid">
+      <div class="hero__intro" style="animation:pa-rise .8s ease both;">
+        <p
+          style="font-family:'Cinzel',serif; font-size:12px; letter-spacing:.42em; text-transform:uppercase; color:#a78bfa; margin:0 0 22px;"
+        >
+          The Cartomancer's Pokédex
+        </p>
+        <h1
+          style="font-family:'Cinzel Decorative',serif; font-weight:900; font-size:clamp(46px,6vw,82px); line-height:.98; margin:0; color:#f3dfa2; text-shadow:0 2px 30px rgba(124,92,255,.35);"
+        >
+          Poké&#8209;<br />Arcana
+        </h1>
+        <div style="width:120px; height:1px; margin:26px 0; background:linear-gradient(90deg,#cba85a,transparent);"></div>
+        <p style="font-size:19px; line-height:1.65; color:#c8bfe0; max-width:440px; margin:0;">
+          One hundred fifty-one creatures of the first age, each dealt a place in the arcana. The legendary rise to the
+          Major; the rest fall to four elemental suits. Browse the full deck, or draw a spread and let the cards speak.
+        </p>
+        <div style="display:flex; gap:14px; margin-top:34px; flex-wrap:wrap;">
+          <a
+            href="/deck"
+            style="padding:13px 26px; border-radius:999px; text-decoration:none; font-family:'Cinzel',serif; font-size:13px; letter-spacing:.12em; text-transform:uppercase; color:#0b0714; background:linear-gradient(160deg,#e3cf95,#c39a45); box-shadow:0 8px 24px -8px rgba(203,168,90,.6);"
+            >Browse the Deck</a
+          >
+          <a
+            href="/reading"
+            style="padding:13px 26px; border-radius:999px; text-decoration:none; font-family:'Cinzel',serif; font-size:13px; letter-spacing:.12em; text-transform:uppercase; color:#e9e4f5; border:1px solid rgba(167,139,250,.55); background:rgba(124,92,255,.12);"
+            >Draw a Reading</a
+          >
+        </div>
+      </div>
+
+      <HomeDraw deck={deck} featured={featured} />
     </div>
   </section>
 
-  <section class="pb-16">
-    <h2 class="mb-6 text-center text-xs uppercase tracking-[0.3em] text-mist">Cards drawn from the deck</h2>
-    <div class="mx-auto grid max-w-3xl grid-cols-2 gap-4 sm:grid-cols-4">
-      {featured.map((card) => <TarotCard card={card.data} href={`/deck/${card.data.slug}`} />)}
+  <section style="padding:30px 0 80px; text-align:center;">
+    <p
+      style="font-family:'Cinzel',serif; font-size:11px; letter-spacing:.34em; text-transform:uppercase; color:#8f86ac; margin-bottom:6px;"
+    >
+      The Four Suits &amp; the Major
+    </p>
+    <div style="width:60px; height:1px; margin:0 auto 34px; background:rgba(203,168,90,.4);"></div>
+    <div class="suits">
+      {
+        suitCards.map((s) => (
+          <div style="text-align:center;">
+            <div style={`font-family:'Cinzel',serif; font-size:26px; color:${s.color}; margin-bottom:10px;`}>
+              {s.glyph}
+            </div>
+            <div style="font-family:'Cinzel',serif; font-size:13px; letter-spacing:.1em; text-transform:uppercase; color:#e9e4f5;">
+              {s.name}
+            </div>
+            <div style="font-size:14px; font-style:italic; color:#8f86ac; margin-top:3px;">{s.desc}</div>
+          </div>
+        ))
+      }
     </div>
   </section>
 </BaseLayout>
+
+<style>
+  .hero {
+    padding: 64px 0 40px;
+  }
+  .hero__grid {
+    display: grid;
+    grid-template-columns: 1.05fr 0.95fr;
+    gap: 40px;
+    align-items: center;
+  }
+  .suits {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px;
+    max-width: 820px;
+    margin: 0 auto;
+  }
+
+  @media (max-width: 860px) {
+    .hero {
+      padding: 40px 0 30px;
+    }
+    .hero__grid {
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+    .suits {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px 16px;
+      max-width: 420px;
+    }
+  }
+</style>

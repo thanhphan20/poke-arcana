@@ -1,37 +1,299 @@
 @import "tailwindcss";
 
 @theme {
-  /* Mystical dark palette */
+  /* Base voidscape */
   --color-void: #0b0714;
   --color-nocturne: #150e2b;
-  --color-arcane: #1e1440;
+  --color-arcane: #201a3a;
+
+  /* Gilt (gold) ink */
+  --color-gilt: #cba85a;
+  --color-gilt-soft: #e3cf95;
+  --color-gilt-bright: #f3dfa2;
+  --color-gilt-deep: #c39a45;
+
+  /* Amethyst (arcane purple) */
   --color-amethyst: #7c5cff;
   --color-amethyst-soft: #a78bfa;
-  --color-gilt: #e8c66b;
-  --color-gilt-soft: #f3dfa2;
-  --color-moonlight: #e9e4f5;
-  --color-mist: #a89fc4;
 
-  /* Suit accents */
+  /* Text tones */
+  --color-moonlight: #e9e4f5;
+  --color-parchment: #c8bfe0;
+  --color-mist: #8f86ac;
+  --color-shade: #5a5273;
+
+  /* Vivid suit accents (UI chrome) */
   --color-cups: #4fb6e0;
   --color-wands: #f0803c;
   --color-swords: #b98cff;
   --color-pentacles: #6bbf7b;
 
-  --font-display: "Cinzel", "Georgia", serif;
-  --font-body: "Inter", system-ui, sans-serif;
+  --font-display: "Cinzel Decorative", serif;
+  --font-serif: "Cinzel", serif;
+  --font-body: "EB Garamond", serif;
 }
 
 :root {
   color-scheme: dark;
 }
 
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
 body {
   background:
-    radial-gradient(circle at 20% -10%, color-mix(in srgb, var(--color-arcane) 60%, transparent), transparent 55%),
-    radial-gradient(circle at 85% 10%, color-mix(in srgb, var(--color-amethyst) 22%, transparent), transparent 45%),
+    radial-gradient(120% 90% at 15% -10%, #201a3a 0%, transparent 55%),
+    radial-gradient(90% 70% at 88% 5%, #2a1c46 0%, transparent 50%),
+    radial-gradient(100% 100% at 50% 120%, #180f2e 0%, transparent 60%),
     var(--color-void);
   color: var(--color-moonlight);
   font-family: var(--font-body);
   min-height: 100vh;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: rgba(203, 168, 90, 0.3);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #0c0a16;
+}
+::-webkit-scrollbar-thumb {
+  background: #2c2440;
+  border-radius: 6px;
+}
+
+/* Shared mystical motion */
+@keyframes pa-rise {
+  from { opacity: 0; transform: translateY(22px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes pa-glow {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 0.9; }
+}
+@keyframes pa-float {
+  0%, 100% { transform: translateY(0) rotate(var(--rot, 0deg)); }
+  50% { transform: translateY(-10px) rotate(var(--rot, 0deg)); }
+}
+
+.pa-rise { animation: pa-rise 0.7s ease both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .pa-rise { animation: none; }
+}
+
+/* ============================================================
+   Arcana card face — GLOBAL (unscoped) so both the TarotCard
+   Astro component and JS-built cards (home draw, reading spread)
+   render identically. Markup contract:
+     .arcana-card[style="--accent:…; --wash:…"] (.is-link optional)
+       > .arcana-card__paper
+           .arcana-card__grain, .arcana-card__keyline,
+           .arcana-card__flourish ×4,
+           .arcana-card__kicker,
+           .arcana-card__vignette > .arcana-card__rays .arcana-card__horizon .arcana-card__sprite,
+           .arcana-card__banner > .arcana-card__star .arcana-card__arcana .arcana-card__star,
+           .arcana-card__footer > .arcana-card__name .arcana-card__id
+   ============================================================ */
+.arcana-card {
+  --accent: #9c7b34;
+  --wash: #e3cf95;
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 63 / 100;
+  border-radius: 11px;
+  background: linear-gradient(160deg, #2b2117, #1a130c);
+  padding: 5.2%;
+  box-sizing: border-box;
+  box-shadow:
+    0 14px 30px -14px rgba(0, 0, 0, 0.75),
+    0 2px 4px rgba(0, 0, 0, 0.5),
+    inset 0 0 0 1px rgba(203, 168, 90, 0.28);
+  text-decoration: none;
+  color: inherit;
+  transform: translateY(0);
+  transition: transform 0.45s cubic-bezier(0.2, 0.7, 0.2, 1), box-shadow 0.45s;
+}
+.arcana-card.is-link { cursor: pointer; }
+.arcana-card.is-link:hover {
+  transform: translateY(-8px);
+  box-shadow:
+    0 26px 46px -16px rgba(0, 0, 0, 0.8),
+    0 0 0 1px rgba(203, 168, 90, 0.5),
+    0 0 30px -6px var(--accent);
+}
+.arcana-card__paper {
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(158deg, #f3e9d0 0%, #ecdfc0 45%, #e2d2ac 100%);
+  border-radius: 6px;
+  box-shadow: inset 0 0 22px rgba(90, 60, 20, 0.22), inset 0 0 0 1px rgba(120, 86, 32, 0.55);
+  overflow: hidden;
+  padding: 5.5% 5.5% 5%;
+}
+.arcana-card__grain {
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+  mix-blend-mode: multiply;
+  opacity: 0.06;
+  pointer-events: none;
+  border-radius: 6px;
+}
+.arcana-card__keyline {
+  position: absolute;
+  inset: 4px;
+  border: 1px solid rgba(140, 100, 38, 0.5);
+  border-radius: 4px;
+  pointer-events: none;
+}
+.arcana-card__flourish {
+  position: absolute;
+  font-size: 9px;
+  color: rgba(120, 86, 32, 0.7);
+  line-height: 1;
+}
+.arcana-card__kicker {
+  text-align: center;
+  font-family: "Cinzel", serif;
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  color: var(--accent, #8a6a2c);
+  z-index: 1;
+  text-transform: uppercase;
+}
+.arcana-card__vignette {
+  position: relative;
+  flex: 1;
+  margin: 6px 0;
+  border-radius: 46% 46% 7px 7px / 34% 34% 7px 7px;
+  overflow: hidden;
+  background: radial-gradient(
+    120% 80% at 50% 22%,
+    color-mix(in srgb, var(--wash, #c9b98a) 55%, #f3e9d0) 0%,
+    #efe3c6 60%,
+    #e0cfa6 100%
+  );
+  box-shadow: inset 0 0 0 1px rgba(120, 86, 32, 0.45), inset 0 10px 26px rgba(90, 60, 20, 0.18);
+}
+.arcana-card__rays {
+  position: absolute;
+  inset: 0;
+  background: repeating-conic-gradient(from 90deg at 50% 30%, rgba(120, 86, 32, 0.08) 0deg 2deg, transparent 2deg 12deg);
+  opacity: 0.5;
+}
+.arcana-card__horizon {
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: 26%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(120, 86, 32, 0.5), transparent);
+}
+.arcana-card__sprite {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 78%;
+  height: 78%;
+  object-fit: contain;
+  filter: drop-shadow(0 6px 10px rgba(60, 40, 10, 0.4)) contrast(1.03) saturate(1.02);
+}
+.arcana-card__banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 5px 4px;
+  border-top: 1px solid rgba(120, 86, 32, 0.55);
+  border-bottom: 1px solid rgba(120, 86, 32, 0.55);
+  z-index: 1;
+}
+.arcana-card__star {
+  font-size: 7px;
+  color: var(--accent, #8a6a2c);
+}
+.arcana-card__arcana {
+  font-family: "Cinzel", serif;
+  font-weight: 600;
+  font-size: 11.5px;
+  letter-spacing: 0.13em;
+  color: #2c2114;
+  text-transform: uppercase;
+  text-align: center;
+  line-height: 1.15;
+}
+.arcana-card__footer {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 7px;
+  padding-top: 5px;
+  z-index: 1;
+}
+.arcana-card__name {
+  font-family: "EB Garamond", serif;
+  font-style: italic;
+  font-size: 13px;
+  color: #4a3a24;
+  text-transform: capitalize;
+  line-height: 1;
+}
+.arcana-card__id {
+  font-family: "Cinzel", serif;
+  font-size: 8.5px;
+  letter-spacing: 0.08em;
+  color: rgba(120, 86, 32, 0.85);
+  line-height: 1;
+}
+
+/* Card back — GLOBAL. Markup: .card-back > .card-back__field > .card-back__ring > .card-back__sigil */
+.card-back {
+  width: 100%;
+  height: 100%;
+  border-radius: 11px;
+  background: linear-gradient(160deg, #2b2117, #1a130c);
+  padding: 6px;
+  box-shadow: 0 14px 30px -12px rgba(0, 0, 0, 0.7);
+  box-sizing: border-box;
+}
+.card-back__field {
+  height: 100%;
+  border-radius: 6px;
+  background: radial-gradient(circle at 50% 45%, #2a1c46, #150e2b);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 0 0 1px rgba(203, 168, 90, 0.4);
+}
+.card-back__ring {
+  width: 66%;
+  height: 66%;
+  border-radius: 50%;
+  border: 1px solid rgba(203, 168, 90, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 0 20px rgba(124, 92, 255, 0.35);
+}
+.card-back__sigil {
+  font-size: 34px;
+  color: rgba(203, 168, 90, 0.75);
+  animation: pa-glow 3s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .card-back__sigil { animation: none; }
 }

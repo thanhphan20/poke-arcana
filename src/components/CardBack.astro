@@ -1,23 +1,16 @@
 ---
-// Shared tarot card-back art. Purely decorative; fills its container.
+// The reverse of a tarot card — a gilt sigil on a deep arcane field.
+// Styles live as global classes in global.css so JS-built cards match.
 interface Props {
   class?: string;
 }
 const { class: className = '' } = Astro.props;
 ---
 
-<div
-  class:list={[
-    'flex h-full w-full items-center justify-center rounded-xl border border-gilt/30 bg-nocturne',
-    className,
-  ]}
-  style="background-image: radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--color-amethyst) 25%, transparent), transparent 70%);"
->
-  <svg viewBox="0 0 100 140" class="h-2/3 w-2/3 text-gilt/70" fill="none" aria-hidden="true">
-    <circle cx="50" cy="70" r="30" stroke="currentColor" stroke-width="1.5" />
-    <circle cx="50" cy="70" r="20" stroke="currentColor" stroke-width="0.8" opacity="0.6" />
-    <path d="M50 30 L58 70 L50 110 L42 70 Z" fill="currentColor" opacity="0.5" />
-    <path d="M20 70 L50 62 L80 70 L50 78 Z" fill="currentColor" opacity="0.5" />
-    <circle cx="50" cy="70" r="4" fill="currentColor" />
-  </svg>
+<div class:list={['card-back', className]}>
+  <div class="card-back__field">
+    <div class="card-back__ring">
+      <span class="card-back__sigil">✦</span>
+    </div>
+  </div>
 </div>

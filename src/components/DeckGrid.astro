@@ -1,6 +1,7 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import TarotCard from './TarotCard.astro';
+import { SUIT_META } from '../lib/arcana/meanings';
 
 interface Props {
   cards: CollectionEntry<'pokemonCards'>[];
@@ -8,30 +9,40 @@ interface Props {
 
 const { cards } = Astro.props;
 
+const ALL_MAJOR_ACCENT = '#cba85a';
+
 const filters = [
-  { key: 'all', label: 'All' },
-  { key: 'major', label: 'Major' },
-  { key: 'cups', label: 'Cups' },
-  { key: 'wands', label: 'Wands' },
-  { key: 'swords', label: 'Swords' },
-  { key: 'pentacles', label: 'Pentacles' },
+  { key: 'all', label: 'All', accent: ALL_MAJOR_ACCENT },
+  { key: 'major', label: 'Major', accent: ALL_MAJOR_ACCENT },
+  { key: 'cups', label: 'Cups', accent: SUIT_META.cups.color },
+  { key: 'wands', label: 'Wands', accent: SUIT_META.wands.color },
+  { key: 'swords', label: 'Swords', accent: SUIT_META.swords.color },
+  { key: 'pentacles', label: 'Pentacles', accent: SUIT_META.pentacles.color },
 ] as const;
+
+const sorted = cards.slice().sort((a, b) => a.data.id - b.data.id);
 ---
 
 <div class="deck">
-  <div class="mb-8 flex flex-wrap gap-2" role="group" aria-label="Filter cards">
+  <div
+    class="deck-filters"
+    style="display:flex; flex-wrap:wrap; justify-content:center; gap:9px; margin:34px 0 40px;"
+    role="group"
+    aria-label="Filter cards"
+  >
     {
       filters.map((f) => (
         <button
           type="button"
+          class="deck-pill"
           data-filter={f.key}
-          class:list={[
-            'deck-chip rounded-full border px-4 py-1.5 text-sm transition',
-            f.key === 'all'
-              ? 'border-gilt bg-gilt/15 text-gilt'
-              : 'border-amethyst/40 text-mist hover:border-amethyst hover:text-moonlight',
-          ]}
+          data-accent={f.accent}
           aria-pressed={f.key === 'all' ? 'true' : 'false'}
+          style={`padding:8px 18px; border-radius:999px; cursor:pointer; font-family:'Cinzel',serif; font-size:12px; letter-spacing:.12em; text-transform:uppercase; transition:all .3s; color:${
+            f.key === 'all' ? '#0b0714' : '#c8bfe0'
+          }; background:${f.key === 'all' ? f.accent : 'transparent'}; border:1px solid ${
+            f.key === 'all' ? f.accent : 'rgba(167,139,250,.35)'
+          };`}
         >
           {f.label}
         </button>
@@ -39,14 +50,10 @@ const filters = [
     }
   </div>
 
-  <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+  <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:22px;">
     {
-      cards.map((entry) => (
-        <div
-          class="deck-item"
-          data-kind={entry.data.arcana.kind}
-          data-suit={entry.data.arcana.suit ?? ''}
-        >
+      sorted.map((entry) => (
+        <div class="deck-item" data-kind={entry.data.arcana.kind} data-suit={entry.data.arcana.suit ?? ''}>
           <TarotCard card={entry.data} href={'/deck/' + entry.data.slug} />
         </div>
       ))
@@ -54,9 +61,15 @@ const filters = [
   </div>
 </div>
 
+<style>
+  .deck-item.hidden {
+    display: none;
+  }
+</style>
+
 <script>
-  const root = document.currentScript?.closest('.deck') ?? document;
-  const chips = Array.from(root.querySelectorAll<HTMLButtonElement>('.deck-chip'));
+  const root = document.querySelector<HTMLElement>('.deck') ?? document.body;
+  const pills = Array.from(root.querySelectorAll<HTMLButtonElement>('.deck-pill'));
   const items = Array.from(root.querySelectorAll<HTMLElement>('.deck-item'));
 
   function apply(filter: string) {
@@ -68,18 +81,18 @@ const filters = [
       else if (filter !== 'all') visible = kind === 'minor' && suit === filter;
       item.classList.toggle('hidden', !visible);
     }
-    for (const chip of chips) {
-      const active = chip.dataset.filter === filter;
-      chip.setAttribute('aria-pressed', active ? 'true' : 'false');
-      chip.classList.toggle('border-gilt', active);
-      chip.classList.toggle('bg-gilt/15', active);
-      chip.classList.toggle('text-gilt', active);
-      chip.classList.toggle('border-amethyst/40', !active);
-      chip.classList.toggle('text-mist', !active);
+
+    for (const pill of pills) {
+      const active = pill.dataset.filter === filter;
+      const accent = pill.dataset.accent ?? '#cba85a';
+      pill.setAttribute('aria-pressed', active ? 'true' : 'false');
+      pill.style.color = active ? '#0b0714' : '#c8bfe0';
+      pill.style.background = active ? accent : 'transparent';
+      pill.style.border = active ? `1px solid ${accent}` : '1px solid rgba(167,139,250,.35)';
     }
   }
 
-  for (const chip of chips) {
-    chip.addEventListener('click', () => apply(chip.dataset.filter ?? 'all'));
+  for (const pill of pills) {
+    pill.addEventListener('click', () => apply(pill.dataset.filter ?? 'all'));
   }
 </script>

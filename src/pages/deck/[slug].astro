@@ -2,6 +2,8 @@
 import type { GetStaticPaths } from 'astro';
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import TarotCard from '../../components/TarotCard.astro';
+import { SUIT_META, TYPE_COLOR, ROMAN, uiAccent, arcanaMeaning } from '../../lib/arcana/meanings';
 
 export const getStaticPaths = (async () => {
   const cards = await getCollection('pokemonCards');
@@ -14,92 +16,220 @@ export const getStaticPaths = (async () => {
 const { card } = Astro.props;
 const { arcana } = card;
 
-const suitColor: Record<string, string> = {
-  cups: 'var(--color-cups)',
-  wands: 'var(--color-wands)',
-  swords: 'var(--color-swords)',
-  pentacles: 'var(--color-pentacles)',
-};
-const accent = arcana.kind === 'major' ? 'var(--color-gilt)' : suitColor[arcana.suit ?? 'cups'];
+const accent = uiAccent(arcana);
+const isMajor = arcana.kind === 'major';
 
-const romanNumerals = ['0', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII', 'XIII', 'XIV', 'XV', 'XVI', 'XVII', 'XVIII', 'XIX', 'XX', 'XXI'];
-const roman = arcana.kind === 'major' ? romanNumerals[arcana.majorNumber ?? 0] : null;
-
-const typeColor: Record<string, string> = {
-  normal: '#a8a878', fire: '#f08030', water: '#6890f0', electric: '#f8d030',
-  grass: '#78c850', ice: '#98d8d8', fighting: '#c03028', poison: '#a040a0',
-  ground: '#e0c068', flying: '#a890f0', psychic: '#f85888', bug: '#a8b820',
-  rock: '#b8a038', ghost: '#705898', dragon: '#7038f8', dark: '#705848',
-  steel: '#b8b8d0', fairy: '#ee99ac',
-};
+const paddedId = String(card.id).padStart(3, '0');
+const kicker = isMajor ? (ROMAN[arcana.majorNumber ?? 0] ?? '✦') : (SUIT_META[arcana.suit ?? 'cups']?.glyph ?? '✦');
+const arcanaLabel = isMajor ? 'Major Arcana' : `Minor Arcana · ${arcana.suit}`;
+const arcanaKind = isMajor ? 'Major' : arcana.suit;
+const meaning = arcanaMeaning(arcana);
+const accentBorder = `color-mix(in srgb, ${accent} 40%, transparent)`;
 ---
 
-<BaseLayout
-  title={`${card.name} — Poké-Arcana`}
-  description={`${card.name}, the ${arcana.name} of the Poké-Arcana.`}
->
-  <a href="/deck" class="inline-block text-sm text-mist transition hover:text-gilt-soft">&larr; Back to the deck</a>
+<BaseLayout title={`${card.name} — Poké-Arcana`} description={`${card.name}, the ${arcana.name} of the Poké-Arcana.`}>
+  <section class="pa-rise pa-detail">
+    <a href="/deck" class="pa-back">← Back to the deck</a>
 
-  <article class="mt-6 grid gap-10 md:grid-cols-2">
-    <div
-      class="flex items-center justify-center rounded-2xl border bg-arcane/60 p-8 shadow-lg shadow-black/40"
-      style={`border-color: color-mix(in srgb, ${accent} 45%, transparent);`}
-    >
-      <img
-        src={card.sprite}
-        alt={card.name}
-        class="h-full w-full max-w-sm object-contain drop-shadow-[0_0_24px_rgba(124,92,255,0.3)]"
-      />
-    </div>
-
-    <div>
-      <div class="flex items-center gap-3 text-xs uppercase tracking-widest text-mist">
-        <span>#{String(card.id).padStart(3, '0')}</span>
-        <span>{card.genus}</span>
+    <div class="pa-grid">
+      <div class="pa-left">
+        <TarotCard card={card} />
       </div>
 
-      <h1 class="mt-2 font-display text-4xl capitalize text-moonlight">{card.name}</h1>
-
-      <div class="mt-4 rounded-xl border border-white/5 bg-nocturne/50 p-4">
-        {
-          arcana.kind === 'major' ? (
-            <>
-              <p class="text-xs uppercase tracking-widest text-mist">Major Arcana</p>
-              <p class="mt-1 font-display text-2xl" style={`color: ${accent};`}>
-                {roman && <span class="mr-2">{roman}</span>}
-                {arcana.name}
-              </p>
-            </>
-          ) : (
-            <>
-              <p class="text-xs uppercase tracking-widest text-mist">Minor Arcana &middot; <span class="capitalize">{arcana.suit}</span></p>
-              <p class="mt-1 font-display text-2xl" style={`color: ${accent};`}>{arcana.name}</p>
-            </>
-          )
-        }
-      </div>
-
-      <div class="mt-5 flex flex-wrap gap-2">
-        {
-          card.types.map((t) => (
-            <span
-              class="rounded-full px-3 py-1 text-xs font-medium capitalize text-white"
-              style={`background: color-mix(in srgb, ${typeColor[t] ?? '#888'} 80%, black);`}
-            >
-              {t}
-            </span>
-          ))
-        }
-      </div>
-
-      <p class="mt-5 leading-relaxed text-moonlight/90">{card.flavorText}</p>
-
-      <dl class="mt-6 flex gap-8 border-t border-white/5 pt-5">
-        <div>
-          <dt class="text-xs uppercase tracking-widest text-mist">Base Stat Total</dt>
-          <dd class="mt-1 font-display text-3xl text-gilt">{card.bst}</dd>
+      <div class="pa-right">
+        <div class="pa-idrow">
+          <span>№ {paddedId}</span>
+          <span class="pa-sep">·</span>
+          <span>{card.genus}</span>
         </div>
-      </dl>
+
+        <h1 class="pa-name">{card.name}</h1>
+
+        <div class="pa-arcanabox" style={`border-color:${accentBorder};`}>
+          <div class="pa-watermark" style={`color:${accent};`}>{kicker}</div>
+          <p class="pa-arcanalabel">{arcanaLabel}</p>
+          <p class="pa-arcananame" style={`color:${accent};`}>{arcana.name}</p>
+          <p class="pa-meaning">{meaning}</p>
+        </div>
+
+        <div class="pa-types">
+          {
+            card.types.map((t) => (
+              <span
+                class="pa-type"
+                style={`background: color-mix(in srgb, ${TYPE_COLOR[t] ?? '#888'} 82%, black);`}
+              >
+                {t}
+              </span>
+            ))
+          }
+        </div>
+
+        <p class="pa-flavor">{card.flavorText}</p>
+
+        <div class="pa-stats">
+          <div>
+            <div class="pa-statlabel">Base Stat Total</div>
+            <div class="pa-statval" style="color:#e3cf95;">{card.bst}</div>
+          </div>
+          <div>
+            <div class="pa-statlabel">Arcana</div>
+            <div class="pa-statval pa-statval-cap" style={`color:${accent};`}>{arcanaKind}</div>
+          </div>
+        </div>
+      </div>
     </div>
-  </article>
+  </section>
 </BaseLayout>
+
+<style>
+  @keyframes pa-rise {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .pa-rise { animation: pa-rise 0.5s ease both; }
+
+  .pa-detail { padding: 36px 0 80px; }
+
+  .pa-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #8f86ac;
+  }
+
+  .pa-grid {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: 52px;
+    margin-top: 28px;
+    align-items: start;
+  }
+
+  .pa-left {
+    position: sticky;
+    top: 100px;
+  }
+
+  .pa-idrow {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #8f86ac;
+  }
+  .pa-sep { opacity: 0.5; }
+
+  .pa-name {
+    font-family: 'Cinzel Decorative', serif;
+    font-weight: 700;
+    font-size: clamp(40px, 5vw, 60px);
+    margin: 10px 0 0;
+    color: #f3dfa2;
+    text-transform: capitalize;
+  }
+
+  .pa-arcanabox {
+    margin-top: 22px;
+    padding: 22px 24px;
+    border-radius: 14px;
+    border: 1px solid transparent;
+    background: linear-gradient(160deg, rgba(21, 14, 43, 0.7), rgba(11, 7, 20, 0.5));
+    position: relative;
+    overflow: hidden;
+  }
+  .pa-watermark {
+    position: absolute;
+    top: -30px;
+    right: -20px;
+    font-size: 120px;
+    opacity: 0.06;
+    font-family: 'Cinzel Decorative', serif;
+  }
+  .pa-arcanalabel {
+    margin: 0;
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: #8f86ac;
+  }
+  .pa-arcananame {
+    margin: 8px 0 0;
+    font-family: 'Cinzel', serif;
+    font-weight: 600;
+    font-size: 30px;
+  }
+  .pa-meaning {
+    margin: 14px 0 0;
+    font-size: 16px;
+    line-height: 1.6;
+    color: #c8bfe0;
+    font-style: italic;
+  }
+
+  .pa-types {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+    margin-top: 22px;
+  }
+  .pa-type {
+    padding: 6px 16px;
+    border-radius: 999px;
+    font-family: 'Cinzel', serif;
+    font-size: 11.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #fff;
+  }
+
+  .pa-flavor {
+    margin: 24px 0 0;
+    font-size: 18px;
+    line-height: 1.7;
+    color: #d8d0ec;
+    max-width: 560px;
+  }
+
+  .pa-stats {
+    display: flex;
+    gap: 40px;
+    margin-top: 28px;
+    padding-top: 24px;
+    border-top: 1px solid rgba(203, 168, 90, 0.18);
+  }
+  .pa-statlabel {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #8f86ac;
+  }
+  .pa-statval {
+    font-family: 'Cinzel Decorative', serif;
+    font-weight: 700;
+    font-size: 38px;
+    margin-top: 4px;
+  }
+  .pa-statval-cap { text-transform: capitalize; }
+
+  @media (max-width: 720px) {
+    .pa-grid {
+      grid-template-columns: 1fr;
+      gap: 32px;
+    }
+    .pa-left {
+      position: static;
+      justify-self: center;
+    }
+  }
+</style>

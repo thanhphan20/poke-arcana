@@ -1,0 +1,3235 @@
+[
+  {
+    "id": 1,
+    "name": "bulbasaur",
+    "slug": "bulbasaur",
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "bst": 318,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/1.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png",
+    "flavorText": "A strange seed was planted on its back at birth. The plant sprouts and grows with this POKéMON.",
+    "genus": "Seed Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "pentacles",
+      "rankIndex": 3,
+      "name": "Four of Pentacles"
+    }
+  },
+  {
+    "id": 2,
+    "name": "ivysaur",
+    "slug": "ivysaur",
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "bst": 405,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/2.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/2.png",
+    "flavorText": "When the bulb on its back grows large, it appears to lose the ability to stand on its hind legs.",
+    "genus": "Seed Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "pentacles",
+      "rankIndex": 7,
+      "name": "Eight of Pentacles"
+    }
+  },
+  {
+    "id": 3,
+    "name": "venusaur",
+    "slug": "venusaur",
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "bst": 525,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/3.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/3.png",
+    "flavorText": "The plant blooms when it is absorbing solar energy. It stays on the move to seek sunlight.",
+    "genus": "Seed Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "pentacles",
+      "rankIndex": 13,
+      "name": "King of Pentacles"
+    }
+  },
+  {
+    "id": 4,
+    "name": "charmander",
+    "slug": "charmander",
+    "types": [
+      "fire"
+    ],
+    "bst": 309,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/4.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/4.png",
+    "flavorText": "Obviously prefers hot places. When it rains, steam is said to spout from the tip of its tail.",
+    "genus": "Lizard Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "wands",
+      "rankIndex": 2,
+      "name": "Three of Wands"
+    }
+  },
+  {
+    "id": 5,
+    "name": "charmeleon",
+    "slug": "charmeleon",
+    "types": [
+      "fire"
+    ],
+    "bst": 405,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/5.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/5.png",
+    "flavorText": "When it swings its burning tail, it elevates the temperature to unbearably high levels.",
+    "genus": "Flame Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "wands",
+      "rankIndex": 4,
+      "name": "Five of Wands"
+    }
+  },
+  {
+    "id": 6,
+    "name": "charizard",
+    "slug": "charizard",
+    "types": [
+      "fire",
+      "flying"
+    ],
+    "bst": 534,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/6.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/6.png",
+    "flavorText": "It is said that Charizard’s fire burns hotter if it has experienced harsh battles.",
+    "genus": "Flame Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "wands",
+      "rankIndex": 12,
+      "name": "Queen of Wands"
+    }
+  },
+  {
+    "id": 7,
+    "name": "squirtle",
+    "slug": "squirtle",
+    "types": [
+      "water"
+    ],
+    "bst": 314,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/7.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/7.png",
+    "flavorText": "After birth, its back swells and hardens into a shell. Powerfully sprays foam from its mouth.",
+    "genus": "Tiny Turtle Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "cups",
+      "rankIndex": 2,
+      "name": "Three of Cups"
+    }
+  },
+  {
+    "id": 8,
+    "name": "wartortle",
+    "slug": "wartortle",
+    "types": [
+      "water"
+    ],
+    "bst": 405,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/8.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/8.png",
+    "flavorText": "Often hides in water to stalk unwary prey. For swimming fast, it moves its ears to maintain balance.",
+    "genus": "Turtle Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "cups",
+      "rankIndex": 6,
+      "name": "Seven of Cups"
+    }
+  },
+  {
+    "id": 9,
+    "name": "blastoise",
+    "slug": "blastoise",
+    "types": [
+      "water"
+    ],
+    "bst": 530,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/9.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/9.png",
+    "flavorText": "A brutal POKéMON with pressurized water jets on its shell. They are used for high speed tackles.",
+    "genus": "Shellfish Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "cups",
+      "rankIndex": 13,
+      "name": "King of Cups"
+    }
+  },
+  {
+    "id": 10,
+    "name": "caterpie",
+    "slug": "caterpie",
+    "types": [
+      "bug"
+    ],
+    "bst": 195,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/10.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10.png",
+    "flavorText": "Its short feet are tipped with suction pads that enable it to tirelessly climb slopes and walls.",
+    "genus": "Worm Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "pentacles",
+      "rankIndex": 0,
+      "name": "Ace of Pentacles"
+    }
+  },
+  {
+    "id": 11,
+    "name": "metapod",
+    "slug": "metapod",
+    "types": [
+      "bug"
+    ],
+    "bst": 205,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/11.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/11.png",
+    "flavorText": "This POKéMON is vulnerable to attack while its shell is soft, exposing its weak and tender body.",
+    "genus": "Cocoon Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "pentacles",
+      "rankIndex": 0,
+      "name": "Ace of Pentacles"
+    }
+  },
+  {
+    "id": 12,
+    "name": "butterfree",
+    "slug": "butterfree",
+    "types": [
+      "bug",
+      "flying"
+    ],
+    "bst": 395,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/12.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/12.png",
+    "flavorText": "In battle, it flaps its wings at high speed to release highly toxic dust into the air.",
+    "genus": "Butterfly Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "pentacles",
+      "rankIndex": 7,
+      "name": "Eight of Pentacles"
+    }
+  },
+  {
+    "id": 13,
+    "name": "weedle",
+    "slug": "weedle",
+    "types": [
+      "bug",
+      "poison"
+    ],
+    "bst": 195,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/13.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/13.png",
+    "flavorText": "Often found in forests, eating leaves. It has a sharp venomous stinger on its head.",
+    "genus": "Hairy Bug Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "pentacles",
+      "rankIndex": 0,
+      "name": "Ace of Pentacles"
+    }
+  },
+  {
+    "id": 14,
+    "name": "kakuna",
+    "slug": "kakuna",
+    "types": [
+      "bug",
+      "poison"
+    ],
+    "bst": 205,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/14.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/14.png",
+    "flavorText": "Almost incapable of moving, this POKéMON can only harden its shell to protect itself from predators.",
+    "genus": "Cocoon Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "pentacles",
+      "rankIndex": 0,
+      "name": "Ace of Pentacles"
+    }
+  },
+  {
+    "id": 15,
+    "name": "beedrill",
+    "slug": "beedrill",
+    "types": [
+      "bug",
+      "poison"
+    ],
+    "bst": 395,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/15.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/15.png",
+    "flavorText": "Flies at high speed and attacks using its large venomous stingers on its forelegs and tail.",
+    "genus": "Poison Bee Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "pentacles",
+      "rankIndex": 7,
+      "name": "Eight of Pentacles"
+    }
+  },
+  {
+    "id": 16,
+    "name": "pidgey",
+    "slug": "pidgey",
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "bst": 251,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/16.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/16.png",
+    "flavorText": "A common sight in forests and woods. It flaps its wings at ground level to kick up blinding sand.",
+    "genus": "Tiny Bird Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "pentacles",
+      "rankIndex": 0,
+      "name": "Ace of Pentacles"
+    }
+  },
+  {
+    "id": 17,
+    "name": "pidgeotto",
+    "slug": "pidgeotto",
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "bst": 349,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/17.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/17.png",
+    "flavorText": "Very protective of its sprawling territorial area, this POKéMON will fiercely peck at any intruder.",
+    "genus": "Bird Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "pentacles",
+      "rankIndex": 5,
+      "name": "Six of Pentacles"
+    }
+  },
+  {
+    "id": 18,
+    "name": "pidgeot",
+    "slug": "pidgeot",
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "bst": 479,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/18.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/18.png",
+    "flavorText": "When hunting, it skims the surface of water at high speed to pick off unwary prey such as MAGIKARP.",
+    "genus": "Bird Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "pentacles",
+      "rankIndex": 10,
+      "name": "Page of Pentacles"
+    }
+  },
+  {
+    "id": 19,
+    "name": "rattata",
+    "slug": "rattata",
+    "types": [
+      "normal"
+    ],
+    "bst": 253,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/19.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/19.png",
+    "flavorText": "Living wherever there is food available, it ceaselessly scav­ enges for edibles the entire day.",
+    "genus": "Mouse Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "pentacles",
+      "rankIndex": 1,
+      "name": "Two of Pentacles"
+    }
+  },
+  {
+    "id": 20,
+    "name": "raticate",
+    "slug": "raticate",
+    "types": [
+      "normal"
+    ],
+    "bst": 413,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/20.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/20.png",
+    "flavorText": "It uses its whis­ kers to maintain its balance. It apparently slows down if they are cut off.",
+    "genus": "Mouse Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "pentacles",
+      "rankIndex": 8,
+      "name": "Nine of Pentacles"
+    }
+  },
+  {
+    "id": 21,
+    "name": "spearow",
+    "slug": "spearow",
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "bst": 262,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/21.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/21.png",
+    "flavorText": "Eats bugs in grassy areas. It has to flap its short wings at high speed to stay airborne.",
+    "genus": "Tiny Bird Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "pentacles",
+      "rankIndex": 1,
+      "name": "Two of Pentacles"
+    }
+  },
+  {
+    "id": 22,
+    "name": "fearow",
+    "slug": "fearow",
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "bst": 442,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/22.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/22.png",
+    "flavorText": "With its huge and magnificent wings, it can keep aloft without ever having to land for rest.",
+    "genus": "Beak Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "pentacles",
+      "rankIndex": 9,
+      "name": "Ten of Pentacles"
+    }
+  },
+  {
+    "id": 23,
+    "name": "ekans",
+    "slug": "ekans",
+    "types": [
+      "poison"
+    ],
+    "bst": 288,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/23.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/23.png",
+    "flavorText": "Moves silently and stealthily. Eats the eggs of birds, such as PIDGEY and SPEAROW, whole.",
+    "genus": "Snake Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "swords",
+      "rankIndex": 1,
+      "name": "Two of Swords"
+    }
+  },
+  {
+    "id": 24,
+    "name": "arbok",
+    "slug": "arbok",
+    "types": [
+      "poison"
+    ],
+    "bst": 448,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/24.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/24.png",
+    "flavorText": "It is rumored that the ferocious warning markings on its belly differ from area to area.",
+    "genus": "Cobra Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "swords",
+      "rankIndex": 7,
+      "name": "Eight of Swords"
+    }
+  },
+  {
+    "id": 25,
+    "name": "pikachu",
+    "slug": "pikachu",
+    "types": [
+      "electric"
+    ],
+    "bst": 320,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png",
+    "flavorText": "When several of these POKéMON gather, their electricity could build and cause lightning storms.",
+    "genus": "Mouse Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "swords",
+      "rankIndex": 2,
+      "name": "Three of Swords"
+    }
+  },
+  {
+    "id": 26,
+    "name": "raichu",
+    "slug": "raichu",
+    "types": [
+      "electric"
+    ],
+    "bst": 485,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/26.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/26.png",
+    "flavorText": "Its long tail serves as a ground to protect itself from its own high voltage power.",
+    "genus": "Mouse Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "swords",
+      "rankIndex": 9,
+      "name": "Ten of Swords"
+    }
+  },
+  {
+    "id": 27,
+    "name": "sandshrew",
+    "slug": "sandshrew",
+    "types": [
+      "ground"
+    ],
+    "bst": 300,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/27.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/27.png",
+    "flavorText": "Burrows deep underground in arid locations far from water. It only emerges to hunt for food.",
+    "genus": "Mouse Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "pentacles",
+      "rankIndex": 2,
+      "name": "Three of Pentacles"
+    }
+  },
+  {
+    "id": 28,
+    "name": "sandslash",
+    "slug": "sandslash",
+    "types": [
+      "ground"
+    ],
+    "bst": 450,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/28.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/28.png",
+    "flavorText": "Curls up into a spiny ball when threatened. It can roll while curled up to attack or escape.",
+    "genus": "Mouse Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "pentacles",
+      "rankIndex": 9,
+      "name": "Ten of Pentacles"
+    }
+  },
+  {
+    "id": 29,
+    "name": "nidoran-f",
+    "slug": "nidoran-f",
+    "types": [
+      "poison"
+    ],
+    "bst": 275,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/29.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/29.png",
+    "flavorText": "Although small, its venomous barbs render this POKéMON dangerous. The female has smaller horns.",
+    "genus": "Poison Pin Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "swords",
+      "rankIndex": 1,
+      "name": "Two of Swords"
+    }
+  },
+  {
+    "id": 30,
+    "name": "nidorina",
+    "slug": "nidorina",
+    "types": [
+      "poison"
+    ],
+    "bst": 365,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/30.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/30.png",
+    "flavorText": "The female's horn develops slowly. Prefers physical attacks such as clawing and biting.",
+    "genus": "Poison Pin Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "swords",
+      "rankIndex": 5,
+      "name": "Six of Swords"
+    }
+  },
+  {
+    "id": 31,
+    "name": "nidoqueen",
+    "slug": "nidoqueen",
+    "types": [
+      "poison",
+      "ground"
+    ],
+    "bst": 505,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/31.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/31.png",
+    "flavorText": "Its hard scales provide strong protection. It uses its hefty bulk to execute powerful moves.",
+    "genus": "Drill Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "swords",
+      "rankIndex": 12,
+      "name": "Queen of Swords"
+    }
+  },
+  {
+    "id": 32,
+    "name": "nidoran-m",
+    "slug": "nidoran-m",
+    "types": [
+      "poison"
+    ],
+    "bst": 273,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/32.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/32.png",
+    "flavorText": "Stiffens its ears to sense danger. The larger its horns, the more powerful its secreted venom.",
+    "genus": "Poison Pin Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "swords",
+      "rankIndex": 0,
+      "name": "Ace of Swords"
+    }
+  },
+  {
+    "id": 33,
+    "name": "nidorino",
+    "slug": "nidorino",
+    "types": [
+      "poison"
+    ],
+    "bst": 365,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/33.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/33.png",
+    "flavorText": "An aggressive POKéMON that is quick to attack. The horn on its head secretes a powerful venom.",
+    "genus": "Poison Pin Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "swords",
+      "rankIndex": 6,
+      "name": "Seven of Swords"
+    }
+  },
+  {
+    "id": 34,
+    "name": "nidoking",
+    "slug": "nidoking",
+    "types": [
+      "poison",
+      "ground"
+    ],
+    "bst": 505,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/34.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/34.png",
+    "flavorText": "It uses its powerful tail in battle to smash, constrict, then break the prey's bones.",
+    "genus": "Drill Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "swords",
+      "rankIndex": 13,
+      "name": "King of Swords"
+    }
+  },
+  {
+    "id": 35,
+    "name": "clefairy",
+    "slug": "clefairy",
+    "types": [
+      "fairy"
+    ],
+    "bst": 323,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/35.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/35.png",
+    "flavorText": "Its magical and cute appeal has many admirers. It is rare and found only in certain areas.",
+    "genus": "Fairy Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "cups",
+      "rankIndex": 3,
+      "name": "Four of Cups"
+    }
+  },
+  {
+    "id": 36,
+    "name": "clefable",
+    "slug": "clefable",
+    "types": [
+      "fairy"
+    ],
+    "bst": 483,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/36.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/36.png",
+    "flavorText": "A timid fairy POKéMON that is rarely seen. It will run and hide the moment it senses people.",
+    "genus": "Fairy Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "cups",
+      "rankIndex": 9,
+      "name": "Ten of Cups"
+    }
+  },
+  {
+    "id": 37,
+    "name": "vulpix",
+    "slug": "vulpix",
+    "types": [
+      "fire"
+    ],
+    "bst": 299,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/37.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/37.png",
+    "flavorText": "At the time of birth, it has just one tail. The tail splits from its tip as it grows older.",
+    "genus": "Fox Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "wands",
+      "rankIndex": 0,
+      "name": "Ace of Wands"
+    }
+  },
+  {
+    "id": 38,
+    "name": "ninetales",
+    "slug": "ninetales",
+    "types": [
+      "fire"
+    ],
+    "bst": 505,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/38.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/38.png",
+    "flavorText": "Very smart and very vengeful. Grabbing one of its many tails could result in a 1000-year curse.",
+    "genus": "Fox Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "wands",
+      "rankIndex": 10,
+      "name": "Page of Wands"
+    }
+  },
+  {
+    "id": 39,
+    "name": "jigglypuff",
+    "slug": "jigglypuff",
+    "types": [
+      "normal",
+      "fairy"
+    ],
+    "bst": 270,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/39.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/39.png",
+    "flavorText": "When its huge eyes light up, it sings a mysteriously soothing melody that lulls its enemies to sleep.",
+    "genus": "Balloon Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "pentacles",
+      "rankIndex": 1,
+      "name": "Two of Pentacles"
+    }
+  },
+  {
+    "id": 40,
+    "name": "wigglytuff",
+    "slug": "wigglytuff",
+    "types": [
+      "normal",
+      "fairy"
+    ],
+    "bst": 435,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/40.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/40.png",
+    "flavorText": "The body is soft and rubbery. When angered, it will suck in air and inflate itself to an enormous size.",
+    "genus": "Balloon Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "pentacles",
+      "rankIndex": 9,
+      "name": "Ten of Pentacles"
+    }
+  },
+  {
+    "id": 41,
+    "name": "zubat",
+    "slug": "zubat",
+    "types": [
+      "poison",
+      "flying"
+    ],
+    "bst": 245,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/41.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/41.png",
+    "flavorText": "It has no eyes. Instead, it relies on its ultrasonic cries for echolocation to flit about in darkness.",
+    "genus": "Bat Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "swords",
+      "rankIndex": 0,
+      "name": "Ace of Swords"
+    }
+  },
+  {
+    "id": 42,
+    "name": "golbat",
+    "slug": "golbat",
+    "types": [
+      "poison",
+      "flying"
+    ],
+    "bst": 455,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/42.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/42.png",
+    "flavorText": "Once it strikes, it will not stop draining energy from the victim even if it gets too heavy to fly.",
+    "genus": "Bat Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "swords",
+      "rankIndex": 7,
+      "name": "Eight of Swords"
+    }
+  },
+  {
+    "id": 43,
+    "name": "oddish",
+    "slug": "oddish",
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "bst": 320,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/43.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/43.png",
+    "flavorText": "During the day, it keeps its face buried in the ground. At night, it wanders around sowing its seeds.",
+    "genus": "Weed Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "pentacles",
+      "rankIndex": 4,
+      "name": "Five of Pentacles"
+    }
+  },
+  {
+    "id": 44,
+    "name": "gloom",
+    "slug": "gloom",
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "bst": 395,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/44.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/44.png",
+    "flavorText": "The fluid that oozes from its mouth isn't drool. It is a nectar that is used to attract prey.",
+    "genus": "Weed Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "pentacles",
+      "rankIndex": 7,
+      "name": "Eight of Pentacles"
+    }
+  },
+  {
+    "id": 45,
+    "name": "vileplume",
+    "slug": "vileplume",
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "bst": 490,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/45.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/45.png",
+    "flavorText": "The larger its petals, the more toxic pollen it contains. Its big head is heavy and hard to hold up.",
+    "genus": "Flower Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "pentacles",
+      "rankIndex": 11,
+      "name": "Knight of Pentacles"
+    }
+  },
+  {
+    "id": 46,
+    "name": "paras",
+    "slug": "paras",
+    "types": [
+      "bug",
+      "grass"
+    ],
+    "bst": 285,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/46.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/46.png",
+    "flavorText": "Burrows to suck tree roots. The mushrooms on its back grow by draw­ ing nutrients from the bug host.",
+    "genus": "Mushroom Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "pentacles",
+      "rankIndex": 2,
+      "name": "Three of Pentacles"
+    }
+  },
+  {
+    "id": 47,
+    "name": "parasect",
+    "slug": "parasect",
+    "types": [
+      "bug",
+      "grass"
+    ],
+    "bst": 405,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/47.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/47.png",
+    "flavorText": "It stays mostly in dark, damp places, the preference not of the bug, but of the big mush­ rooms on its back.",
+    "genus": "Mushroom Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "pentacles",
+      "rankIndex": 8,
+      "name": "Nine of Pentacles"
+    }
+  },
+  {
+    "id": 48,
+    "name": "venonat",
+    "slug": "venonat",
+    "types": [
+      "bug",
+      "poison"
+    ],
+    "bst": 305,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/48.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/48.png",
+    "flavorText": "Its big eyes are actually clusters of tiny eyes. At night, its kind is drawn by light.",
+    "genus": "Insect Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "pentacles",
+      "rankIndex": 3,
+      "name": "Four of Pentacles"
+    }
+  },
+  {
+    "id": 49,
+    "name": "venomoth",
+    "slug": "venomoth",
+    "types": [
+      "bug",
+      "poison"
+    ],
+    "bst": 450,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/49.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/49.png",
+    "flavorText": "The dust-like scales covering its wings are color coded to indicate the kinds of poison it has.",
+    "genus": "Poison Moth Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "pentacles",
+      "rankIndex": 10,
+      "name": "Page of Pentacles"
+    }
+  },
+  {
+    "id": 50,
+    "name": "diglett",
+    "slug": "diglett",
+    "types": [
+      "ground"
+    ],
+    "bst": 265,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/50.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/50.png",
+    "flavorText": "Lives about one yard underground where it feeds on plant roots. It sometimes appears above ground.",
+    "genus": "Mole Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "pentacles",
+      "rankIndex": 1,
+      "name": "Two of Pentacles"
+    }
+  },
+  {
+    "id": 51,
+    "name": "dugtrio",
+    "slug": "dugtrio",
+    "types": [
+      "ground"
+    ],
+    "bst": 425,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/51.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/51.png",
+    "flavorText": "A team of DIGLETT triplets. It triggers huge earthquakes by burrowing 60 miles underground.",
+    "genus": "Mole Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "pentacles",
+      "rankIndex": 8,
+      "name": "Nine of Pentacles"
+    }
+  },
+  {
+    "id": 52,
+    "name": "meowth",
+    "slug": "meowth",
+    "types": [
+      "normal"
+    ],
+    "bst": 290,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/52.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/52.png",
+    "flavorText": "Adores circular objects. Wanders the streets on a nightly basis to look for dropped loose change.",
+    "genus": "Scratch Cat Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "pentacles",
+      "rankIndex": 2,
+      "name": "Three of Pentacles"
+    }
+  },
+  {
+    "id": 53,
+    "name": "persian",
+    "slug": "persian",
+    "types": [
+      "normal"
+    ],
+    "bst": 440,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/53.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/53.png",
+    "flavorText": "Although its fur has many admirers, it is tough to raise as a pet because of its fickle meanness.",
+    "genus": "Classy Cat Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "pentacles",
+      "rankIndex": 9,
+      "name": "Ten of Pentacles"
+    }
+  },
+  {
+    "id": 54,
+    "name": "psyduck",
+    "slug": "psyduck",
+    "types": [
+      "water"
+    ],
+    "bst": 320,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/54.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/54.png",
+    "flavorText": "While lulling its enemies with its vacant look, this wily POKéMON will use psychokinetic powers.",
+    "genus": "Duck Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "cups",
+      "rankIndex": 2,
+      "name": "Three of Cups"
+    }
+  },
+  {
+    "id": 55,
+    "name": "golduck",
+    "slug": "golduck",
+    "types": [
+      "water"
+    ],
+    "bst": 500,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/55.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/55.png",
+    "flavorText": "Often seen swim­ ming elegantly by lake shores. It is often mistaken for the Japanese monster, Kappa.",
+    "genus": "Duck Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "cups",
+      "rankIndex": 10,
+      "name": "Page of Cups"
+    }
+  },
+  {
+    "id": 56,
+    "name": "mankey",
+    "slug": "mankey",
+    "types": [
+      "fighting"
+    ],
+    "bst": 305,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/56.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/56.png",
+    "flavorText": "Extremely quick to anger. It could be docile one moment then thrashing away the next instant.",
+    "genus": "Pig Monkey Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "wands",
+      "rankIndex": 1,
+      "name": "Two of Wands"
+    }
+  },
+  {
+    "id": 57,
+    "name": "primeape",
+    "slug": "primeape",
+    "types": [
+      "fighting"
+    ],
+    "bst": 455,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/57.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/57.png",
+    "flavorText": "Always furious and tenacious to boot. It will not abandon chasing its quarry until it is caught.",
+    "genus": "Pig Monkey Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "wands",
+      "rankIndex": 7,
+      "name": "Eight of Wands"
+    }
+  },
+  {
+    "id": 58,
+    "name": "growlithe",
+    "slug": "growlithe",
+    "types": [
+      "fire"
+    ],
+    "bst": 350,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/58.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/58.png",
+    "flavorText": "Very protective of its territory. It will bark and bite to repel intruders from its space.",
+    "genus": "Puppy Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "wands",
+      "rankIndex": 3,
+      "name": "Four of Wands"
+    }
+  },
+  {
+    "id": 59,
+    "name": "arcanine",
+    "slug": "arcanine",
+    "types": [
+      "fire"
+    ],
+    "bst": 555,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/59.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/59.png",
+    "flavorText": "A POKéMON that has been admired since the past for its beauty. It runs agilely as if on wings.",
+    "genus": "Legendary Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "wands",
+      "rankIndex": 13,
+      "name": "King of Wands"
+    }
+  },
+  {
+    "id": 60,
+    "name": "poliwag",
+    "slug": "poliwag",
+    "types": [
+      "water"
+    ],
+    "bst": 300,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/60.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/60.png",
+    "flavorText": "Its newly grown legs prevent it from running. It appears to prefer swimming than trying to stand.",
+    "genus": "Tadpole Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "cups",
+      "rankIndex": 0,
+      "name": "Ace of Cups"
+    }
+  },
+  {
+    "id": 61,
+    "name": "poliwhirl",
+    "slug": "poliwhirl",
+    "types": [
+      "water"
+    ],
+    "bst": 385,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/61.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/61.png",
+    "flavorText": "Capable of living in or out of water. When out of water, it sweats to keep its body slimy.",
+    "genus": "Tadpole Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "cups",
+      "rankIndex": 5,
+      "name": "Six of Cups"
+    }
+  },
+  {
+    "id": 62,
+    "name": "poliwrath",
+    "slug": "poliwrath",
+    "types": [
+      "water",
+      "fighting"
+    ],
+    "bst": 510,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/62.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/62.png",
+    "flavorText": "An adept swimmer at both the front crawl and breast stroke. Easily overtakes the best human swimmers.",
+    "genus": "Tadpole Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "cups",
+      "rankIndex": 11,
+      "name": "Knight of Cups"
+    }
+  },
+  {
+    "id": 63,
+    "name": "abra",
+    "slug": "abra",
+    "types": [
+      "psychic"
+    ],
+    "bst": 310,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/63.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/63.png",
+    "flavorText": "Using its ability to read minds, it will identify impending danger and TELEPORT to safety.",
+    "genus": "Psi Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "swords",
+      "rankIndex": 2,
+      "name": "Three of Swords"
+    }
+  },
+  {
+    "id": 64,
+    "name": "kadabra",
+    "slug": "kadabra",
+    "types": [
+      "psychic"
+    ],
+    "bst": 400,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/64.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/64.png",
+    "flavorText": "It emits special alpha waves from its body that induce headaches just by being close by.",
+    "genus": "Psi Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "swords",
+      "rankIndex": 6,
+      "name": "Seven of Swords"
+    }
+  },
+  {
+    "id": 65,
+    "name": "alakazam",
+    "slug": "alakazam",
+    "types": [
+      "psychic"
+    ],
+    "bst": 500,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/65.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/65.png",
+    "flavorText": "Its brain can out­ perform a super­ computer. Its intelligence quotient is said to be 5,000.",
+    "genus": "Psi Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "swords",
+      "rankIndex": 11,
+      "name": "Knight of Swords"
+    }
+  },
+  {
+    "id": 66,
+    "name": "machop",
+    "slug": "machop",
+    "types": [
+      "fighting"
+    ],
+    "bst": 305,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/66.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/66.png",
+    "flavorText": "Loves to build its muscles. It trains in all styles of martial arts to become even stronger.",
+    "genus": "Superpower Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "wands",
+      "rankIndex": 2,
+      "name": "Three of Wands"
+    }
+  },
+  {
+    "id": 67,
+    "name": "machoke",
+    "slug": "machoke",
+    "types": [
+      "fighting"
+    ],
+    "bst": 405,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/67.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/67.png",
+    "flavorText": "It happily carries heavy cargo to toughen up. It willingly does hard work for people.",
+    "genus": "Superpower Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "wands",
+      "rankIndex": 4,
+      "name": "Five of Wands"
+    }
+  },
+  {
+    "id": 68,
+    "name": "machamp",
+    "slug": "machamp",
+    "types": [
+      "fighting"
+    ],
+    "bst": 505,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/68.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/68.png",
+    "flavorText": "Using its heavy muscles, it throws powerful punches that can send the victim clear over the horizon.",
+    "genus": "Superpower Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "wands",
+      "rankIndex": 11,
+      "name": "Knight of Wands"
+    }
+  },
+  {
+    "id": 69,
+    "name": "bellsprout",
+    "slug": "bellsprout",
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "bst": 300,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/69.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/69.png",
+    "flavorText": "A carnivorous POKéMON that traps and eats bugs. It uses its root feet to soak up needed moisture.",
+    "genus": "Flower Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "pentacles",
+      "rankIndex": 2,
+      "name": "Three of Pentacles"
+    }
+  },
+  {
+    "id": 70,
+    "name": "weepinbell",
+    "slug": "weepinbell",
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "bst": 390,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/70.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/70.png",
+    "flavorText": "A Pokémon that appears to be a plant. It captures unwary prey by dousing them with a toxic powder.",
+    "genus": "Flycatcher Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "pentacles",
+      "rankIndex": 6,
+      "name": "Seven of Pentacles"
+    }
+  },
+  {
+    "id": 71,
+    "name": "victreebel",
+    "slug": "victreebel",
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "bst": 490,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/71.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/71.png",
+    "flavorText": "Said to live in huge colonies deep in jungles, although no one has ever returned from there.",
+    "genus": "Flycatcher Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "pentacles",
+      "rankIndex": 11,
+      "name": "Knight of Pentacles"
+    }
+  },
+  {
+    "id": 72,
+    "name": "tentacool",
+    "slug": "tentacool",
+    "types": [
+      "water",
+      "poison"
+    ],
+    "bst": 335,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/72.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/72.png",
+    "flavorText": "Drifts in shallow seas. Anglers who hook them by accident are often punished by its stinging acid.",
+    "genus": "Jellyfish Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "cups",
+      "rankIndex": 5,
+      "name": "Six of Cups"
+    }
+  },
+  {
+    "id": 73,
+    "name": "tentacruel",
+    "slug": "tentacruel",
+    "types": [
+      "water",
+      "poison"
+    ],
+    "bst": 515,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/73.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/73.png",
+    "flavorText": "The tentacles are normally kept short. On hunts, they are extended to ensnare and immobilize prey.",
+    "genus": "Jellyfish Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "cups",
+      "rankIndex": 11,
+      "name": "Knight of Cups"
+    }
+  },
+  {
+    "id": 74,
+    "name": "geodude",
+    "slug": "geodude",
+    "types": [
+      "rock",
+      "ground"
+    ],
+    "bst": 300,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/74.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/74.png",
+    "flavorText": "Found in fields and mountains. Mistaking them for boulders, people often step or trip on them.",
+    "genus": "Rock Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "pentacles",
+      "rankIndex": 3,
+      "name": "Four of Pentacles"
+    }
+  },
+  {
+    "id": 75,
+    "name": "graveler",
+    "slug": "graveler",
+    "types": [
+      "rock",
+      "ground"
+    ],
+    "bst": 390,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/75.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/75.png",
+    "flavorText": "Rolls down slopes to move. It rolls over any obstacle without slowing or changing its direction.",
+    "genus": "Rock Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "pentacles",
+      "rankIndex": 6,
+      "name": "Seven of Pentacles"
+    }
+  },
+  {
+    "id": 76,
+    "name": "golem",
+    "slug": "golem",
+    "types": [
+      "rock",
+      "ground"
+    ],
+    "bst": 495,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/76.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/76.png",
+    "flavorText": "Its boulder-like body is extremely hard. It can easily withstand dynamite blasts without damage.",
+    "genus": "Megaton Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "pentacles",
+      "rankIndex": 12,
+      "name": "Queen of Pentacles"
+    }
+  },
+  {
+    "id": 77,
+    "name": "ponyta",
+    "slug": "ponyta",
+    "types": [
+      "fire"
+    ],
+    "bst": 410,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/77.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/77.png",
+    "flavorText": "Its hooves are 10 times harder than diamonds. It can trample anything completely flat in little time.",
+    "genus": "Fire Horse Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "wands",
+      "rankIndex": 5,
+      "name": "Six of Wands"
+    }
+  },
+  {
+    "id": 78,
+    "name": "rapidash",
+    "slug": "rapidash",
+    "types": [
+      "fire"
+    ],
+    "bst": 500,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/78.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/78.png",
+    "flavorText": "Very competitive, this POKéMON will chase anything that moves fast in the hopes of racing it.",
+    "genus": "Fire Horse Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "wands",
+      "rankIndex": 9,
+      "name": "Ten of Wands"
+    }
+  },
+  {
+    "id": 79,
+    "name": "slowpoke",
+    "slug": "slowpoke",
+    "types": [
+      "water",
+      "psychic"
+    ],
+    "bst": 315,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/79.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/79.png",
+    "flavorText": "It is always so absent-minded that it won't react, even if its flavorful tail is bitten.",
+    "genus": "Dopey Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "cups",
+      "rankIndex": 2,
+      "name": "Three of Cups"
+    }
+  },
+  {
+    "id": 80,
+    "name": "slowbro",
+    "slug": "slowbro",
+    "types": [
+      "water",
+      "psychic"
+    ],
+    "bst": 490,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/80.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/80.png",
+    "flavorText": "The SHELLDER that is latched onto SLOWPOKE's tail is said to feed on the host's left over scraps.",
+    "genus": "Hermit Crab Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "cups",
+      "rankIndex": 9,
+      "name": "Ten of Cups"
+    }
+  },
+  {
+    "id": 81,
+    "name": "magnemite",
+    "slug": "magnemite",
+    "types": [
+      "electric",
+      "steel"
+    ],
+    "bst": 325,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/81.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/81.png",
+    "flavorText": "Uses anti-gravity to stay suspended. Appears without warning and uses THUNDER WAVE and similar moves.",
+    "genus": "Magnet Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "swords",
+      "rankIndex": 3,
+      "name": "Four of Swords"
+    }
+  },
+  {
+    "id": 82,
+    "name": "magneton",
+    "slug": "magneton",
+    "types": [
+      "electric",
+      "steel"
+    ],
+    "bst": 465,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/82.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/82.png",
+    "flavorText": "Formed by several MAGNEMITEs linked together. They frequently appear when sunspots flare up.",
+    "genus": "Magnet Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "swords",
+      "rankIndex": 8,
+      "name": "Nine of Swords"
+    }
+  },
+  {
+    "id": 83,
+    "name": "farfetchd",
+    "slug": "farfetchd",
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "bst": 377,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/83.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/83.png",
+    "flavorText": "The sprig of green onions it holds is its weapon. It is used much like a metal sword.",
+    "genus": "Wild Duck Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "pentacles",
+      "rankIndex": 5,
+      "name": "Six of Pentacles"
+    }
+  },
+  {
+    "id": 84,
+    "name": "doduo",
+    "slug": "doduo",
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "bst": 310,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/84.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/84.png",
+    "flavorText": "A bird that makes up for its poor flying with its fast foot speed. Leaves giant footprints.",
+    "genus": "Twin Bird Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "pentacles",
+      "rankIndex": 3,
+      "name": "Four of Pentacles"
+    }
+  },
+  {
+    "id": 85,
+    "name": "dodrio",
+    "slug": "dodrio",
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "bst": 470,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/85.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/85.png",
+    "flavorText": "Uses its three brains to execute complex plans. While two heads sleep, one head stays awake.",
+    "genus": "Triple Bird Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "pentacles",
+      "rankIndex": 10,
+      "name": "Page of Pentacles"
+    }
+  },
+  {
+    "id": 86,
+    "name": "seel",
+    "slug": "seel",
+    "types": [
+      "water"
+    ],
+    "bst": 325,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/86.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/86.png",
+    "flavorText": "The protruding horn on its head is very hard. It is used for bashing through thick ice.",
+    "genus": "Sea Lion Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "cups",
+      "rankIndex": 4,
+      "name": "Five of Cups"
+    }
+  },
+  {
+    "id": 87,
+    "name": "dewgong",
+    "slug": "dewgong",
+    "types": [
+      "water",
+      "ice"
+    ],
+    "bst": 475,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/87.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/87.png",
+    "flavorText": "Stores thermal energy in its body. Swims at a steady 8 knots even in intensely cold waters.",
+    "genus": "Sea Lion Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "cups",
+      "rankIndex": 8,
+      "name": "Nine of Cups"
+    }
+  },
+  {
+    "id": 88,
+    "name": "grimer",
+    "slug": "grimer",
+    "types": [
+      "poison"
+    ],
+    "bst": 325,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/88.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/88.png",
+    "flavorText": "Appears in filthy areas. Thrives by sucking up polluted sludge that is pumped out of factories.",
+    "genus": "Sludge Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "swords",
+      "rankIndex": 3,
+      "name": "Four of Swords"
+    }
+  },
+  {
+    "id": 89,
+    "name": "muk",
+    "slug": "muk",
+    "types": [
+      "poison"
+    ],
+    "bst": 500,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/89.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/89.png",
+    "flavorText": "Thickly covered with a filthy, vile sludge. It is so toxic, even its footprints contain poison.",
+    "genus": "Sludge Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "swords",
+      "rankIndex": 12,
+      "name": "Queen of Swords"
+    }
+  },
+  {
+    "id": 90,
+    "name": "shellder",
+    "slug": "shellder",
+    "types": [
+      "water"
+    ],
+    "bst": 305,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/90.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/90.png",
+    "flavorText": "Its hard shell repels any kind of attack. It is vulnerable only when its shell is open.",
+    "genus": "Bivalve Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "cups",
+      "rankIndex": 1,
+      "name": "Two of Cups"
+    }
+  },
+  {
+    "id": 91,
+    "name": "cloyster",
+    "slug": "cloyster",
+    "types": [
+      "water",
+      "ice"
+    ],
+    "bst": 525,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/91.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/91.png",
+    "flavorText": "When attacked, it launches its horns in quick volleys. Its innards have never been seen.",
+    "genus": "Bivalve Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "cups",
+      "rankIndex": 12,
+      "name": "Queen of Cups"
+    }
+  },
+  {
+    "id": 92,
+    "name": "gastly",
+    "slug": "gastly",
+    "types": [
+      "ghost",
+      "poison"
+    ],
+    "bst": 310,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/92.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/92.png",
+    "flavorText": "Almost invisible, this gaseous POKéMON cloaks the target and puts it to sleep without notice.",
+    "genus": "Gas Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "cups",
+      "rankIndex": 1,
+      "name": "Two of Cups"
+    }
+  },
+  {
+    "id": 93,
+    "name": "haunter",
+    "slug": "haunter",
+    "types": [
+      "ghost",
+      "poison"
+    ],
+    "bst": 405,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/93.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/93.png",
+    "flavorText": "Because of its ability to slip through block walls, it is said to be from an­ other dimension.",
+    "genus": "Gas Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "cups",
+      "rankIndex": 6,
+      "name": "Seven of Cups"
+    }
+  },
+  {
+    "id": 94,
+    "name": "gengar",
+    "slug": "gengar",
+    "types": [
+      "ghost",
+      "poison"
+    ],
+    "bst": 500,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/94.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/94.png",
+    "flavorText": "Under a full moon, this POKéMON likes to mimic the shadows of people and laugh at their fright.",
+    "genus": "Shadow Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "cups",
+      "rankIndex": 10,
+      "name": "Page of Cups"
+    }
+  },
+  {
+    "id": 95,
+    "name": "onix",
+    "slug": "onix",
+    "types": [
+      "rock",
+      "ground"
+    ],
+    "bst": 385,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/95.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/95.png",
+    "flavorText": "It burrows through the ground at a speed of 50 mph while feeding on large boulders.",
+    "genus": "Rock Snake Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "pentacles",
+      "rankIndex": 6,
+      "name": "Seven of Pentacles"
+    }
+  },
+  {
+    "id": 96,
+    "name": "drowzee",
+    "slug": "drowzee",
+    "types": [
+      "psychic"
+    ],
+    "bst": 328,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/96.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/96.png",
+    "flavorText": "Puts enemies to sleep then eats their dreams. Occasionally gets sick from eating bad dreams.",
+    "genus": "Hypnosis Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "swords",
+      "rankIndex": 4,
+      "name": "Five of Swords"
+    }
+  },
+  {
+    "id": 97,
+    "name": "hypno",
+    "slug": "hypno",
+    "types": [
+      "psychic"
+    ],
+    "bst": 483,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/97.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/97.png",
+    "flavorText": "When it locks eyes with an enemy, it will use a mix of PSI moves such as HYPNOSIS and CONFUSION.",
+    "genus": "Hypnosis Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "swords",
+      "rankIndex": 9,
+      "name": "Ten of Swords"
+    }
+  },
+  {
+    "id": 98,
+    "name": "krabby",
+    "slug": "krabby",
+    "types": [
+      "water"
+    ],
+    "bst": 325,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/98.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/98.png",
+    "flavorText": "Its pincers are not only powerful weapons, they are used for balance when walking sideways.",
+    "genus": "River Crab Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "cups",
+      "rankIndex": 4,
+      "name": "Five of Cups"
+    }
+  },
+  {
+    "id": 99,
+    "name": "kingler",
+    "slug": "kingler",
+    "types": [
+      "water"
+    ],
+    "bst": 475,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/99.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/99.png",
+    "flavorText": "The large pincer has 10000 hp of crushing power. However, its huge size makes it unwieldy to use.",
+    "genus": "Pincer Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "cups",
+      "rankIndex": 8,
+      "name": "Nine of Cups"
+    }
+  },
+  {
+    "id": 100,
+    "name": "voltorb",
+    "slug": "voltorb",
+    "types": [
+      "electric"
+    ],
+    "bst": 330,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/100.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/100.png",
+    "flavorText": "Usually found in power plants. Easily mistaken for a POKé BALL, they have zapped many people.",
+    "genus": "Ball Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "swords",
+      "rankIndex": 4,
+      "name": "Five of Swords"
+    }
+  },
+  {
+    "id": 101,
+    "name": "electrode",
+    "slug": "electrode",
+    "types": [
+      "electric"
+    ],
+    "bst": 490,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/101.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/101.png",
+    "flavorText": "It stores electric energy under very high pressure. It often explodes with little or no provocation.",
+    "genus": "Ball Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "swords",
+      "rankIndex": 10,
+      "name": "Page of Swords"
+    }
+  },
+  {
+    "id": 102,
+    "name": "exeggcute",
+    "slug": "exeggcute",
+    "types": [
+      "grass",
+      "psychic"
+    ],
+    "bst": 325,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/102.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/102.png",
+    "flavorText": "Using telepathy only they can receive, they always form a cluster of six EXEGGCUTE.",
+    "genus": "Egg Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "pentacles",
+      "rankIndex": 4,
+      "name": "Five of Pentacles"
+    }
+  },
+  {
+    "id": 103,
+    "name": "exeggutor",
+    "slug": "exeggutor",
+    "types": [
+      "grass",
+      "psychic"
+    ],
+    "bst": 530,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/103.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/103.png",
+    "flavorText": "Legend has it that on rare occasions, one of its heads will drop off and continue on as an EXEGGCUTE.",
+    "genus": "Coconut Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "pentacles",
+      "rankIndex": 13,
+      "name": "King of Pentacles"
+    }
+  },
+  {
+    "id": 104,
+    "name": "cubone",
+    "slug": "cubone",
+    "types": [
+      "ground"
+    ],
+    "bst": 320,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/104.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/104.png",
+    "flavorText": "Because it never removes its skull helmet, no one has ever seen this POKéMON's real face.",
+    "genus": "Lonely Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "pentacles",
+      "rankIndex": 4,
+      "name": "Five of Pentacles"
+    }
+  },
+  {
+    "id": 105,
+    "name": "marowak",
+    "slug": "marowak",
+    "types": [
+      "ground"
+    ],
+    "bst": 425,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/105.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/105.png",
+    "flavorText": "The bone it holds is its key weapon. It throws the bone skillfully like a boomerang to KO targets.",
+    "genus": "Bone Keeper Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "pentacles",
+      "rankIndex": 8,
+      "name": "Nine of Pentacles"
+    }
+  },
+  {
+    "id": 106,
+    "name": "hitmonlee",
+    "slug": "hitmonlee",
+    "types": [
+      "fighting"
+    ],
+    "bst": 455,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/106.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/106.png",
+    "flavorText": "When in a hurry, its legs lengthen progressively. It runs smoothly with extra long, loping strides.",
+    "genus": "Kicking Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "wands",
+      "rankIndex": 7,
+      "name": "Eight of Wands"
+    }
+  },
+  {
+    "id": 107,
+    "name": "hitmonchan",
+    "slug": "hitmonchan",
+    "types": [
+      "fighting"
+    ],
+    "bst": 455,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/107.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/107.png",
+    "flavorText": "The arm-twisting punches it throws pulverize even concrete. It rests after three minutes of fighting.",
+    "genus": "Punching Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "wands",
+      "rankIndex": 8,
+      "name": "Nine of Wands"
+    }
+  },
+  {
+    "id": 108,
+    "name": "lickitung",
+    "slug": "lickitung",
+    "types": [
+      "normal"
+    ],
+    "bst": 385,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/108.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/108.png",
+    "flavorText": "Its tongue can be extended like a chameleon's. It leaves a tingling sensation when it licks enemies.",
+    "genus": "Licking Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "pentacles",
+      "rankIndex": 6,
+      "name": "Seven of Pentacles"
+    }
+  },
+  {
+    "id": 109,
+    "name": "koffing",
+    "slug": "koffing",
+    "types": [
+      "poison"
+    ],
+    "bst": 340,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/109.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/109.png",
+    "flavorText": "Because it stores several kinds of toxic gases in its body, it is prone to exploding without warning.",
+    "genus": "Poison Gas Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "swords",
+      "rankIndex": 5,
+      "name": "Six of Swords"
+    }
+  },
+  {
+    "id": 110,
+    "name": "weezing",
+    "slug": "weezing",
+    "types": [
+      "poison"
+    ],
+    "bst": 490,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/110.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/110.png",
+    "flavorText": "Where two kinds of poison gases meet, 2 KOFFINGs can fuse into a WEEZING over many years.",
+    "genus": "Poison Gas Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "swords",
+      "rankIndex": 10,
+      "name": "Page of Swords"
+    }
+  },
+  {
+    "id": 111,
+    "name": "rhyhorn",
+    "slug": "rhyhorn",
+    "types": [
+      "ground",
+      "rock"
+    ],
+    "bst": 345,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/111.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/111.png",
+    "flavorText": "Its massive bones are 1000 times harder than human bones. It can easily knock a trailer flying.",
+    "genus": "Spikes Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "pentacles",
+      "rankIndex": 4,
+      "name": "Five of Pentacles"
+    }
+  },
+  {
+    "id": 112,
+    "name": "rhydon",
+    "slug": "rhydon",
+    "types": [
+      "ground",
+      "rock"
+    ],
+    "bst": 485,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/112.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/112.png",
+    "flavorText": "Protected by an armor-like hide, it is capable of living in molten lava of 3,600 degrees.",
+    "genus": "Drill Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "pentacles",
+      "rankIndex": 11,
+      "name": "Knight of Pentacles"
+    }
+  },
+  {
+    "id": 113,
+    "name": "chansey",
+    "slug": "chansey",
+    "types": [
+      "normal"
+    ],
+    "bst": 450,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/113.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/113.png",
+    "flavorText": "A rare and elusive POKéMON that is said to bring happiness to those who manage to get it.",
+    "genus": "Egg Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "pentacles",
+      "rankIndex": 10,
+      "name": "Page of Pentacles"
+    }
+  },
+  {
+    "id": 114,
+    "name": "tangela",
+    "slug": "tangela",
+    "types": [
+      "grass"
+    ],
+    "bst": 435,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/114.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/114.png",
+    "flavorText": "The whole body is swathed with wide vines that are similar to sea­ weed. Its vines shake as it walks.",
+    "genus": "Vine Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "pentacles",
+      "rankIndex": 9,
+      "name": "Ten of Pentacles"
+    }
+  },
+  {
+    "id": 115,
+    "name": "kangaskhan",
+    "slug": "kangaskhan",
+    "types": [
+      "normal"
+    ],
+    "bst": 490,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/115.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/115.png",
+    "flavorText": "The infant rarely ventures out of its mother's protective pouch until it is 3 years old.",
+    "genus": "Parent Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "pentacles",
+      "rankIndex": 11,
+      "name": "Knight of Pentacles"
+    }
+  },
+  {
+    "id": 116,
+    "name": "horsea",
+    "slug": "horsea",
+    "types": [
+      "water"
+    ],
+    "bst": 295,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/116.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/116.png",
+    "flavorText": "Known to shoot down flying bugs with precision blasts of ink from the surface of the water.",
+    "genus": "Dragon Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "cups",
+      "rankIndex": 0,
+      "name": "Ace of Cups"
+    }
+  },
+  {
+    "id": 117,
+    "name": "seadra",
+    "slug": "seadra",
+    "types": [
+      "water"
+    ],
+    "bst": 440,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/117.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/117.png",
+    "flavorText": "Capable of swim­ ming backwards by rapidly flapping its wing-like pectoral fins and stout tail.",
+    "genus": "Dragon Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "cups",
+      "rankIndex": 7,
+      "name": "Eight of Cups"
+    }
+  },
+  {
+    "id": 118,
+    "name": "goldeen",
+    "slug": "goldeen",
+    "types": [
+      "water"
+    ],
+    "bst": 320,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/118.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/118.png",
+    "flavorText": "Its tail fin billows like an elegant ballroom dress, giving it the nickname of the Water Queen.",
+    "genus": "Goldfish Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "cups",
+      "rankIndex": 3,
+      "name": "Four of Cups"
+    }
+  },
+  {
+    "id": 119,
+    "name": "seaking",
+    "slug": "seaking",
+    "types": [
+      "water"
+    ],
+    "bst": 450,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/119.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/119.png",
+    "flavorText": "In autumn, its body becomes more fatty in preparing to propose to a mate. It takes on beautiful colors.",
+    "genus": "Goldfish Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "cups",
+      "rankIndex": 7,
+      "name": "Eight of Cups"
+    }
+  },
+  {
+    "id": 120,
+    "name": "staryu",
+    "slug": "staryu",
+    "types": [
+      "water"
+    ],
+    "bst": 340,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/120.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/120.png",
+    "flavorText": "An enigmatic POKéMON that can effortlessly regenerate any appendage it loses in battle.",
+    "genus": "Star Shape Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "cups",
+      "rankIndex": 5,
+      "name": "Six of Cups"
+    }
+  },
+  {
+    "id": 121,
+    "name": "starmie",
+    "slug": "starmie",
+    "types": [
+      "water",
+      "psychic"
+    ],
+    "bst": 520,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/121.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/121.png",
+    "flavorText": "Its central core glows with the seven colors of the rainbow. Some people value the core as a gem.",
+    "genus": "Mysterious Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "cups",
+      "rankIndex": 11,
+      "name": "Knight of Cups"
+    }
+  },
+  {
+    "id": 122,
+    "name": "mr-mime",
+    "slug": "mr-mime",
+    "types": [
+      "psychic",
+      "fairy"
+    ],
+    "bst": 460,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/122.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/122.png",
+    "flavorText": "If interrupted while it is miming, it will slap around the offender with its broad hands.",
+    "genus": "Barrier Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "swords",
+      "rankIndex": 8,
+      "name": "Nine of Swords"
+    }
+  },
+  {
+    "id": 123,
+    "name": "scyther",
+    "slug": "scyther",
+    "types": [
+      "bug",
+      "flying"
+    ],
+    "bst": 500,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/123.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/123.png",
+    "flavorText": "With ninja-like agility and speed, it can create the illusion that there is more than one.",
+    "genus": "Mantis Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "pentacles",
+      "rankIndex": 12,
+      "name": "Queen of Pentacles"
+    }
+  },
+  {
+    "id": 124,
+    "name": "jynx",
+    "slug": "jynx",
+    "types": [
+      "ice",
+      "psychic"
+    ],
+    "bst": 455,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/124.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/124.png",
+    "flavorText": "It seductively wiggles its hips as it walks. It can cause people to dance in unison with it.",
+    "genus": "Human Shape Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "cups",
+      "rankIndex": 8,
+      "name": "Nine of Cups"
+    }
+  },
+  {
+    "id": 125,
+    "name": "electabuzz",
+    "slug": "electabuzz",
+    "types": [
+      "electric"
+    ],
+    "bst": 490,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/125.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/125.png",
+    "flavorText": "Normally found near power plants, they can wander away and cause major blackouts in cities.",
+    "genus": "Electric Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "swords",
+      "rankIndex": 11,
+      "name": "Knight of Swords"
+    }
+  },
+  {
+    "id": 126,
+    "name": "magmar",
+    "slug": "magmar",
+    "types": [
+      "fire"
+    ],
+    "bst": 495,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/126.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/126.png",
+    "flavorText": "Its body always burns with an orange glow that enables it to hide perfectly among flames.",
+    "genus": "Spitfire Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "wands",
+      "rankIndex": 9,
+      "name": "Ten of Wands"
+    }
+  },
+  {
+    "id": 127,
+    "name": "pinsir",
+    "slug": "pinsir",
+    "types": [
+      "bug"
+    ],
+    "bst": 500,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/127.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/127.png",
+    "flavorText": "If it fails to crush the victim in its pincers, it will swing it around and toss it hard.",
+    "genus": "Stag Beetle Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "pentacles",
+      "rankIndex": 13,
+      "name": "King of Pentacles"
+    }
+  },
+  {
+    "id": 128,
+    "name": "tauros",
+    "slug": "tauros",
+    "types": [
+      "normal"
+    ],
+    "bst": 490,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/128.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/128.png",
+    "flavorText": "When it targets an enemy, it charges furiously while whipping its body with its long tails.",
+    "genus": "Wild Bull Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "pentacles",
+      "rankIndex": 11,
+      "name": "Knight of Pentacles"
+    }
+  },
+  {
+    "id": 129,
+    "name": "magikarp",
+    "slug": "magikarp",
+    "types": [
+      "water"
+    ],
+    "bst": 200,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/129.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/129.png",
+    "flavorText": "In the distant past, it was somewhat stronger than the horribly weak descendants that exist today.",
+    "genus": "Fish Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "cups",
+      "rankIndex": 0,
+      "name": "Ace of Cups"
+    }
+  },
+  {
+    "id": 130,
+    "name": "gyarados",
+    "slug": "gyarados",
+    "types": [
+      "water",
+      "flying"
+    ],
+    "bst": 540,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/130.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/130.png",
+    "flavorText": "Rarely seen in the wild. Huge and vicious, it is capable of destroying entire cities in a rage.",
+    "genus": "Atrocious Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "cups",
+      "rankIndex": 13,
+      "name": "King of Cups"
+    }
+  },
+  {
+    "id": 131,
+    "name": "lapras",
+    "slug": "lapras",
+    "types": [
+      "water",
+      "ice"
+    ],
+    "bst": 535,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/131.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/131.png",
+    "flavorText": "A POKéMON that has been over­ hunted almost to extinction. It can ferry people across the water.",
+    "genus": "Transport Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "cups",
+      "rankIndex": 13,
+      "name": "King of Cups"
+    }
+  },
+  {
+    "id": 132,
+    "name": "ditto",
+    "slug": "ditto",
+    "types": [
+      "normal"
+    ],
+    "bst": 288,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/132.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/132.png",
+    "flavorText": "When it spots an enemy, its body transfigures into an almost-perfect copy of its opponent.",
+    "genus": "Transform Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "pentacles",
+      "rankIndex": 2,
+      "name": "Three of Pentacles"
+    }
+  },
+  {
+    "id": 133,
+    "name": "eevee",
+    "slug": "eevee",
+    "types": [
+      "normal"
+    ],
+    "bst": 325,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/133.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/133.png",
+    "flavorText": "Its genetic code is irregular. It may mutate if it is exposed to radiation from element STONEs.",
+    "genus": "Evolution Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "pentacles",
+      "rankIndex": 4,
+      "name": "Five of Pentacles"
+    }
+  },
+  {
+    "id": 134,
+    "name": "vaporeon",
+    "slug": "vaporeon",
+    "types": [
+      "water"
+    ],
+    "bst": 525,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/134.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/134.png",
+    "flavorText": "Lives close to water. Its long tail is ridged with a fin which is often mistaken for a mermaid's.",
+    "genus": "Bubble Jet Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "cups",
+      "rankIndex": 12,
+      "name": "Queen of Cups"
+    }
+  },
+  {
+    "id": 135,
+    "name": "jolteon",
+    "slug": "jolteon",
+    "types": [
+      "electric"
+    ],
+    "bst": 525,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/135.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/135.png",
+    "flavorText": "It accumulates negative ions in the atmosphere to blast out 10000- volt lightning bolts.",
+    "genus": "Lightning Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "swords",
+      "rankIndex": 13,
+      "name": "King of Swords"
+    }
+  },
+  {
+    "id": 136,
+    "name": "flareon",
+    "slug": "flareon",
+    "types": [
+      "fire"
+    ],
+    "bst": 525,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/136.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/136.png",
+    "flavorText": "When storing thermal energy in its body, its temperature could soar to over 1600 degrees.",
+    "genus": "Flame Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "wands",
+      "rankIndex": 11,
+      "name": "Knight of Wands"
+    }
+  },
+  {
+    "id": 137,
+    "name": "porygon",
+    "slug": "porygon",
+    "types": [
+      "normal"
+    ],
+    "bst": 395,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/137.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/137.png",
+    "flavorText": "A POKéMON that consists entirely of programming code. Capable of moving freely in cyberspace.",
+    "genus": "Virtual Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "pentacles",
+      "rankIndex": 7,
+      "name": "Eight of Pentacles"
+    }
+  },
+  {
+    "id": 138,
+    "name": "omanyte",
+    "slug": "omanyte",
+    "types": [
+      "rock",
+      "water"
+    ],
+    "bst": 355,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/138.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/138.png",
+    "flavorText": "Although long extinct, in rare cases, it can be genetically resurrected from fossils.",
+    "genus": "Spiral Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "pentacles",
+      "rankIndex": 5,
+      "name": "Six of Pentacles"
+    }
+  },
+  {
+    "id": 139,
+    "name": "omastar",
+    "slug": "omastar",
+    "types": [
+      "rock",
+      "water"
+    ],
+    "bst": 495,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/139.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/139.png",
+    "flavorText": "A prehistoric POKéMON that died out when its heavy shell made it impossible to catch prey.",
+    "genus": "Spiral Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "pentacles",
+      "rankIndex": 12,
+      "name": "Queen of Pentacles"
+    }
+  },
+  {
+    "id": 140,
+    "name": "kabuto",
+    "slug": "kabuto",
+    "types": [
+      "rock",
+      "water"
+    ],
+    "bst": 355,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/140.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/140.png",
+    "flavorText": "A POKéMON that was resurrected from a fossil found in what was once the ocean floor eons ago.",
+    "genus": "Shellfish Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "pentacles",
+      "rankIndex": 5,
+      "name": "Six of Pentacles"
+    }
+  },
+  {
+    "id": 141,
+    "name": "kabutops",
+    "slug": "kabutops",
+    "types": [
+      "rock",
+      "water"
+    ],
+    "bst": 495,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/141.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/141.png",
+    "flavorText": "Kabutops slices its prey apart and sucks out the fluids. The discarded body parts become food for other Pokémon.",
+    "genus": "Shellfish Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "pentacles",
+      "rankIndex": 12,
+      "name": "Queen of Pentacles"
+    }
+  },
+  {
+    "id": 142,
+    "name": "aerodactyl",
+    "slug": "aerodactyl",
+    "types": [
+      "rock",
+      "flying"
+    ],
+    "bst": 515,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/142.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/142.png",
+    "flavorText": "A ferocious, pre­ historic POKéMON that goes for the enemy's throat with its serrated saw-like fangs.",
+    "genus": "Fossil Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "pentacles",
+      "rankIndex": 13,
+      "name": "King of Pentacles"
+    }
+  },
+  {
+    "id": 143,
+    "name": "snorlax",
+    "slug": "snorlax",
+    "types": [
+      "normal"
+    ],
+    "bst": 540,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/143.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/143.png",
+    "flavorText": "Very lazy. Just eats and sleeps. As its rotund bulk builds, it becomes steadily more slothful.",
+    "genus": "Sleeping Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "pentacles",
+      "rankIndex": 13,
+      "name": "King of Pentacles"
+    }
+  },
+  {
+    "id": 144,
+    "name": "articuno",
+    "slug": "articuno",
+    "types": [
+      "ice",
+      "flying"
+    ],
+    "bst": 580,
+    "isLegendary": true,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/144.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/144.png",
+    "flavorText": "A legendary bird POKéMON that is said to appear to doomed people who are lost in icy mountains.",
+    "genus": "Freeze Pokémon",
+    "arcana": {
+      "kind": "major",
+      "majorNumber": 13,
+      "name": "Death"
+    }
+  },
+  {
+    "id": 145,
+    "name": "zapdos",
+    "slug": "zapdos",
+    "types": [
+      "electric",
+      "flying"
+    ],
+    "bst": 580,
+    "isLegendary": true,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/145.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/145.png",
+    "flavorText": "A legendary bird POKéMON that is said to appear from clouds while dropping enormous lightning bolts.",
+    "genus": "Electric Pokémon",
+    "arcana": {
+      "kind": "major",
+      "majorNumber": 7,
+      "name": "The Chariot"
+    }
+  },
+  {
+    "id": 146,
+    "name": "moltres",
+    "slug": "moltres",
+    "types": [
+      "fire",
+      "flying"
+    ],
+    "bst": 580,
+    "isLegendary": true,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/146.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/146.png",
+    "flavorText": "Known as the legendary bird of fire. Every flap of its wings creates a dazzling flash of flames.",
+    "genus": "Flame Pokémon",
+    "arcana": {
+      "kind": "major",
+      "majorNumber": 17,
+      "name": "The Star"
+    }
+  },
+  {
+    "id": 147,
+    "name": "dratini",
+    "slug": "dratini",
+    "types": [
+      "dragon"
+    ],
+    "bst": 300,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/147.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/147.png",
+    "flavorText": "Long considered a mythical POKéMON until recently when a small colony was found living underwater.",
+    "genus": "Dragon Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "wands",
+      "rankIndex": 0,
+      "name": "Ace of Wands"
+    }
+  },
+  {
+    "id": 148,
+    "name": "dragonair",
+    "slug": "dragonair",
+    "types": [
+      "dragon"
+    ],
+    "bst": 420,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/148.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/148.png",
+    "flavorText": "A mystical POKéMON that exudes a gentle aura. Has the ability to change climate conditions.",
+    "genus": "Dragon Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "wands",
+      "rankIndex": 6,
+      "name": "Seven of Wands"
+    }
+  },
+  {
+    "id": 149,
+    "name": "dragonite",
+    "slug": "dragonite",
+    "types": [
+      "dragon",
+      "flying"
+    ],
+    "bst": 600,
+    "isLegendary": false,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/149.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/149.png",
+    "flavorText": "An extremely rarely seen marine POKéMON. Its intelligence is said to match that of humans.",
+    "genus": "Dragon Pokémon",
+    "arcana": {
+      "kind": "minor",
+      "suit": "wands",
+      "rankIndex": 13,
+      "name": "King of Wands"
+    }
+  },
+  {
+    "id": 150,
+    "name": "mewtwo",
+    "slug": "mewtwo",
+    "types": [
+      "psychic"
+    ],
+    "bst": 680,
+    "isLegendary": true,
+    "isMythical": false,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/150.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/150.png",
+    "flavorText": "It was created by a scientist after years of horrific gene splicing and DNA engineering experiments.",
+    "genus": "Genetic Pokémon",
+    "arcana": {
+      "kind": "major",
+      "majorNumber": 11,
+      "name": "Justice"
+    }
+  },
+  {
+    "id": 151,
+    "name": "mew",
+    "slug": "mew",
+    "types": [
+      "psychic"
+    ],
+    "bst": 600,
+    "isLegendary": false,
+    "isMythical": true,
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/151.png",
+    "thumbSprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/151.png",
+    "flavorText": "So rare that it is still said to be a mirage by many experts. Only a few people have seen it worldwide.",
+    "genus": "New Species Pokémon",
+    "arcana": {
+      "kind": "major",
+      "majorNumber": 21,
+      "name": "The World"
+    }
+  }
+]
