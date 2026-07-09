@@ -7,10 +7,11 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "bun run scripts/sync-pokedex-prod.ts && astro build",
     "preview": "astro preview",
     "astro": "astro",
     "sync": "bun run scripts/sync-pokedex.ts",
+    "sync:prod": "bun run scripts/sync-pokedex-prod.ts",
     "upload-sprites": "bun run scripts/upload-sprites-to-blob.ts",
     "typecheck": "astro check",
     "lint": "eslint . --ext .ts,.astro"
