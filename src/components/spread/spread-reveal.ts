@@ -1,7 +1,5 @@
 import {
   MAJOR_CARD_THEME,
-  MAJOR_MEANING,
-  RANK_MEANING,
   ROMAN,
   SPREAD_POSITIONS,
   SUIT_CARD_THEME,
@@ -10,17 +8,27 @@ import {
 import { spriteUrl, SPRITE_FALLBACK } from '../../lib/sprites';
 import type { Suit } from '../../lib/arcana/types';
 
+// ─── Interfaces ──────────────────────────────────────────────────────────────
+
+interface SpreadMetadata {
+  keywords: string[];
+  uprightMeaning: string;
+  description: string;
+}
+
 interface SpreadArcana {
   kind: 'major' | 'minor';
   name: string;
   suit?: Suit;
   majorNumber?: number;
+  metadata?: SpreadMetadata | null;
 }
 
 interface SpreadMember {
   id: number;
   name: string;
   slug: string;
+  flavorText: string;
 }
 
 interface SpreadCard {
@@ -33,24 +41,44 @@ interface Slot {
   flip: HTMLElement;
   front: HTMLElement;
   label: HTMLElement;
-  meaning: HTMLElement;
+  arcanaReading: HTMLElement;
+  pokemonReading: HTMLElement;
+  drawnMember: SpreadMember | null;
   card: SpreadCard;
   position: string;
   revealed: boolean;
   drawn: boolean;
 }
 
-const FAN_TOTAL = 78;
-const PER_ROW = 39; // 78 / 2 rows
+// ─── Constants ───────────────────────────────────────────────────────────────
 
-/** Back → front. Same radius = same arc shape; bottom offset + z-index puts row 1 clearly in front. */
+const FAN_TOTAL = 78;
+const PER_ROW = 39;
+
 const ROW_CONFIGS = [
-  { bottom: 88, radius: 740, arc: 99, zBase: 1  }, // back
-  { bottom: 12, radius: 690, arc: 99, zBase: 42 }, // front
+  { bottom: 88, radius: 740, arc: 99, zBase: 1  },
+  { bottom: 12, radius: 690, arc: 99, zBase: 42 },
 ] as const;
 
 const REDUCED_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const FLIP_MS = REDUCED_MOTION ? 0 : 800;
+
+// Position → a sentence that sets the reading context for that slot.
+const POSITION_CONTEXT: Record<string, string> = {
+  'Past':          'In the past, this energy shaped the ground beneath where you now stand.',
+  'Present':       'In the present, this force moves actively through your situation.',
+  'Future':        'Looking ahead, this quality is what approaches on the horizon.',
+  'The Card':      'This card is the oracle\'s direct answer to your question.',
+  'Challenge':     'This is the central force you are being called to meet or transform.',
+  'Foundation':    'Beneath everything, this energy forms the hidden root of the matter.',
+  'Crown':         'Above you, this card marks your highest aspiration or potential.',
+  'Self':          'This reflects how you yourself show up within this situation.',
+  'Environment':   'The forces moving around you carry this quality.',
+  'Hopes & Fears': 'What you most desire — and perhaps most dread — takes this shape.',
+  'Outcome':       'If the current path continues, this is where it leads.',
+};
+
+// ─── Utilities ───────────────────────────────────────────────────────────────
 
 function esc(s: string): string {
   return s
@@ -60,18 +88,27 @@ function esc(s: string): string {
     .replace(/"/g, '&quot;');
 }
 
+function capitalize(s: string): string {
+  return s ? s[0].toUpperCase() + s.slice(1) : s;
+}
+
+function cleanFlavor(text: string): string {
+  return text.replace(/­/g, '').replace(/\s+/g, ' ').trim();
+}
+
 function numWord(n: number): string {
   if (n === 1) return 'one card';
   if (n === 3) return 'three cards';
   return 'ten cards';
 }
 
-function meaningFor(card: SpreadCard): string {
-  const arc = card.arcana;
-  return arc.kind === 'major'
-    ? (MAJOR_MEANING[arc.name] ?? '')
-    : (RANK_MEANING[arc.suit ?? 'cups'] ?? '');
+function spreadIntro(size: number): string {
+  if (size === 1) return 'One card has come forward to answer your question directly.';
+  if (size === 3) return 'Three cards have surfaced — past, present, and future held in a single breath.';
+  return 'The ten cards of the Celtic Cross have spread before you, mapping every dimension of your question.';
 }
+
+// ─── Card HTML builders ───────────────────────────────────────────────────────
 
 function cardBackHtml(): string {
   return `<div class="card-back"><div class="card-back__field"><div class="card-back__ring"><span class="card-back__sigil">✦</span></div></div></div>`;
@@ -84,9 +121,6 @@ function emblemFrontHtml(card: SpreadCard): string {
     ? (ROMAN[card.arcana.majorNumber ?? 0] ?? '✦')
     : (SUIT_META[card.arcana.suit ?? 'cups']?.glyph ?? '✦');
   const arcanaName = esc(card.arcana.name);
-  const centerGlyph = isMajor
-    ? (ROMAN[card.arcana.majorNumber ?? 0] ?? '✦')
-    : (SUIT_META[card.arcana.suit ?? 'cups']?.glyph ?? '✦');
 
   return `<div class="arcana-card" style="--accent:${theme.accent}; --wash:${theme.wash};">
     <div class="arcana-card__paper">
@@ -100,7 +134,7 @@ function emblemFrontHtml(card: SpreadCard): string {
       <div class="arcana-card__vignette">
         <div class="arcana-card__rays"></div>
         <div class="arcana-card__horizon"></div>
-        <span class="arcana-card__glyph">${esc(centerGlyph)}</span>
+        <span class="arcana-card__glyph">${esc(kicker)}</span>
       </div>
       <div class="arcana-card__banner">
         <span class="arcana-card__star">✦</span>
@@ -153,6 +187,163 @@ function pokemonFrontHtml(card: SpreadCard, member: SpreadMember): string {
   </a>`;
 }
 
+// ─── Per-slot reading panels ──────────────────────────────────────────────────
+
+function buildArcanaReading(card: SpreadCard): HTMLElement {
+  const el = document.createElement('div');
+  el.className = 'slot-reading';
+  el.hidden = true;
+
+  // Show just the upright meaning as a single clean sentence — no keyword dumps.
+  const meta = card.arcana.metadata;
+  if (meta?.uprightMeaning) {
+    const p = document.createElement('p');
+    p.className = 'slot-upright';
+    p.textContent = meta.uprightMeaning;
+    el.appendChild(p);
+  }
+
+  return el;
+}
+
+function buildPokemonReading(member: SpreadMember): HTMLElement {
+  const el = document.createElement('div');
+  el.className = 'slot-reading';
+  el.hidden = true;
+
+  const divider = document.createElement('div');
+  divider.className = 'slot-divider';
+
+  const nameEl = document.createElement('div');
+  nameEl.className = 'slot-flavor-name';
+  nameEl.textContent = capitalize(member.name);
+
+  const flavor = document.createElement('p');
+  flavor.className = 'slot-flavor';
+  flavor.textContent = cleanFlavor(member.flavorText);
+
+  el.append(divider, nameEl, flavor);
+  return el;
+}
+
+// ─── Full reading panel ───────────────────────────────────────────────────────
+//
+// Currently generates template-based prose from card data.
+//
+// TO SWAP IN AN AI PROVIDER:
+//   1. Add `@astrojs/vercel` (or your adapter) to astro.config.mjs with output: 'hybrid'
+//   2. Create `src/pages/api/reading.ts` as a POST endpoint
+//   3. Replace `buildReadingPanel()` below with a fetch call to that endpoint,
+//      sending { question, cards: slots.map(s => ({ position, arcana, pokemon })) }
+//   4. Stream or await the response and inject the returned HTML/text into the panel.
+
+function buildCardReadingSection(slot: Slot): HTMLElement {
+  const { card, position, drawnMember } = slot;
+  const meta = card.arcana.metadata;
+  const pokeName = drawnMember ? capitalize(drawnMember.name) : '';
+  const flavor = drawnMember ? cleanFlavor(drawnMember.flavorText) : '';
+
+  const section = document.createElement('div');
+  section.className = 'rp-card';
+
+  // Title: POSITION · ARCANA · POKÉMON
+  const titleEl = document.createElement('h3');
+  titleEl.className = 'rp-card__title';
+  titleEl.textContent = position && pokeName
+    ? `${position} · ${card.arcana.name} · ${pokeName}`
+    : card.arcana.name;
+
+  // Main prose: position context sentence + card description + upright meaning
+  const textEl = document.createElement('p');
+  textEl.className = 'rp-card__text';
+
+  const posCtx = POSITION_CONTEXT[position] ?? `This card speaks to the ${position.toLowerCase()} dimension of your question.`;
+  let prose = posCtx + ' ';
+  if (meta?.description) prose += meta.description + ' ';
+  if (meta?.uprightMeaning) prose += meta.uprightMeaning;
+  textEl.textContent = prose.trim();
+
+  // Pokémon witness line
+  const pokeEl = document.createElement('p');
+  pokeEl.className = 'rp-card__pokemon';
+
+  if (pokeName && flavor) {
+    const nameSpan = document.createElement('span');
+    nameSpan.className = 'rp-card__pokemon-name';
+    nameSpan.textContent = pokeName;
+
+    const flavorEm = document.createElement('em');
+    flavorEm.textContent = ` "${flavor}"`;
+
+    pokeEl.append(nameSpan, flavorEm);
+  }
+
+  section.append(titleEl, textEl);
+  if (pokeName && flavor) section.appendChild(pokeEl);
+  return section;
+}
+
+function buildReadingPanel(question: string, slots: Slot[], spreadSize: number): HTMLElement {
+  const panel = document.createElement('div');
+
+  // Header
+  const header = document.createElement('div');
+  header.className = 'rp-header';
+
+  const kicker = document.createElement('p');
+  kicker.className = 'rp-kicker';
+  kicker.textContent = '✦ The Oracle Speaks ✦';
+
+  const questionEl = document.createElement('p');
+  questionEl.className = 'rp-question';
+  questionEl.textContent = `"${question}"`;
+
+  const intro = document.createElement('p');
+  intro.className = 'rp-intro';
+  intro.textContent = spreadIntro(spreadSize);
+
+  header.append(kicker, questionEl, intro);
+  panel.appendChild(header);
+
+  // One section per drawn card
+  for (const slot of slots) {
+    panel.appendChild(buildCardReadingSection(slot));
+  }
+
+  // Synthesis — weaves the cards together
+  if (slots.length >= 2) {
+    const synthesis = document.createElement('div');
+    synthesis.className = 'rp-synthesis';
+
+    const synthLabel = document.createElement('p');
+    synthLabel.className = 'rp-synthesis__label';
+    synthLabel.textContent = '✦ The Thread Between Them ✦';
+
+    const synthText = document.createElement('p');
+    synthText.className = 'rp-synthesis__text';
+
+    const names = slots.map(s => s.card.arcana.name).join(', ');
+    synthText.textContent =
+      `The cards drawn — ${names} — do not answer in isolation. ` +
+      `Notice the movement between them: what shifts in tone, what theme recurs, where the energy turns. ` +
+      `That motion — the arc from one card to the next — is the true response the deck has given your question. ` +
+      `Let it work on you quietly, beyond the words on the page.`;
+
+    synthesis.append(synthLabel, synthText);
+    panel.appendChild(synthesis);
+  }
+
+  // Stub note — visible cue that AI is not yet wired in
+  const note = document.createElement('p');
+  note.className = 'rp-ai-note';
+  note.textContent = '✦ Reading generated from card data · AI interpretation coming soon ✦';
+  panel.appendChild(note);
+
+  return panel;
+}
+
+// ─── Web component ───────────────────────────────────────────────────────────
+
 class SpreadReveal extends HTMLElement {
   private deck: SpreadCard[] = [];
   private pool: SpreadCard[] = [];
@@ -160,10 +351,13 @@ class SpreadReveal extends HTMLElement {
   private slots: Slot[] = [];
   private taken = new Set<number>();
   private timers: number[] = [];
+  private question = '';
+  private readingShown = false;
 
   private instructionEl!: HTMLElement;
   private counterEl!: HTMLElement;
   private slotsEl!: HTMLElement;
+  private readingPanelEl!: HTMLElement;
   private resetRow!: HTMLElement;
   private fanHintEl!: HTMLElement;
   private fanEl!: HTMLElement;
@@ -177,15 +371,19 @@ class SpreadReveal extends HTMLElement {
       try { this.deck = JSON.parse(dataScript.textContent) as SpreadCard[]; } catch { this.deck = []; }
     }
 
-    this.instructionEl = this.querySelector('[data-instruction]') as HTMLElement;
-    this.counterEl     = this.querySelector('[data-counter]')     as HTMLElement;
-    this.slotsEl       = this.querySelector('[data-slots]')       as HTMLElement;
-    this.resetRow      = this.querySelector('[data-reset-row]')   as HTMLElement;
-    this.fanHintEl     = this.querySelector('[data-fan-hint]')    as HTMLElement;
-    this.fanEl         = this.querySelector('[data-fan]')         as HTMLElement;
+    this.instructionEl   = this.querySelector('[data-instruction]')    as HTMLElement;
+    this.counterEl       = this.querySelector('[data-counter]')        as HTMLElement;
+    this.slotsEl         = this.querySelector('[data-slots]')          as HTMLElement;
+    this.readingPanelEl  = this.querySelector('[data-reading-panel]')  as HTMLElement;
+    this.resetRow        = this.querySelector('[data-reset-row]')      as HTMLElement;
+    this.fanHintEl       = this.querySelector('[data-fan-hint]')       as HTMLElement;
+    this.fanEl           = this.querySelector('[data-fan]')            as HTMLElement;
 
-    this.onDocumentClick = this.onDocumentClick.bind(this);
+    this.onDocumentClick   = this.onDocumentClick.bind(this);
+    this.onQuestionChange  = this.onQuestionChange.bind(this);
+
     document.addEventListener('click', this.onDocumentClick);
+    window.addEventListener('question-change', this.onQuestionChange);
 
     this.shufflePool();
     this.renderFan();
@@ -196,7 +394,12 @@ class SpreadReveal extends HTMLElement {
 
   disconnectedCallback() {
     document.removeEventListener('click', this.onDocumentClick);
+    window.removeEventListener('question-change', this.onQuestionChange);
     this.clearTimers();
+  }
+
+  private onQuestionChange(e: Event) {
+    this.question = (e as CustomEvent<{ question: string }>).detail?.question ?? '';
   }
 
   private onDocumentClick(e: Event) {
@@ -210,9 +413,7 @@ class SpreadReveal extends HTMLElement {
       return;
     }
 
-    if (target.closest('[data-reset]')) {
-      this.resetReading();
-    }
+    if (target.closest('[data-reset]')) this.resetReading();
   }
 
   private clearTimers() {
@@ -247,6 +448,9 @@ class SpreadReveal extends HTMLElement {
     this.clearTimers();
     this.slots = [];
     this.taken = new Set();
+    this.readingShown = false;
+    this.readingPanelEl.hidden = true;
+    this.readingPanelEl.replaceChildren();
     this.shufflePool();
     this.renderFan();
     this.renderSlots();
@@ -274,6 +478,19 @@ class SpreadReveal extends HTMLElement {
     this.counterEl.textContent = `Drawn ${picked} / ${n}`;
     this.resetRow.hidden = picked === 0;
     this.fanHintEl.textContent = picked >= n ? '✧ the spread is drawn ✧' : 'Hover to lift · click to draw';
+
+    // Show reading panel once all Pokémon are revealed
+    if (this.allDrawn && !this.readingShown) {
+      this.readingShown = true;
+      this.showReadingPanel();
+    }
+  }
+
+  private showReadingPanel() {
+    this.readingPanelEl.replaceChildren(
+      buildReadingPanel(this.question, this.slots, this.spreadSize)
+    );
+    this.readingPanelEl.hidden = false;
   }
 
   private updateSlotLabel(slot: Slot) {
@@ -282,7 +499,7 @@ class SpreadReveal extends HTMLElement {
     slot.label.style.color = slot.revealed ? '#e3cf95' : '#5a5273';
   }
 
-  // ─── Fan ─────────────────────────────────────────────────────────────────
+  // ─── Fan ────────────────────────────────────────────────────────────────────
 
   private renderFan() {
     this.fanEl.replaceChildren();
@@ -300,15 +517,10 @@ class SpreadReveal extends HTMLElement {
 
       const card = document.createElement('div');
       card.style.cssText = [
-        'position:absolute',
-        'left:50%',
-        `bottom:${cfg.bottom}px`,
-        'width:100px',
-        'height:180px',
-        `transform-origin:50% ${cfg.radius}px`,
-        `transform:${baseTransform}`,
-        `z-index:${baseZ}`,
-        'cursor:pointer',
+        'position:absolute', 'left:50%',
+        `bottom:${cfg.bottom}px`, 'width:100px', 'height:180px',
+        `transform-origin:50% ${cfg.radius}px`, `transform:${baseTransform}`,
+        `z-index:${baseZ}`, 'cursor:pointer',
         'transition:transform .45s cubic-bezier(.2,.7,.2,1), opacity .55s, filter .3s',
       ].join(';');
 
@@ -332,7 +544,6 @@ class SpreadReveal extends HTMLElement {
         card.style.zIndex = String(baseZ);
       });
       card.addEventListener('click', () => this.pickFan(i, card, baseTransform));
-
       this.fanEl.appendChild(card);
     }
   }
@@ -357,16 +568,18 @@ class SpreadReveal extends HTMLElement {
     this.slots.push(slot);
     this.syncUI();
 
+    // After emblem flips up: show arcana reading (phase 1)
     const tid = window.setTimeout(() => {
       slot.revealed = true;
       slot.flip.style.transform = 'rotateY(0deg)';
+      slot.arcanaReading.hidden = false;
       this.updateSlotLabel(slot);
       this.syncUI();
     }, 240);
     this.timers.push(tid);
   }
 
-  // ─── Slots ───────────────────────────────────────────────────────────────
+  // ─── Slots ──────────────────────────────────────────────────────────────────
 
   private slotWidth(): string {
     if (this.spreadSize === 10) return '132px';
@@ -385,7 +598,6 @@ class SpreadReveal extends HTMLElement {
       wrapper.style.cssText = `width:${w};text-align:center;`;
 
       const label = document.createElement('div');
-      label.className = 'slot-label';
       label.style.cssText =
         "font-family:'Cinzel',serif;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#5a5273;margin-bottom:10px;";
       label.textContent = positions[i];
@@ -401,11 +613,9 @@ class SpreadReveal extends HTMLElement {
     }
   }
 
-  /** Replace the empty frame at slotIndex with a live flip card, return the Slot. */
   private activateSlot(card: SpreadCard, position: string, index: number): Slot {
     const wrapper = this.slotsEl.querySelector<HTMLElement>(`[data-slot-index="${index}"]`);
 
-    // Always create a fresh set of elements inside the wrapper.
     const label = document.createElement('div');
     label.style.cssText =
       "font-family:'Cinzel',serif;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#5a5273;margin-bottom:10px;";
@@ -427,22 +637,27 @@ class SpreadReveal extends HTMLElement {
     flip.append(back, front);
     flip.addEventListener('click', () => this.onCardTap(index));
 
-    const meaning = document.createElement('p');
-    meaning.style.cssText =
-      "margin:10px auto 0;font-family:'EB Garamond',serif;font-style:italic;font-size:13px;line-height:1.4;color:#8f86ac;max-width:210px;display:none;";
-    meaning.textContent = meaningFor(card);
+    const arcanaReading = buildArcanaReading(card);
+    const pokemonReading = document.createElement('div');
+    pokemonReading.className = 'slot-reading';
+    pokemonReading.hidden = true;
 
     if (wrapper) {
-      wrapper.replaceChildren(label, flip, meaning);
+      wrapper.replaceChildren(label, flip, arcanaReading, pokemonReading);
     } else {
-      // Fallback: append a new wrapper if the DOM slot is missing.
       const fallback = document.createElement('div');
       fallback.style.cssText = `width:${this.slotWidth()};text-align:center;`;
-      fallback.append(label, flip, meaning);
+      fallback.append(label, flip, arcanaReading, pokemonReading);
       this.slotsEl.appendChild(fallback);
     }
 
-    return { flip, front, label, meaning, card, position, revealed: false, drawn: false };
+    return {
+      flip, front, label,
+      arcanaReading, pokemonReading,
+      drawnMember: null,
+      card, position,
+      revealed: false, drawn: false,
+    };
   }
 
   private onCardTap(index: number) {
@@ -454,23 +669,34 @@ class SpreadReveal extends HTMLElement {
   private drawPokemon(index: number) {
     const slot = this.slots[index];
     if (!slot || slot.drawn || slot.card.members.length === 0) return;
+
     const member = slot.card.members[Math.floor(Math.random() * slot.card.members.length)];
     slot.drawn = true;
+    slot.drawnMember = member;
     this.updateSlotLabel(slot);
+
+    // Build pokemon reading panel, hide until after flip
+    const pokemonPanel = buildPokemonReading(member);
+    slot.pokemonReading.replaceChildren(...Array.from(pokemonPanel.childNodes));
+    slot.pokemonReading.hidden = true;
 
     if (REDUCED_MOTION) {
       slot.front.innerHTML = pokemonFrontHtml(slot.card, member);
-      slot.meaning.style.display = '';
+      slot.pokemonReading.hidden = false;
       this.syncUI();
       return;
     }
 
+    // Flip back → swap content → flip forward → show pokemon reading (phase 2)
     slot.flip.style.transform = 'rotateY(180deg)';
     const tid = window.setTimeout(() => {
       slot.front.innerHTML = pokemonFrontHtml(slot.card, member);
       slot.flip.style.transform = 'rotateY(0deg)';
-      slot.meaning.style.display = '';
-      this.syncUI();
+      const tid2 = window.setTimeout(() => {
+        slot.pokemonReading.hidden = false;
+        this.syncUI();
+      }, FLIP_MS);
+      this.timers.push(tid2);
     }, FLIP_MS);
     this.timers.push(tid);
   }
