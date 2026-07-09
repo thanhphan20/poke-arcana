@@ -2,21 +2,20 @@
 import type { CollectionEntry } from 'astro:content';
 
 interface Props {
-  cards: CollectionEntry<'pokemonCards'>[];
+  cards: CollectionEntry<'tarotCards'>[];
 }
 
 const { cards } = Astro.props;
 
 const payload = cards.map((c) => ({
-  id: c.data.id,
   slug: c.data.slug,
-  name: c.data.name,
   arcana: {
     kind: c.data.arcana.kind,
     name: c.data.arcana.name,
     suit: c.data.arcana.suit,
     majorNumber: c.data.arcana.majorNumber,
   },
+  members: c.data.members.map((m) => ({ id: m.id, name: m.name, slug: m.slug })),
 }));
 ---
 

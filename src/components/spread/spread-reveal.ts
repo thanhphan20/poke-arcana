@@ -1,4 +1,4 @@
-import { MAJOR_CARD_THEME, ROMAN, SPREAD_POSITIONS, SUIT_CARD_THEME } from '../../lib/arcana/meanings';
+import { MAJOR_CARD_THEME, ROMAN, SPREAD_POSITIONS, SUIT_CARD_THEME, SUIT_META } from '../../lib/arcana/meanings';
 import { spriteUrl, SPRITE_FALLBACK } from '../../lib/sprites';
 import type { Suit } from '../../lib/arcana/types';
 
@@ -9,20 +9,33 @@ interface SpreadArcana {
   majorNumber?: number;
 }
 
-interface SpreadCard {
+interface SpreadMember {
   id: number;
-  slug: string;
   name: string;
+  slug: string;
+}
+
+interface SpreadCard {
+  slug: string;
   arcana: SpreadArcana;
+  members: SpreadMember[];
 }
 
 interface Slot {
   flip: HTMLElement;
+  front: HTMLElement;
   label: HTMLElement;
+  card: SpreadCard;
+  position: string;
+  /** Arcana face is showing (auto-revealed from face-down). */
   revealed: boolean;
+  /** A Pokemon has been drawn for this card; terminal state. */
+  drawn: boolean;
 }
 
 const REDUCED_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+/** Matches the flip transition duration set on each card below. */
+const FLIP_MS = 800;
 
 function escapeHtml(value: string): string {
   return value
@@ -134,7 +147,7 @@ class SpreadReveal extends HTMLElement {
     });
     this.results.appendChild(fragment);
 
-    // Auto-flip reveal with a stagger: card i reveals at 350 + i*260 ms.
+    // Auto-flip reveal with a stagger: card i reveals its arcana face at 350 + i*260 ms.
     this.slots.forEach((_, i) => {
       const id = window.setTimeout(() => this.setRevealed(i, true), 350 + i * 260);
       this.timers.push(id);
@@ -166,6 +179,40 @@ class SpreadReveal extends HTMLElement {
     slot.revealed = revealed;
     slot.flip.style.transform = revealed ? 'rotateY(0deg)' : 'rotateY(180deg)';
     slot.label.style.color = revealed ? '#e3cf95' : '#5a5273';
+    this.updateLabel(slot);
+  }
+
+  /** Position label, plus a "tap to reveal" hint while the arcana face is showing and undrawn. */
+  private updateLabel(slot: Slot) {
+    const hint = slot.revealed && !slot.drawn ? ' · Tap to Reveal' : '';
+    slot.label.textContent = `${slot.position}${hint}`;
+  }
+
+  private onCardTap(index: number) {
+    const slot = this.slots[index];
+    if (!slot || !slot.revealed || slot.drawn) return;
+    this.drawPokemon(index);
+  }
+
+  /** Draws one Pokemon at random from the card's members and morphs the card to show it. */
+  private drawPokemon(index: number) {
+    const slot = this.slots[index];
+    if (!slot || slot.drawn || slot.card.members.length === 0) return;
+    const member = slot.card.members[Math.floor(Math.random() * slot.card.members.length)];
+    slot.drawn = true;
+    this.updateLabel(slot);
+
+    if (REDUCED_MOTION) {
+      slot.front.innerHTML = this.pokemonFrontHtml(slot.card, member);
+      return;
+    }
+
+    slot.flip.style.transform = 'rotateY(180deg)';
+    const id = window.setTimeout(() => {
+      slot.front.innerHTML = this.pokemonFrontHtml(slot.card, member);
+      slot.flip.style.transform = 'rotateY(0deg)';
+    }, FLIP_MS);
+    this.timers.push(id);
   }
 
   private buildSlot(card: SpreadCard, position: string, index: number) {
@@ -175,7 +222,7 @@ class SpreadReveal extends HTMLElement {
     const flip = document.createElement('div');
     flip.style.cssText =
       'position:relative;width:100%;aspect-ratio:63/100;transform-style:preserve-3d;cursor:pointer;transform:rotateY(180deg);' +
-      (REDUCED_MOTION ? '' : 'transition:transform .8s cubic-bezier(.4,.1,.2,1);');
+      (REDUCED_MOTION ? '' : `transition:transform ${FLIP_MS}ms cubic-bezier(.4,.1,.2,1);`);
 
     const back = document.createElement('div');
     back.style.cssText = 'position:absolute;inset:0;backface-visibility:hidden;transform:rotateY(180deg);';
@@ -184,33 +231,65 @@ class SpreadReveal extends HTMLElement {
 
     const front = document.createElement('div');
     front.style.cssText = 'position:absolute;inset:0;backface-visibility:hidden;';
-    front.innerHTML = this.frontHtml(card);
+    front.innerHTML = this.emblemFrontHtml(card);
 
     flip.append(back, front);
+    flip.addEventListener('click', () => this.onCardTap(index));
 
     const label = document.createElement('div');
     label.style.cssText =
       "margin-top:12px;font-family:'Cinzel',serif;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#5a5273;";
     label.textContent = position;
 
-    // Click toggles this card's flip state.
-    flip.addEventListener('click', () => this.setRevealed(index, !this.slots[index]?.revealed));
-
     wrapper.append(flip, label);
-    return { el: wrapper, state: { flip, label, revealed: false } satisfies Slot };
+    return {
+      el: wrapper,
+      state: { flip, front, label, card, position, revealed: false, drawn: false } satisfies Slot,
+    };
   }
 
-  private frontHtml(card: SpreadCard): string {
+  /** First-tier face: the arcana identity, no Pokemon yet. */
+  private emblemFrontHtml(card: SpreadCard): string {
     const isMajor = card.arcana.kind === 'major';
     const theme = isMajor ? MAJOR_CARD_THEME : SUIT_CARD_THEME[card.arcana.suit ?? 'cups'];
     const kicker = isMajor ? (ROMAN[card.arcana.majorNumber ?? 0] ?? '✦') : (card.arcana.suit ?? '');
-    const paddedId = String(card.id).padStart(3, '0');
-    const name = escapeHtml(card.name);
+    const centerGlyph = isMajor
+      ? (ROMAN[card.arcana.majorNumber ?? 0] ?? '✦')
+      : (SUIT_META[card.arcana.suit ?? 'cups']?.glyph ?? '✦');
     const arcanaName = escapeHtml(card.arcana.name);
-    const slug = escapeHtml(card.slug);
-    const sprite = escapeHtml(spriteUrl(card.id, 'artwork'));
 
-    return `<a class="arcana-card is-link" style="--accent:${theme.accent}; --wash:${theme.wash};" href="/deck/${slug}">
+    return `<div class="arcana-card" style="--accent:${theme.accent}; --wash:${theme.wash};">
+      <div class="arcana-card__paper">
+        <div class="arcana-card__grain"></div>
+        <div class="arcana-card__keyline"></div>
+        <span class="arcana-card__flourish" style="top:5px;left:7px">✦</span>
+        <span class="arcana-card__flourish" style="top:5px;right:7px">✦</span>
+        <span class="arcana-card__flourish" style="bottom:5px;left:7px">✦</span>
+        <span class="arcana-card__flourish" style="bottom:5px;right:7px">✦</span>
+        <div class="arcana-card__kicker">${escapeHtml(kicker)}</div>
+        <div class="arcana-card__vignette">
+          <div class="arcana-card__rays"></div>
+          <div class="arcana-card__horizon"></div>
+          <span class="arcana-card__glyph">${escapeHtml(centerGlyph)}</span>
+        </div>
+        <div class="arcana-card__banner"><span class="arcana-card__star">✦</span><span class="arcana-card__arcana">${arcanaName}</span><span class="arcana-card__star">✦</span></div>
+        <div class="arcana-card__footer"><span class="arcana-card__name">${arcanaName}</span></div>
+      </div>
+    </div>`;
+  }
+
+  /** Second-tier face: the drawn Pokemon, linking to its detail page. */
+  private pokemonFrontHtml(card: SpreadCard, member: SpreadMember): string {
+    const isMajor = card.arcana.kind === 'major';
+    const theme = isMajor ? MAJOR_CARD_THEME : SUIT_CARD_THEME[card.arcana.suit ?? 'cups'];
+    const kicker = isMajor ? (ROMAN[card.arcana.majorNumber ?? 0] ?? '✦') : (card.arcana.suit ?? '');
+    const paddedId = String(member.id).padStart(3, '0');
+    const name = escapeHtml(member.name);
+    const arcanaName = escapeHtml(card.arcana.name);
+    const slug = escapeHtml(member.slug);
+    const sprite = escapeHtml(spriteUrl(member.id, 'artwork'));
+
+    return `<a class="arcana-card is-link" style="--accent:${theme.accent}; --wash:${theme.wash};" href="/card/${slug}">
       <div class="arcana-card__paper">
         <div class="arcana-card__grain"></div>
         <div class="arcana-card__keyline"></div>
