@@ -114,16 +114,6 @@ async function fetchPokemon(id: number): Promise<PokemonRaw & Omit<PokemonCard, 
   );
   const genusEntry = (species.genera as any[]).find((g) => g.language.name === 'en');
 
-  const remoteArtwork: string =
-    pokemon.sprites?.other?.['official-artwork']?.front_default ??
-    pokemon.sprites?.front_default ??
-    '';
-  const remoteThumb: string = pokemon.sprites?.front_default ?? remoteArtwork;
-
-  // Use local paths; images will be downloaded in a separate phase after all API data is fetched.
-  const sprite = remoteArtwork ? `/sprites/official-artwork/${id}.png` : '';
-  const thumbSprite = remoteThumb ? `/sprites/thumbnails/${id}.png` : sprite;
-
   return {
     id,
     name: pokemon.name,
@@ -132,8 +122,6 @@ async function fetchPokemon(id: number): Promise<PokemonRaw & Omit<PokemonCard, 
     bst,
     isLegendary: species.is_legendary === true,
     isMythical: species.is_mythical === true,
-    sprite,
-    thumbSprite,
     flavorText: flavorEntry ? cleanFlavor(flavorEntry.flavor_text) : '',
     genus: genusEntry ? genusEntry.genus : '',
   };
