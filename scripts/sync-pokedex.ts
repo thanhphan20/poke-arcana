@@ -1,15 +1,13 @@
-import { mkdir, writeFile, readFile, rename, unlink } from 'node:fs/promises';
+import { mkdir, writeFile, readFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { spawn } from 'node:child_process';
 import { assignArcana, groupIntoCards } from '../src/lib/arcana/index';
 import type { PokemonCard, PokemonRaw, TypeName } from '../src/lib/arcana/types';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const OUT_DIR = join(ROOT, 'src', 'data', 'generated');
 const CACHE_DIR = join(ROOT, '.cache', 'pokeapi');
-const SPRITES_DIR = join(ROOT, 'public', 'sprites');
 
 const DEX_START = Number(process.env.DEX_START ?? 1);
 const DEX_END = Number(process.env.DEX_END ?? 151);
@@ -43,58 +41,6 @@ async function fetchJson(url: string, cacheKey: string): Promise<any> {
   throw lastErr;
 }
 
-const IMAGE_RETRIES = 4;
-// A GitHub PAT (any classic token, no scopes needed) raises the raw.githubusercontent.com
-// rate limit from ~60 to 5 000 req/hour — set GITHUB_TOKEN in .env to enable.
-const GITHUB_AUTH_HEADER: string[] = process.env.GITHUB_TOKEN
-  ? ['-H', `Authorization: token ${process.env.GITHUB_TOKEN}`]
-  : [];
-
-function runCurl(args: string[]): Promise<{ exitCode: number; stdout: string }> {
-  return new Promise((resolve, reject) => {
-    let stdout = '';
-    const proc = spawn('curl', args);
-    proc.stdout?.on('data', (chunk: Buffer) => { stdout += chunk.toString(); });
-    proc.on('error', reject);
-    proc.on('close', (code) => resolve({ exitCode: code ?? 1, stdout }));
-  });
-}
-
-async function downloadImage(url: string, destPath: string): Promise<void> {
-  if (!url || existsSync(destPath)) return;
-  // Bun's built-in fetch is rate-limited by GitHub's CDN via TLS fingerprinting;
-  // curl (with optional auth) bypasses this. We write to a temp file and check the
-  // HTTP status via -w "%{http_code}" to stdout so a 429 body isn't treated as success.
-  for (let attempt = 0; attempt <= IMAGE_RETRIES; attempt++) {
-    const tmp = `${destPath}.tmp`;
-    const { exitCode, stdout } = await runCurl([
-      '-sL', '--max-time', '60', ...GITHUB_AUTH_HEADER, '--output', tmp, '-w', '%{http_code}', url,
-    ]);
-    const status = parseInt(stdout.trim(), 10);
-    if (exitCode !== 0) {
-      await unlink(tmp).catch(() => {});
-      if (attempt < IMAGE_RETRIES) { await sleep(2 ** attempt * 500); continue; }
-      throw new Error(`curl exited ${exitCode} for ${url}`);
-    }
-    if (status === 404) { await unlink(tmp).catch(() => {}); return; }
-    if (status === 429) {
-      await unlink(tmp).catch(() => {});
-      const delay = 2 ** attempt * 3000;
-      process.stderr.write(`  rate-limited; waiting ${delay / 1000}s…\n`);
-      await sleep(delay);
-      continue;
-    }
-    if (status < 200 || status >= 300) {
-      await unlink(tmp).catch(() => {});
-      if (attempt < IMAGE_RETRIES) { await sleep(2 ** attempt * 500); continue; }
-      throw new Error(`HTTP ${status} for ${url}`);
-    }
-    await rename(tmp, destPath);
-    return;
-  }
-  throw new Error(`Failed to download after ${IMAGE_RETRIES} retries: ${url}`);
-}
-
 function cleanFlavor(text: string): string {
   return text.replace(/[\n\r]+/g, ' ').replace(/\s+/g, ' ').trim();
 }
@@ -114,16 +60,6 @@ async function fetchPokemon(id: number): Promise<PokemonRaw & Omit<PokemonCard, 
   );
   const genusEntry = (species.genera as any[]).find((g) => g.language.name === 'en');
 
-  const remoteArtwork: string =
-    pokemon.sprites?.other?.['official-artwork']?.front_default ??
-    pokemon.sprites?.front_default ??
-    '';
-  const remoteThumb: string = pokemon.sprites?.front_default ?? remoteArtwork;
-
-  // Use local paths; images will be downloaded in a separate phase after all API data is fetched.
-  const sprite = remoteArtwork ? `/sprites/official-artwork/${id}.png` : '';
-  const thumbSprite = remoteThumb ? `/sprites/thumbnails/${id}.png` : sprite;
-
   return {
     id,
     name: pokemon.name,
@@ -132,8 +68,6 @@ async function fetchPokemon(id: number): Promise<PokemonRaw & Omit<PokemonCard, 
     bst,
     isLegendary: species.is_legendary === true,
     isMythical: species.is_mythical === true,
-    sprite,
-    thumbSprite,
     flavorText: flavorEntry ? cleanFlavor(flavorEntry.flavor_text) : '',
     genus: genusEntry ? genusEntry.genus : '',
   };
@@ -158,43 +92,11 @@ async function main() {
     throw new Error(`Invalid range: DEX_START=${DEX_START} DEX_END=${DEX_END}`);
   }
 
-  await mkdir(join(SPRITES_DIR, 'official-artwork'), { recursive: true });
-  await mkdir(join(SPRITES_DIR, 'thumbnails'), { recursive: true });
-
   const ids = Array.from({ length: DEX_END - DEX_START + 1 }, (_, i) => DEX_START + i);
   console.log(`Fetching Pokemon #${DEX_START}-${DEX_END} from ${BASE_URL} ...`);
 
 
   const records = await pool(ids, CONCURRENCY, fetchPokemon);
-
-  // Download sprites at low concurrency to avoid GitHub secondary rate limits.
-  console.log('Downloading sprites to public/sprites/ ...');
-  type SpriteJob = { remoteUrl: string; destPath: string };
-  const spriteJobs: SpriteJob[] = ids.flatMap((id) => [
-    {
-      remoteUrl: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`,
-      destPath: join(SPRITES_DIR, 'official-artwork', `${id}.png`),
-    },
-    {
-      remoteUrl: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`,
-      destPath: join(SPRITES_DIR, 'thumbnails', `${id}.png`),
-    },
-  ]);
-  // Serial downloads (concurrency 1) to stay well under GitHub's rate limits.
-  // Failures are warnings, not fatal — re-run sync to fill in any gaps.
-  let downloadFailed = 0;
-  for (const job of spriteJobs) {
-    try {
-      await downloadImage(job.remoteUrl, job.destPath);
-    } catch (err) {
-      downloadFailed++;
-      process.stderr.write(`  [warn] ${err instanceof Error ? err.message : err}\n`);
-    }
-    await sleep(100);
-  }
-  if (downloadFailed > 0) {
-    console.warn(`\n⚠  ${downloadFailed} sprite(s) failed to download (rate limit?). Re-run \`bun run sync\` to retry — already-downloaded files are skipped.`);
-  }
 
   const arcana = assignArcana(records);
   const cards: PokemonCard[] = records
@@ -240,8 +142,6 @@ async function main() {
   console.log(
     `Wrote ${cards.length} Pokemon across 78 tarot cards (${majorCount} Major, ${minorCount} Minor) to src/data/generated/`,
   );
-  const count = DEX_END - DEX_START + 1;
-  console.log(`Sprites saved to public/sprites/ (${count} artwork + ${count} thumbnails)`);
 }
 
 main().catch((err) => {

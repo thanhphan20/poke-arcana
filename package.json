@@ -7,14 +7,16 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "bun run scripts/sync-pokedex.ts && astro build",
+    "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
     "sync": "bun run scripts/sync-pokedex.ts",
+    "upload-sprites": "bun run scripts/upload-sprites-to-blob.ts",
     "typecheck": "astro check",
     "lint": "eslint . --ext .ts,.astro"
   },
   "dependencies": {
+    "@vercel/blob": "^2.6.1",
     "astro": "^7.0.6"
   },
   "devDependencies": {

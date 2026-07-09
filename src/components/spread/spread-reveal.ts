@@ -1,4 +1,5 @@
 import { MAJOR_CARD_THEME, ROMAN, SPREAD_POSITIONS, SUIT_CARD_THEME } from '../../lib/arcana/meanings';
+import { spriteUrl, SPRITE_FALLBACK } from '../../lib/sprites';
 import type { Suit } from '../../lib/arcana/types';
 
 interface SpreadArcana {
@@ -12,7 +13,6 @@ interface SpreadCard {
   id: number;
   slug: string;
   name: string;
-  sprite: string;
   arcana: SpreadArcana;
 }
 
@@ -208,7 +208,7 @@ class SpreadReveal extends HTMLElement {
     const name = escapeHtml(card.name);
     const arcanaName = escapeHtml(card.arcana.name);
     const slug = escapeHtml(card.slug);
-    const sprite = escapeHtml(card.sprite);
+    const sprite = escapeHtml(spriteUrl(card.id, 'artwork'));
 
     return `<a class="arcana-card is-link" style="--accent:${theme.accent}; --wash:${theme.wash};" href="/deck/${slug}">
       <div class="arcana-card__paper">
@@ -222,7 +222,7 @@ class SpreadReveal extends HTMLElement {
         <div class="arcana-card__vignette">
           <div class="arcana-card__rays"></div>
           <div class="arcana-card__horizon"></div>
-          <img class="arcana-card__sprite" src="${sprite}" alt="${name}" loading="lazy">
+          <img class="arcana-card__sprite" src="${sprite}" alt="${name}" loading="lazy" onerror="this.onerror=null;this.src='${SPRITE_FALLBACK}';">
         </div>
         <div class="arcana-card__banner"><span class="arcana-card__star">✦</span><span class="arcana-card__arcana">${arcanaName}</span><span class="arcana-card__star">✦</span></div>
         <div class="arcana-card__footer"><span class="arcana-card__name">${name}</span><span class="arcana-card__id">№ ${paddedId}</span></div>
