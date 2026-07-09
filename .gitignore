@@ -3,8 +3,9 @@ dist/
 # generated types
 .astro/
 
-# generated data
+# generated data & sprites (run `bun run sync` to regenerate)
 src/data/generated/
+public/sprites/
 
 # dependencies
 node_modules/
