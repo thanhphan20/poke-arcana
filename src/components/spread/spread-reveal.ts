@@ -289,7 +289,7 @@ class SpreadReveal extends HTMLElement {
     const slug = escapeHtml(member.slug);
     const sprite = escapeHtml(spriteUrl(member.id, 'artwork'));
 
-    return `<a class="arcana-card is-link" style="--accent:${theme.accent}; --wash:${theme.wash};" href="/card/${slug}">
+    return `<a class="arcana-card is-link" style="--accent:${theme.accent}; --wash:${theme.wash};" href="/deck/${slug}">
       <div class="arcana-card__paper">
         <div class="arcana-card__grain"></div>
         <div class="arcana-card__keyline"></div>
