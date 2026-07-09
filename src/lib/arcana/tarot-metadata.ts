@@ -1,12 +1,4 @@
-export interface TarotMetadata {
-  keywords: string[];
-  uprightMeaning: string;
-  reversedMeaning: string;
-  element?: string;
-  astrology?: string;
-  numerology?: string;
-  description: string;
-}
+import { TarotMetadata } from './types';
 
 export const MAJOR_ARCANA_METADATA: Record<string, TarotMetadata> = {
   'The Fool': {
