@@ -212,6 +212,19 @@ body {
   object-fit: contain;
   filter: drop-shadow(0 6px 10px rgba(60, 40, 10, 0.4)) contrast(1.03) saturate(1.02);
 }
+.arcana-card__glyph {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 64px;
+  line-height: 1;
+  opacity: 0.55;
+  font-family: 'Cinzel Decorative', serif;
+  color: var(--accent, #8a6a2c);
+}
 .arcana-card__banner {
   display: flex;
   align-items: center;
