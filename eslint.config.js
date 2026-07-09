@@ -56,9 +56,12 @@ export default [
       globals: {
         HTMLElement: 'readonly',
         HTMLScriptElement: 'readonly',
+        HTMLInputElement: 'readonly',
+        HTMLButtonElement: 'readonly',
         document: 'readonly',
         window: 'readonly',
         Event: 'readonly',
+        CustomEvent: 'readonly',
         clearTimeout: 'readonly',
         customElements: 'readonly'
       }
