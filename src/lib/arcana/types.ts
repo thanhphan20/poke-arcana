@@ -5,6 +5,16 @@ export type TypeName =
 
 export type Suit = 'cups' | 'wands' | 'swords' | 'pentacles';
 
+export interface TarotMetadata {
+  keywords: string[];
+  uprightMeaning: string;
+  reversedMeaning: string;
+  element?: string;
+  astrology?: string;
+  numerology?: string;
+  description: string;
+}
+
 export interface ArcanaResult {
   kind: 'major' | 'minor';
   /** Display name, e.g. "The Fool" or "Three of Cups". */
@@ -15,6 +25,8 @@ export interface ArcanaResult {
   suit?: Suit;
   /** 0-13 (Ace..King), present only for Minor Arcana. */
   rankIndex?: number;
+  /** Tarot card metadata (meanings, keywords, etc.) */
+  metadata?: TarotMetadata;
 }
 
 /** Minimal Pokemon shape the arcana algorithm needs as input. */

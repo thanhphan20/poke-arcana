@@ -1,7 +1,8 @@
-import type { ArcanaResult, PokemonRaw, Suit } from './types';
-import { majorArcanaForRank } from './majorArcana';
-import { resolveSuit, suitLabel } from './suits';
-import { RANKS, rankIndexForPercentile } from './ranks';
+import type { ArcanaResult, PokemonRaw, Suit } from './types.js';
+import { majorArcanaForRank } from './majorArcana.js';
+import { resolveSuit, suitLabel } from './suits.js';
+import { RANKS, rankIndexForPercentile } from './ranks.js';
+import { MAJOR_ARCANA_METADATA, MINOR_ARCANA_METADATA } from './tarot-metadata.js';
 
 export * from './types';
 export { MAJOR_ARCANA, majorArcanaForRank } from './majorArcana';
@@ -21,7 +22,12 @@ export function assignArcana(pokemon: PokemonRaw[]): Map<number, ArcanaResult> {
   const legendaries = pokemon.filter((p) => p.isLegendary || p.isMythical).sort((a, b) => a.id - b.id);
   legendaries.forEach((p, rank) => {
     const { majorNumber, name } = majorArcanaForRank(rank);
-    results.set(p.id, { kind: 'major', majorNumber, name });
+    results.set(p.id, {
+      kind: 'major',
+      majorNumber,
+      name,
+      metadata: MAJOR_ARCANA_METADATA[name],
+    });
   });
 
   const bySuit = new Map<Suit, PokemonRaw[]>();
@@ -39,11 +45,13 @@ export function assignArcana(pokemon: PokemonRaw[]): Map<number, ArcanaResult> {
     sorted.forEach((p, i) => {
       const percentile = sorted.length === 1 ? 0 : i / (sorted.length - 1);
       const rankIndex = rankIndexForPercentile(percentile);
+      const rankName = RANKS[rankIndex];
       results.set(p.id, {
         kind: 'minor',
         suit,
         rankIndex,
-        name: `${RANKS[rankIndex]} of ${suitLabel(suit)}`,
+        name: `${rankName} of ${suitLabel(suit)}`,
+        metadata: MINOR_ARCANA_METADATA[suit]?.[rankName],
       });
     });
   }
