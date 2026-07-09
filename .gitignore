@@ -26,6 +26,12 @@ bun-debug.log*
 # pokeapi raw-response cache (dev only)
 .cache/
 
+# generated data (regenerate with `bun run sync`)
+src/data/generated/
+
+# local sprite downloads (sprites are served from Vercel Blob; see src/lib/sprites.ts)
+public/sprites/
+
 # macOS-specific files
 .DS_Store
 

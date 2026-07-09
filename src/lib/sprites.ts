@@ -1,9 +1,8 @@
 /**
  * Public base URL of the Vercel Blob store holding uploaded sprites (see
- * scripts/upload-sprites-to-blob.ts). Replace after creating the store and
- * running the upload script.
+ * scripts/upload-sprites-to-blob.ts). Set via PUBLIC_SPRITES_BASE in .env.
  */
-const SPRITES_BASE = 'https://REPLACE_WITH_BLOB_STORE_BASE_URL.public.blob.vercel-storage.com';
+const SPRITES_BASE = import.meta.env.PUBLIC_SPRITES_BASE;
 
 export type SpriteVariant = 'artwork' | 'thumb';
 
