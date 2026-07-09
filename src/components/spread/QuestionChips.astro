@@ -30,6 +30,7 @@ const QUESTIONS = [
       class="question-input"
       data-question-input
       placeholder="Or write your own question…"
+      aria-label="Write your own question"
       maxlength="120"
       autocomplete="off"
       spellcheck="true"
@@ -55,6 +56,7 @@ const QUESTIONS = [
     const clearBtn = root.querySelector<HTMLButtonElement>('[data-question-clear]')!;
 
     let selected: string | null = null;
+    let inputTimer: ReturnType<typeof setTimeout> | undefined;
 
     const sync = (question: string | null) => {
       selected = question;
@@ -70,24 +72,20 @@ const QUESTIONS = [
         display.hidden = true;
         textEl.textContent = '';
       }
-      // Broadcast so SpreadReveal and the reading gate can react
       window.dispatchEvent(new CustomEvent('question-change', { detail: { question: selected ?? '' } }));
     };
 
-    // Chip click: toggle — re-clicking active chip clears
     for (const chip of chips) {
       chip.addEventListener('click', () => {
+        clearTimeout(inputTimer);
         const q = chip.dataset.question ?? '';
         input.value = '';
         sync(selected === q ? null : q);
       });
     }
 
-    // Input: deselect chip, show display live as user types
-    let inputTimer: ReturnType<typeof setTimeout>;
     input.addEventListener('input', () => {
       clearTimeout(inputTimer);
-      // Deselect chips immediately
       for (const chip of chips) {
         chip.classList.remove('is-active');
         chip.setAttribute('aria-pressed', 'false');
@@ -98,7 +96,8 @@ const QUESTIONS = [
       if (val) {
         textEl.textContent = val;
         display.hidden = false;
-        // Open the gate immediately on first keystroke, then debounce full sync
+        // Open the gate on first keystroke, then debounce the full sync so
+        // aria-live doesn't announce every character.
         window.dispatchEvent(new CustomEvent('question-change', { detail: { question: val } }));
         inputTimer = setTimeout(() => sync(val), 500);
       } else {
@@ -108,8 +107,8 @@ const QUESTIONS = [
       }
     });
 
-    // Clear button
     clearBtn.addEventListener('click', () => {
+      clearTimeout(inputTimer);
       input.value = '';
       sync(null);
     });
@@ -189,6 +188,11 @@ const QUESTIONS = [
   }
 
   /* ── Active-question display banner ── */
+  /* Explicit [hidden] override — the `display: inline-flex` below beats the
+     UA default of `display: none` on the [hidden] attribute otherwise. */
+  .question-display[hidden] {
+    display: none;
+  }
   .question-display {
     display: inline-flex;
     align-items: center;
