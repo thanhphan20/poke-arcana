@@ -1,6 +1,8 @@
 import eslint from '@eslint/js';
 import typescriptEslint from '@typescript-eslint/eslint-plugin';
 import typescriptParser from '@typescript-eslint/parser';
+import astroEslintPlugin from 'eslint-plugin-astro';
+import * as astroParser from 'astro-eslint-parser';
 
 export default [
   eslint.configs.recommended,
@@ -15,7 +17,51 @@ export default [
       sourceType: 'module'
     },
     rules: {
-      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }]
+      'no-unused-vars': 'off',
+      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_', ignoreRestSiblings: true }]
+    }
+  },
+  {
+    files: ['scripts/**/*.ts'],
+    languageOptions: {
+      ecmaVersion: 2022,
+      sourceType: 'module',
+      globals: {
+        process: 'readonly',
+        console: 'readonly',
+        fetch: 'readonly',
+        setTimeout: 'readonly',
+        clearTimeout: 'readonly',
+        Buffer: 'readonly'
+      }
+    }
+  },
+  {
+    files: ['src/**/*.astro'],
+    plugins: {
+      astro: astroEslintPlugin
+    },
+    languageOptions: {
+      parser: astroParser,
+      parserOptions: {
+        ecmaVersion: 2022,
+        sourceType: 'module',
+        parser: typescriptParser
+      }
+    }
+  },
+  {
+    files: ['src/**/*.ts'],
+    languageOptions: {
+      globals: {
+        HTMLElement: 'readonly',
+        HTMLScriptElement: 'readonly',
+        document: 'readonly',
+        window: 'readonly',
+        Event: 'readonly',
+        clearTimeout: 'readonly',
+        customElements: 'readonly'
+      }
     }
   },
   {

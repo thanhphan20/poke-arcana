@@ -42,7 +42,7 @@ async function fetchJson(url: string, cacheKey: string): Promise<any> {
 }
 
 function cleanFlavor(text: string): string {
-  return text.replace(/[\f\n\r]+/g, ' ').replace(/\s+/g, ' ').trim();
+  return text.replace(/[\n\r]+/g, ' ').replace(/\s+/g, ' ').trim();
 }
 
 async function fetchPokemon(id: number): Promise<PokemonRaw & Omit<PokemonCard, 'arcana'>> {
@@ -81,7 +81,7 @@ async function fetchPokemon(id: number): Promise<PokemonRaw & Omit<PokemonCard, 
 }
 
 /** Run tasks with bounded concurrency, preserving input order in the output. */
-async function pool<T, R>(items: T[], limit: number, fn: (item: T) => Promise<R>): Promise<R[]> {
+async function pool<T, R>(items: T[], limit: number, fn: (_item: T) => Promise<R>): Promise<R[]> {
   const results = new Array<R>(items.length);
   let cursor = 0;
   async function worker() {

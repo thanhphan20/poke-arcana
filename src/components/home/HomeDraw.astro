@@ -171,11 +171,11 @@ const fan = [
 
     function draw() {
       const card = deck[Math.floor(Math.random() * deck.length)];
-      fanState.hidden = true;
-      revealState.hidden = false;
-      revealState.innerHTML = revealHtml(card);
+      fanState!.hidden = true;
+      revealState!.hidden = false;
+      revealState!.innerHTML = revealHtml(card);
 
-      const flip = revealState.querySelector<HTMLElement>('.home-draw__flip');
+      const flip = revealState!.querySelector<HTMLElement>('.home-draw__flip');
       if (flip) {
         if (reduce) {
           flip.style.transition = 'none';
@@ -187,7 +187,7 @@ const fan = [
         }
       }
 
-      const again = revealState.querySelector<HTMLElement>('[data-draw-again]');
+      const again = revealState!.querySelector<HTMLElement>('[data-draw-again]');
       again?.addEventListener('click', draw);
     }
 

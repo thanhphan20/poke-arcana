@@ -18,7 +18,7 @@ const arcana = z.object({
 });
 
 const pokemonCards = defineCollection({
-  loader: file('src/data/generated/pokemon.json', { id: (entry) => String(entry.id) }),
+  loader: file('src/data/generated/pokemon.json'),
   schema: z.object({
     id: z.number().int(),
     name: z.string(),
@@ -51,7 +51,7 @@ const pokemonCardMember = z.object({
 });
 
 const tarotCards = defineCollection({
-  loader: file('src/data/generated/cards.json', { id: (entry) => String(entry.slug) }),
+  loader: file('src/data/generated/cards.json'),
   schema: z.object({
     slug: z.string(),
     arcana,
