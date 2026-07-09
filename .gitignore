@@ -9,6 +9,12 @@ src/data/generated/
 # dependencies
 node_modules/
 
+# lock files
+bun.lock
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
 # logs
 npm-debug.log*
 yarn-debug.log*
