@@ -55,3 +55,15 @@ export interface PokemonCard {
   genus: string;
   arcana: ArcanaResult;
 }
+
+/**
+ * One of the 78 tarot cards, grouping every Pokemon that shares that card's
+ * arcana identity. Major cards have exactly one member; Minor cards have
+ * zero or more. Written to src/data/generated/cards.json.
+ */
+export interface TarotCardGroup {
+  slug: string;
+  arcana: ArcanaResult;
+  /** Ordered by base-stat total descending, then Pokedex id ascending. */
+  members: PokemonCard[];
+}

@@ -2,9 +2,10 @@
 import type { CollectionEntry } from 'astro:content';
 import TarotCard from './TarotCard.astro';
 import { SUIT_META } from '../lib/arcana/meanings';
+import { SUITS } from '../lib/arcana/suits';
 
 interface Props {
-  cards: CollectionEntry<'pokemonCards'>[];
+  cards: CollectionEntry<'tarotCards'>[];
 }
 
 const { cards } = Astro.props;
@@ -20,7 +21,15 @@ const filters = [
   { key: 'pentacles', label: 'Pentacles', accent: SUIT_META.pentacles.color },
 ] as const;
 
-const sorted = cards.slice().sort((a, b) => a.data.id - b.data.id);
+const sorted = cards.slice().sort((a, b) => {
+  const { arcana: arcanaA } = a.data;
+  const { arcana: arcanaB } = b.data;
+  if (arcanaA.kind !== arcanaB.kind) return arcanaA.kind === 'major' ? -1 : 1;
+  if (arcanaA.kind === 'major') return (arcanaA.majorNumber ?? 0) - (arcanaB.majorNumber ?? 0);
+  const suitDiff = SUITS.indexOf(arcanaA.suit!) - SUITS.indexOf(arcanaB.suit!);
+  if (suitDiff !== 0) return suitDiff;
+  return (arcanaA.rankIndex ?? 0) - (arcanaB.rankIndex ?? 0);
+});
 ---
 
 <div class="deck">
@@ -52,11 +61,18 @@ const sorted = cards.slice().sort((a, b) => a.data.id - b.data.id);
 
   <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:22px;">
     {
-      sorted.map((entry) => (
-        <div class="deck-item" data-kind={entry.data.arcana.kind} data-suit={entry.data.arcana.suit ?? ''}>
-          <TarotCard card={entry.data} href={'/deck/' + entry.data.slug} />
-        </div>
-      ))
+      sorted.map((entry) => {
+        const representative = entry.data.members[0];
+        return (
+          <div class="deck-item" data-kind={entry.data.arcana.kind} data-suit={entry.data.arcana.suit ?? ''}>
+            {representative ? (
+              <TarotCard card={representative} href={'/card/' + entry.data.slug} />
+            ) : (
+              <TarotCard arcana={entry.data.arcana} href={'/card/' + entry.data.slug} />
+            )}
+          </div>
+        );
+      })
     }
   </div>
 </div>
