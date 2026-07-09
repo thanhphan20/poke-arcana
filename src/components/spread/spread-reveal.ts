@@ -45,8 +45,8 @@ const PER_ROW = 39; // 78 / 2 rows
 
 /** Back → front. Same radius = same arc shape; bottom offset + z-index puts row 1 clearly in front. */
 const ROW_CONFIGS = [
-  { bottom: 78, radius: 540, arc: 66, zBase: 1  }, // back
-  { bottom: 12, radius: 490, arc: 66, zBase: 42 }, // front
+  { bottom: 88, radius: 740, arc: 99, zBase: 1  }, // back
+  { bottom: 12, radius: 690, arc: 99, zBase: 42 }, // front
 ] as const;
 
 const REDUCED_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -303,8 +303,8 @@ class SpreadReveal extends HTMLElement {
         'position:absolute',
         'left:50%',
         `bottom:${cfg.bottom}px`,
-        'width:82px',
-        'height:128px',
+        'width:100px',
+        'height:180px',
         `transform-origin:50% ${cfg.radius}px`,
         `transform:${baseTransform}`,
         `z-index:${baseZ}`,
