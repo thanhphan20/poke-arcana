@@ -54,6 +54,13 @@ const payload = cards.map((c) => {
 
     <div data-reading-panel class="reading-panel" hidden></div>
 
+    <div data-fortune-row class="fortune-row" hidden>
+        <button type="button" data-read-fortune class="fortune-btn"
+            >Read My Fortune</button
+        >
+        <p data-fortune-error class="fortune-error" hidden></p>
+    </div>
+
     <div data-reset-row class="spread-reset" hidden>
         <button type="button" data-reset class="spread-reset-btn"
             >Shuffle · New Reading</button
@@ -90,6 +97,54 @@ const payload = cards.map((c) => {
         perspective: 1400px;
         min-height: 180px;
     }
+    .fortune-row {
+        margin-top: 36px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+    }
+    .fortune-btn {
+        padding: 13px 34px;
+        border-radius: 999px;
+        cursor: pointer;
+        font-family: "Cinzel", serif;
+        font-size: 12px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: #0b0714;
+        border: none;
+        background: linear-gradient(160deg, #e3cf95, #c39a45);
+        transition: opacity 0.25s, transform 0.2s;
+    }
+    .fortune-btn:hover:not(:disabled) {
+        transform: translateY(-1px);
+    }
+    .fortune-btn:focus-visible {
+        outline: 2px solid #a78bfa;
+        outline-offset: 3px;
+    }
+    .fortune-btn:disabled {
+        cursor: default;
+        opacity: 0.6;
+    }
+    .fortune-error {
+        margin: 0;
+        font-family: "EB Garamond", serif;
+        font-style: italic;
+        font-size: 14px;
+        color: #c8bfe0;
+    }
+    :global(.rp-attribution) {
+        margin-top: 14px;
+        font-family: "Cinzel", serif;
+        font-size: 10px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: #3d3455;
+        text-align: center;
+    }
+
     .spread-reset {
         margin-top: 30px;
     }

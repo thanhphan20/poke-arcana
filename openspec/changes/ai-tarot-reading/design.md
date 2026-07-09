@@ -40,7 +40,7 @@ Existing surface we reuse:
 
 ### 1. Adapter: `@astrojs/vercel` with `output: 'server'`, per-page `prerender = true`
 
-**Chosen:** Astro's server output mode, with all non-API routes explicitly marked `export const prerender = true`. Vercel deploys `/api/reading` as an Edge Function and everything else as static HTML.
+**Chosen:** Astro's server output mode, with all non-API routes explicitly marked `export const prerender = true`. Vercel deploys `/api/reading` as an Edge Function (via that route's own `export const config = { runtime: 'edge' }`) and everything else as static HTML. `@astrojs/vercel` v11 unified the old `/edge` and `/serverless` subpath adapters into one default export — the runtime is now selected per-route, not per-adapter-import.
 
 **Alternatives:**
 
@@ -84,8 +84,11 @@ The user's request is encoded as TOON. Format: `key: value` per line;
 nested objects indented; arrays as `- ` items. Interpret it as JSON.
 ```
 
+Implemented with the official [`@toon-format/toon`](https://github.com/toon-format/toon) npm package (zero runtime deps, ESM, ships types) rather than a hand-rolled encoder — no reason to reimplement a spec-driven format a maintained library already covers correctly, including edge cases (quoting, delimiter escaping, strict-mode validation) a first-pass hand implementation would miss.
+
 **Alternatives:**
 
+- Hand-rolled encoder — briefly implemented, then discarded in favor of the official package once its existence was confirmed on npm. Reinventing a spec'd format inside this repo would mean maintaining our own quoting/escaping edge cases forever.
 - Plain JSON — baseline. ~30-50% more tokens for this payload. Marginal on 1 card, meaningful on Celtic Cross (10 cards × ~120 tokens of meta each).
 - YAML — similar savings to TOON but with lookahead parsing quirks that some LLMs mis-handle. TOON is stricter and simpler.
 - Prose ("The user drew The Fool in the past position…") — reads well to a human, uses *more* tokens than JSON, and burdens the model with parsing English rather than data.

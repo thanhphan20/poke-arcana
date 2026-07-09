@@ -63,11 +63,16 @@ export default [
         Event: 'readonly',
         CustomEvent: 'readonly',
         clearTimeout: 'readonly',
-        customElements: 'readonly'
+        customElements: 'readonly',
+        fetch: 'readonly',
+        setTimeout: 'readonly',
+        Response: 'readonly',
+        RequestInit: 'readonly',
+        AbortController: 'readonly'
       }
     }
   },
   {
-    ignores: ['dist/', 'node_modules/', '.astro/']
+    ignores: ['dist/', 'node_modules/', '.astro/', '.vercel/']
   }
 ];
