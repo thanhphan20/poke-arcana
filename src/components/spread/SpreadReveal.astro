@@ -1,40 +1,103 @@
 ---
-import type { CollectionEntry } from 'astro:content';
+import type { CollectionEntry } from "astro:content";
 
 interface Props {
-  cards: CollectionEntry<'tarotCards'>[];
+    cards: CollectionEntry<"tarotCards">[];
 }
 
 const { cards } = Astro.props;
 
 const payload = cards.map((c) => ({
-  slug: c.data.slug,
-  arcana: {
-    kind: c.data.arcana.kind,
-    name: c.data.arcana.name,
-    suit: c.data.arcana.suit,
-    majorNumber: c.data.arcana.majorNumber,
-  },
-  members: c.data.members.map((m) => ({ id: m.id, name: m.name, slug: m.slug })),
+    slug: c.data.slug,
+    arcana: {
+        kind: c.data.arcana.kind,
+        name: c.data.arcana.name,
+        suit: c.data.arcana.suit,
+        majorNumber: c.data.arcana.majorNumber,
+    },
+    members: c.data.members.map((m) => ({
+        id: m.id,
+        name: m.name,
+        slug: m.slug,
+    })),
 }));
 ---
 
 <spread-reveal data-default-spread="3">
-  <script type="application/json" set:html={JSON.stringify(payload)} />
-  <div data-results class="spread-results"></div>
+    <script type="application/json" set:html={JSON.stringify(payload)} />
+
+    <p data-instruction class="spread-instruction">
+        Draw three cards from the deck below.
+    </p>
+    <p data-counter class="spread-counter">Drawn 0 / 3</p>
+
+    <div data-slots class="spread-slots"></div>
+
+    <div data-reset-row class="spread-reset" hidden>
+        <button type="button" data-reset class="spread-reset-btn"
+            >Shuffle · New Reading</button
+        >
+    </div>
+
+    <p data-fan-hint class="spread-fan-hint">Hover to lift · click to draw</p>
+    <div data-fan class="spread-fan"></div>
 </spread-reveal>
 
 <style>
-  .spread-results {
-    margin-top: 52px;
-    min-height: 340px;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: center;
-    gap: 26px;
-    perspective: 1400px;
-  }
+    .spread-instruction {
+        margin: 24px 0 2px;
+        font-family: "EB Garamond", serif;
+        font-style: italic;
+        font-size: 18px;
+        color: #c8bfe0;
+    }
+    .spread-counter {
+        margin: 0;
+        font-family: "Cinzel", serif;
+        font-size: 12px;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: #cba85a;
+    }
+    .spread-slots {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-start;
+        justify-content: center;
+        gap: 24px;
+        margin-top: 30px;
+        perspective: 1400px;
+        min-height: 180px;
+    }
+    .spread-reset {
+        margin-top: 30px;
+    }
+    .spread-reset-btn {
+        padding: 11px 28px;
+        border-radius: 999px;
+        cursor: pointer;
+        font-family: "Cinzel", serif;
+        font-size: 12px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: #e9e4f5;
+        border: 1px solid rgba(167, 139, 250, 0.5);
+        background: rgba(124, 92, 255, 0.12);
+    }
+    .spread-fan-hint {
+        margin: 40px 0 0;
+        font-family: "Cinzel", serif;
+        font-size: 11px;
+        letter-spacing: 0.28em;
+        text-transform: uppercase;
+        color: #5a5273;
+    }
+    .spread-fan {
+        position: relative;
+        width: 100%;
+        height: 360px;
+        margin: 0 auto 140px;
+    }
 </style>
 
 <script src="./spread-reveal.ts"></script>
