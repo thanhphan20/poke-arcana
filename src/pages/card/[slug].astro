@@ -4,6 +4,7 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import TarotCard from '../../components/TarotCard.astro';
 import { SUIT_META, ROMAN, uiAccent, arcanaMeaning } from '../../lib/arcana/meanings';
+import { spriteUrl, SPRITE_FALLBACK } from '../../lib/sprites';
 
 export const getStaticPaths = (async () => {
   const cards = await getCollection('tarotCards');
@@ -64,7 +65,12 @@ const accentBorder = `color-mix(in srgb, ${accent} 40%, transparent)`;
             <div class="pa-members">
               {members.map((member) => (
                 <a href={'/deck/' + member.slug} class="pa-member">
-                  <img src={member.thumbSprite} alt={member.name} loading="lazy" />
+                  <img
+                    src={spriteUrl(member.id, 'thumb')}
+                    alt={member.name}
+                    loading="lazy"
+                    onerror={`this.onerror=null;this.src='${SPRITE_FALLBACK}';`}
+                  />
                   <span class="pa-membername">{member.name}</span>
                   <span class="pa-memberbst">BST {member.bst}</span>
                 </a>

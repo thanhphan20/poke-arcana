@@ -2,6 +2,7 @@
 import type { CollectionEntry } from 'astro:content';
 import type { ArcanaResult } from '../lib/arcana/types';
 import { cardTheme, ROMAN, SUIT_META } from '../lib/arcana/meanings';
+import { spriteUrl, SPRITE_FALLBACK } from '../lib/sprites';
 
 type CardData = CollectionEntry<'pokemonCards'>['data'];
 
@@ -46,7 +47,13 @@ const Tag = href ? 'a' : 'div';
       <div class="arcana-card__horizon"></div>
       {
         card ? (
-          <img src={card.sprite} alt={card.name} loading="lazy" class="arcana-card__sprite" />
+          <img
+            src={spriteUrl(card.id, 'artwork')}
+            alt={card.name}
+            loading="lazy"
+            class="arcana-card__sprite"
+            onerror={`this.onerror=null;this.src='${SPRITE_FALLBACK}';`}
+          />
         ) : (
           <span class="arcana-card__glyph">{kicker}</span>
         )

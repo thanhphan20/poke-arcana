@@ -8,7 +8,6 @@ interface DeckCard {
   id: number;
   slug: string;
   name: string;
-  sprite: string;
   arcana: { kind: 'major' | 'minor'; name: string; suit?: string; majorNumber?: number };
 }
 
@@ -74,12 +73,12 @@ const fan = [
 
 <script>
   import { cardTheme, uiAccent, arcanaMeaning, ROMAN } from '../../lib/arcana/meanings';
+  import { spriteUrl, SPRITE_FALLBACK } from '../../lib/sprites';
 
   interface DeckCard {
     id: number;
     slug: string;
     name: string;
-    sprite: string;
     arcana: { kind: 'major' | 'minor'; name: string; suit?: any; majorNumber?: number };
   }
 
@@ -105,7 +104,7 @@ const fan = [
           <div class="arcana-card__vignette">
             <div class="arcana-card__rays"></div>
             <div class="arcana-card__horizon"></div>
-            <img class="arcana-card__sprite" src="${esc(card.sprite)}" alt="${esc(card.name)}" loading="lazy">
+            <img class="arcana-card__sprite" src="${esc(spriteUrl(card.id, 'artwork'))}" alt="${esc(card.name)}" loading="lazy" onerror="this.onerror=null;this.src='${SPRITE_FALLBACK}';">
           </div>
           <div class="arcana-card__banner">
             <span class="arcana-card__star">✦</span>

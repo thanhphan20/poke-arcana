@@ -15,7 +15,7 @@ const payload = cards.map((c) => ({
     suit: c.data.arcana.suit,
     majorNumber: c.data.arcana.majorNumber,
   },
-  members: c.data.members.map((m) => ({ id: m.id, name: m.name, slug: m.slug, sprite: m.sprite })),
+  members: c.data.members.map((m) => ({ id: m.id, name: m.name, slug: m.slug })),
 }));
 ---
 

@@ -49,8 +49,6 @@ export interface PokemonCard {
   bst: number;
   isLegendary: boolean;
   isMythical: boolean;
-  sprite: string;
-  thumbSprite: string;
   flavorText: string;
   genus: string;
   arcana: ArcanaResult;
