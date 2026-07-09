@@ -1,0 +1,221 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import TarotCard from '../../components/TarotCard.astro';
+import { SUIT_META, ROMAN, uiAccent, arcanaMeaning } from '../../lib/arcana/meanings';
+
+export const getStaticPaths = (async () => {
+  const cards = await getCollection('tarotCards');
+  return cards.map((entry) => ({
+    params: { slug: entry.data.slug },
+    props: { card: entry.data },
+  }));
+}) satisfies GetStaticPaths;
+
+const { card } = Astro.props;
+const { arcana, members } = card;
+const representative = members[0];
+
+const accent = uiAccent(arcana);
+const isMajor = arcana.kind === 'major';
+
+const kicker = isMajor ? (ROMAN[arcana.majorNumber ?? 0] ?? '✦') : (SUIT_META[arcana.suit ?? 'cups']?.glyph ?? '✦');
+const arcanaLabel = isMajor ? 'Major Arcana' : `Minor Arcana · ${arcana.suit}`;
+const meaning = arcanaMeaning(arcana);
+const accentBorder = `color-mix(in srgb, ${accent} 40%, transparent)`;
+---
+
+<BaseLayout title={`${arcana.name} — Poké-Arcana`} description={`${arcana.name}, one of the 78 cards of the Poké-Arcana.`}>
+  <section class="pa-rise pa-detail">
+    <a href="/deck" class="pa-back">← Back to the deck</a>
+
+    <div class="pa-grid">
+      <div class="pa-left">
+        {
+          representative ? (
+            <TarotCard card={representative} href={'/deck/' + representative.slug} />
+          ) : (
+            <TarotCard arcana={arcana} />
+          )
+        }
+      </div>
+
+      <div class="pa-right">
+        <div class="pa-idrow">
+          <span>{arcanaLabel}</span>
+        </div>
+
+        <h1 class="pa-name">{arcana.name}</h1>
+
+        <div class="pa-arcanabox" style={`border-color:${accentBorder};`}>
+          <div class="pa-watermark" style={`color:${accent};`}>{kicker}</div>
+          <p class="pa-meaning">{meaning}</p>
+        </div>
+
+        <h2 class="pa-memberstitle">
+          {members.length === 1 ? '1 Pokémon' : `${members.length} Pokémon`} on this card
+        </h2>
+
+        {
+          members.length === 0 ? (
+            <p class="pa-empty">No Pokémon have drawn this card yet.</p>
+          ) : (
+            <div class="pa-members">
+              {members.map((member) => (
+                <a href={'/deck/' + member.slug} class="pa-member">
+                  <img src={member.thumbSprite} alt={member.name} loading="lazy" />
+                  <span class="pa-membername">{member.name}</span>
+                  <span class="pa-memberbst">BST {member.bst}</span>
+                </a>
+              ))}
+            </div>
+          )
+        }
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  @keyframes pa-rise {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .pa-rise { animation: pa-rise 0.5s ease both; }
+
+  .pa-detail { padding: 36px 0 80px; }
+
+  .pa-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #8f86ac;
+  }
+
+  .pa-grid {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: 52px;
+    margin-top: 28px;
+    align-items: start;
+  }
+
+  .pa-left {
+    position: sticky;
+    top: 100px;
+  }
+
+  .pa-idrow {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #8f86ac;
+  }
+
+  .pa-name {
+    font-family: 'Cinzel Decorative', serif;
+    font-weight: 700;
+    font-size: clamp(40px, 5vw, 60px);
+    margin: 10px 0 0;
+    color: #f3dfa2;
+  }
+
+  .pa-arcanabox {
+    margin-top: 22px;
+    padding: 22px 24px;
+    border-radius: 14px;
+    border: 1px solid transparent;
+    background: linear-gradient(160deg, rgba(21, 14, 43, 0.7), rgba(11, 7, 20, 0.5));
+    position: relative;
+    overflow: hidden;
+  }
+  .pa-watermark {
+    position: absolute;
+    top: -30px;
+    right: -20px;
+    font-size: 120px;
+    opacity: 0.06;
+    font-family: 'Cinzel Decorative', serif;
+  }
+  .pa-meaning {
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.6;
+    color: #c8bfe0;
+    font-style: italic;
+  }
+
+  .pa-memberstitle {
+    margin: 34px 0 16px;
+    font-family: 'Cinzel', serif;
+    font-weight: 600;
+    font-size: 15px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #8f86ac;
+  }
+
+  .pa-empty {
+    font-size: 16px;
+    color: #8f86ac;
+    font-style: italic;
+  }
+
+  .pa-members {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 16px;
+  }
+
+  .pa-member {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 4px;
+    padding: 12px 8px;
+    border-radius: 12px;
+    background: rgba(21, 14, 43, 0.5);
+    border: 1px solid rgba(167, 139, 250, 0.15);
+    text-decoration: none;
+    transition: border-color 0.2s;
+  }
+  .pa-member:hover {
+    border-color: rgba(167, 139, 250, 0.5);
+  }
+  .pa-member img {
+    width: 56px;
+    height: 56px;
+    object-fit: contain;
+  }
+  .pa-membername {
+    font-size: 13px;
+    color: #e8e0f8;
+    text-transform: capitalize;
+  }
+  .pa-memberbst {
+    font-size: 11px;
+    color: #8f86ac;
+  }
+
+  @media (max-width: 720px) {
+    .pa-grid {
+      grid-template-columns: 1fr;
+      gap: 32px;
+    }
+    .pa-left {
+      position: static;
+      justify-self: center;
+    }
+  }
+</style>

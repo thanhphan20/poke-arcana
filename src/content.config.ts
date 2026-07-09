@@ -18,7 +18,7 @@ const arcana = z.object({
 });
 
 const pokemonCards = defineCollection({
-  loader: file('src/data/generated/pokemon.json', { id: (entry) => String(entry.id) }),
+  loader: file('src/data/generated/pokemon.json'),
   schema: z.object({
     id: z.number().int(),
     name: z.string(),
@@ -35,4 +35,28 @@ const pokemonCards = defineCollection({
   }),
 });
 
-export const collections = { pokemonCards };
+const pokemonCardMember = z.object({
+  id: z.number().int(),
+  name: z.string(),
+  slug: z.string(),
+  types: z.array(typeName),
+  bst: z.number().int(),
+  isLegendary: z.boolean(),
+  isMythical: z.boolean(),
+  sprite: z.string(),
+  thumbSprite: z.string(),
+  flavorText: z.string(),
+  genus: z.string(),
+  arcana,
+});
+
+const tarotCards = defineCollection({
+  loader: file('src/data/generated/cards.json'),
+  schema: z.object({
+    slug: z.string(),
+    arcana,
+    members: z.array(pokemonCardMember),
+  }),
+});
+
+export const collections = { pokemonCards, tarotCards };

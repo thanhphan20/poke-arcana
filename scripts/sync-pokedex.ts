@@ -2,7 +2,7 @@ import { mkdir, writeFile, readFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { assignArcana } from '../src/lib/arcana/index';
+import { assignArcana, groupIntoCards } from '../src/lib/arcana/index';
 import type { PokemonCard, PokemonRaw, TypeName } from '../src/lib/arcana/types';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -42,7 +42,7 @@ async function fetchJson(url: string, cacheKey: string): Promise<any> {
 }
 
 function cleanFlavor(text: string): string {
-  return text.replace(/[\f\n\r]+/g, ' ').replace(/\s+/g, ' ').trim();
+  return text.replace(/[\n\r]+/g, ' ').replace(/\s+/g, ' ').trim();
 }
 
 async function fetchPokemon(id: number): Promise<PokemonRaw & Omit<PokemonCard, 'arcana'>> {
@@ -81,7 +81,7 @@ async function fetchPokemon(id: number): Promise<PokemonRaw & Omit<PokemonCard, 
 }
 
 /** Run tasks with bounded concurrency, preserving input order in the output. */
-async function pool<T, R>(items: T[], limit: number, fn: (item: T) => Promise<R>): Promise<R[]> {
+async function pool<T, R>(items: T[], limit: number, fn: (_item: T) => Promise<R>): Promise<R[]> {
   const results = new Array<R>(items.length);
   let cursor = 0;
   async function worker() {
@@ -113,8 +113,22 @@ async function main() {
     })
     .sort((a, b) => a.id - b.id);
 
+  const tarotCards = groupIntoCards(cards);
+  const majorCount = tarotCards.filter((c) => c.arcana.kind === 'major').length;
+  const minorCount = tarotCards.filter((c) => c.arcana.kind === 'minor').length;
+  if (tarotCards.length !== 78 || majorCount !== 22 || minorCount !== 56) {
+    throw new Error(
+      `Expected 78 tarot cards (22 Major + 56 Minor), got ${tarotCards.length} (${majorCount} Major, ${minorCount} Minor).`,
+    );
+  }
+  const emptyMajors = tarotCards.filter((c) => c.arcana.kind === 'major' && c.members.length === 0);
+  if (emptyMajors.length > 0) {
+    throw new Error(`Major Arcana card(s) with no assigned Pokemon: ${emptyMajors.map((c) => c.arcana.name).join(', ')}.`);
+  }
+
   await mkdir(OUT_DIR, { recursive: true });
   await writeFile(join(OUT_DIR, 'pokemon.json'), JSON.stringify(cards, null, 2), 'utf8');
+  await writeFile(join(OUT_DIR, 'cards.json'), JSON.stringify(tarotCards, null, 2), 'utf8');
   await writeFile(
     join(OUT_DIR, 'meta.json'),
     JSON.stringify(
@@ -131,8 +145,9 @@ async function main() {
     'utf8',
   );
 
-  const majors = cards.filter((c) => c.arcana.kind === 'major').length;
-  console.log(`Wrote ${cards.length} cards (${majors} Major Arcana) to src/data/generated/`);
+  console.log(
+    `Wrote ${cards.length} Pokemon across 78 tarot cards (${majorCount} Major, ${minorCount} Minor) to src/data/generated/`,
+  );
 }
 
 main().catch((err) => {

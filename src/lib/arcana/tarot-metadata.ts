@@ -1,4 +1,4 @@
-import { TarotMetadata } from './types';
+import type { TarotMetadata } from './types';
 
 export const MAJOR_ARCANA_METADATA: Record<string, TarotMetadata> = {
   'The Fool': {
