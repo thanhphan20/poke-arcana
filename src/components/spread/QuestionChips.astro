@@ -1,0 +1,243 @@
+---
+const QUESTIONS = [
+  'What am I empowered to do?',
+  'What is my heart leading me to do?',
+  "What isn't being said or revealed?",
+  'What needs more attention right now?',
+  'What guides my choices?',
+  'What can I do to emphasize growth?',
+  'What would happen if I took no action?',
+  'How might this decision transform me?',
+] as const;
+---
+
+<div class="question-chips" data-question-chips>
+  <p class="question-chips__kicker">Step 1 — Focus your intent to begin</p>
+
+  <div class="question-chips__row">
+    {
+      QUESTIONS.map((q) => (
+        <button type="button" class="question-chip" data-question={q} aria-pressed="false">
+          {q}
+        </button>
+      ))
+    }
+  </div>
+
+  <div class="question-input-row">
+    <input
+      type="text"
+      class="question-input"
+      data-question-input
+      placeholder="Or write your own question…"
+      maxlength="120"
+      autocomplete="off"
+      spellcheck="true"
+    />
+  </div>
+
+  <p class="question-display" data-question-display hidden aria-live="polite">
+    <span class="question-display__label">Your question</span>
+    <span class="question-display__text" data-question-text></span>
+    <button type="button" class="question-display__clear" data-question-clear aria-label="Clear your question">
+      ✕
+    </button>
+  </p>
+</div>
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-question-chips]');
+  if (root) {
+    const chips    = Array.from(root.querySelectorAll<HTMLButtonElement>('[data-question]'));
+    const input    = root.querySelector<HTMLInputElement>('[data-question-input]')!;
+    const display  = root.querySelector<HTMLElement>('[data-question-display]')!;
+    const textEl   = root.querySelector<HTMLElement>('[data-question-text]')!;
+    const clearBtn = root.querySelector<HTMLButtonElement>('[data-question-clear]')!;
+
+    let selected: string | null = null;
+
+    const sync = (question: string | null) => {
+      selected = question;
+      for (const chip of chips) {
+        const active = chip.dataset.question === selected;
+        chip.classList.toggle('is-active', active);
+        chip.setAttribute('aria-pressed', String(active));
+      }
+      if (selected) {
+        textEl.textContent = selected;
+        display.hidden = false;
+      } else {
+        display.hidden = true;
+        textEl.textContent = '';
+      }
+      // Broadcast so SpreadReveal and the reading gate can react
+      window.dispatchEvent(new CustomEvent('question-change', { detail: { question: selected ?? '' } }));
+    };
+
+    // Chip click: toggle — re-clicking active chip clears
+    for (const chip of chips) {
+      chip.addEventListener('click', () => {
+        const q = chip.dataset.question ?? '';
+        input.value = '';
+        sync(selected === q ? null : q);
+      });
+    }
+
+    // Input: deselect chip, show display live as user types
+    let inputTimer: ReturnType<typeof setTimeout>;
+    input.addEventListener('input', () => {
+      clearTimeout(inputTimer);
+      // Deselect chips immediately
+      for (const chip of chips) {
+        chip.classList.remove('is-active');
+        chip.setAttribute('aria-pressed', 'false');
+      }
+      selected = null;
+
+      const val = input.value.trim();
+      if (val) {
+        textEl.textContent = val;
+        display.hidden = false;
+        // Open the gate immediately on first keystroke, then debounce full sync
+        window.dispatchEvent(new CustomEvent('question-change', { detail: { question: val } }));
+        inputTimer = setTimeout(() => sync(val), 500);
+      } else {
+        display.hidden = true;
+        textEl.textContent = '';
+        window.dispatchEvent(new CustomEvent('question-change', { detail: { question: '' } }));
+      }
+    });
+
+    // Clear button
+    clearBtn.addEventListener('click', () => {
+      input.value = '';
+      sync(null);
+    });
+  }
+</script>
+
+<style>
+  .question-chips {
+    margin: 30px auto 0;
+    max-width: 640px;
+  }
+  .question-chips__kicker {
+    margin: 0 0 12px;
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: #5a5273;
+  }
+  .question-chips__row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+  }
+  .question-chip {
+    padding: 8px 16px;
+    border-radius: 999px;
+    cursor: pointer;
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 14px;
+    line-height: 1.2;
+    color: #c8bfe0;
+    border: 1px solid rgba(203, 168, 90, 0.24);
+    background: rgba(11, 7, 20, 0.5);
+    transition: all 0.3s;
+  }
+  .question-chip:hover {
+    border-color: rgba(203, 168, 90, 0.55);
+    color: #e9e4f5;
+  }
+  .question-chip.is-active {
+    color: #0b0714;
+    font-style: normal;
+    border-color: transparent;
+    background: linear-gradient(160deg, #e3cf95, #c39a45);
+  }
+
+  /* ── Free-text input ── */
+  .question-input-row {
+    margin-top: 14px;
+    display: flex;
+    justify-content: center;
+  }
+  .question-input {
+    width: 100%;
+    max-width: 440px;
+    padding: 10px 18px;
+    border-radius: 999px;
+    border: 1px solid rgba(203, 168, 90, 0.28);
+    background: rgba(11, 7, 20, 0.55);
+    color: #e9e4f5;
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 16px;
+    outline: none;
+    transition: border-color 0.25s, box-shadow 0.25s;
+  }
+  .question-input::placeholder {
+    color: #5a5273;
+    font-style: italic;
+  }
+  .question-input:focus {
+    border-color: rgba(167, 139, 250, 0.6);
+    box-shadow: 0 0 0 3px rgba(124, 92, 255, 0.12);
+  }
+
+  /* ── Active-question display banner ── */
+  .question-display {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    margin: 22px auto 0;
+    padding: 10px 8px 10px 20px;
+    border-radius: 999px;
+    border: 1px solid rgba(167, 139, 250, 0.32);
+    background: rgba(124, 92, 255, 0.1);
+  }
+  .question-display__label {
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: #a78bfa;
+    white-space: nowrap;
+  }
+  .question-display__text {
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 17px;
+    color: #f3dfa2;
+  }
+  .question-display__clear {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 12px;
+    color: #c8bfe0;
+    border: 1px solid rgba(203, 168, 90, 0.3);
+    background: transparent;
+    transition: all 0.25s;
+  }
+  .question-display__clear:hover {
+    color: #e9e4f5;
+    border-color: rgba(203, 168, 90, 0.6);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .question-chip,
+    .question-input,
+    .question-display__clear {
+      transition: none;
+    }
+  }
+</style>

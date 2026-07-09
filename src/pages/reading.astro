@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import QuestionChips from '../components/spread/QuestionChips.astro';
 import SpreadControls from '../components/spread/SpreadControls.astro';
 import SpreadReveal from '../components/spread/SpreadReveal.astro';
 
@@ -13,14 +14,32 @@ const cards = allCards.filter((c) => c.data.members.length > 0);
     <p class="reading__kicker">Consult the Oracle</p>
     <h1 class="reading__title">A Reading</h1>
     <p class="reading__lede">
-      Still your mind and choose a spread, then draw your cards from the fanned deck below. Turn each card to see
-      which Pokémon answers.
+      Focus your intent, then draw your cards and let the oracle answer.
     </p>
 
-    <SpreadControls />
-    <SpreadReveal cards={cards} />
+    <QuestionChips />
+
+    <div data-spread-section hidden class="spread-section">
+      <SpreadControls />
+      <SpreadReveal cards={cards} />
+    </div>
   </section>
 </BaseLayout>
+
+<script>
+  // Reveal the spread once a question is set; never re-hide once a reading has begun.
+  let revealed = false;
+  window.addEventListener('question-change', (e) => {
+    if (revealed) return;
+    const question = (e as CustomEvent<{ question: string }>).detail?.question ?? '';
+    if (!question) return;
+    const section = document.querySelector<HTMLElement>('[data-spread-section]');
+    if (!section) return;
+    section.hidden = false;
+    section.classList.add('spread-section--entering');
+    revealed = true;
+  });
+</script>
 
 <style>
   .reading {
@@ -48,5 +67,16 @@ const cards = allCards.filter((c) => c.data.members.length > 0);
     font-size: 17px;
     line-height: 1.6;
     color: #c8bfe0;
+  }
+
+  .spread-section {
+    margin-top: 0;
+  }
+  .spread-section--entering {
+    animation: spread-rise 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  @keyframes spread-rise {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
   }
 </style>
