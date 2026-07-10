@@ -1,6 +1,8 @@
 import { SPREAD_POSITIONS } from '../../lib/arcana/meanings';
 import { arcanaCardPaperHtml, arcanaCardThemeStyle, cardBackHtml } from '../../lib/card-html';
 import type { Suit } from '../../lib/arcana/types';
+import { saveDraw, updateDraw, type DrawCard } from '../../lib/history';
+import { renderAiReading, renderTemplateReading } from '../../lib/reading-render';
 
 // ─── Interfaces ──────────────────────────────────────────────────────────────
 
@@ -71,21 +73,6 @@ const ROW_CONFIGS = [
 const REDUCED_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const FLIP_MS = REDUCED_MOTION ? 0 : 800;
 
-// Position → a sentence that sets the reading context for that slot.
-const POSITION_CONTEXT: Record<string, string> = {
-  'Past':          'In the past, this energy shaped the ground beneath where you now stand.',
-  'Present':       'In the present, this force moves actively through your situation.',
-  'Future':        'Looking ahead, this quality is what approaches on the horizon.',
-  'The Card':      'This card is the oracle\'s direct answer to your question.',
-  'Challenge':     'This is the central force you are being called to meet or transform.',
-  'Foundation':    'Beneath everything, this energy forms the hidden root of the matter.',
-  'Crown':         'Above you, this card marks your highest aspiration or potential.',
-  'Self':          'This reflects how you yourself show up within this situation.',
-  'Environment':   'The forces moving around you carry this quality.',
-  'Hopes & Fears': 'What you most desire — and perhaps most dread — takes this shape.',
-  'Outcome':       'If the current path continues, this is where it leads.',
-};
-
 // ─── Utilities ───────────────────────────────────────────────────────────────
 
 function esc(s: string): string {
@@ -108,12 +95,6 @@ function numWord(n: number): string {
   if (n === 1) return 'one card';
   if (n === 3) return 'three cards';
   return 'ten cards';
-}
-
-function spreadIntro(size: number): string {
-  if (size === 1) return 'One card has come forward to answer your question directly.';
-  if (size === 3) return 'Three cards have surfaced — past, present, and future held in a single breath.';
-  return 'The ten cards of the Celtic Cross have spread before you, mapping every dimension of your question.';
 }
 
 // ─── Card HTML builders ───────────────────────────────────────────────────────
@@ -170,116 +151,6 @@ function buildPokemonReading(member: SpreadMember): HTMLElement {
   return el;
 }
 
-// ─── Full reading panel ───────────────────────────────────────────────────────
-//
-// Renders template-based prose immediately so a reading is never blocked on
-// the network. `requestFortune()` below (triggered by the "Read My Fortune"
-// button) overwrites this prose in place with a POST /api/reading response.
-
-function buildCardReadingSection(slot: Slot): HTMLElement {
-  const { card, position, drawnMember } = slot;
-  const meta = card.arcana.metadata;
-  const pokeName = drawnMember ? capitalize(drawnMember.name) : '';
-  const flavor = drawnMember ? cleanFlavor(drawnMember.flavorText) : '';
-
-  const section = document.createElement('div');
-  section.className = 'rp-card';
-
-  // Title: POSITION · ARCANA · POKÉMON
-  const titleEl = document.createElement('h3');
-  titleEl.className = 'rp-card__title';
-  titleEl.textContent = position && pokeName
-    ? `${position} · ${card.arcana.name} · ${pokeName}`
-    : card.arcana.name;
-
-  // Main prose: position context sentence + card description + upright meaning
-  const textEl = document.createElement('p');
-  textEl.className = 'rp-card__text';
-
-  const posCtx = POSITION_CONTEXT[position] ?? `This card speaks to the ${position.toLowerCase()} dimension of your question.`;
-  let prose = posCtx + ' ';
-  if (meta?.description) prose += meta.description + ' ';
-  if (meta?.uprightMeaning) prose += meta.uprightMeaning;
-  textEl.textContent = prose.trim();
-
-  // Pokémon witness line
-  const pokeEl = document.createElement('p');
-  pokeEl.className = 'rp-card__pokemon';
-
-  if (pokeName && flavor) {
-    const nameSpan = document.createElement('span');
-    nameSpan.className = 'rp-card__pokemon-name';
-    nameSpan.textContent = pokeName;
-
-    const flavorEm = document.createElement('em');
-    flavorEm.textContent = ` "${flavor}"`;
-
-    pokeEl.append(nameSpan, flavorEm);
-  }
-
-  section.append(titleEl, textEl);
-  if (pokeName && flavor) section.appendChild(pokeEl);
-  return section;
-}
-
-function buildReadingPanel(question: string, slots: Slot[], spreadSize: number): HTMLElement {
-  const panel = document.createElement('div');
-
-  // Header
-  const header = document.createElement('div');
-  header.className = 'rp-header';
-
-  const kicker = document.createElement('p');
-  kicker.className = 'rp-kicker';
-  kicker.textContent = '✦ The Oracle Speaks ✦';
-
-  const questionEl = document.createElement('p');
-  questionEl.className = 'rp-question';
-  questionEl.textContent = `"${question}"`;
-
-  const intro = document.createElement('p');
-  intro.className = 'rp-intro';
-  intro.textContent = spreadIntro(spreadSize);
-
-  header.append(kicker, questionEl, intro);
-  panel.appendChild(header);
-
-  // One section per drawn card
-  for (const slot of slots) {
-    panel.appendChild(buildCardReadingSection(slot));
-  }
-
-  // Synthesis — weaves the cards together
-  if (slots.length >= 2) {
-    const synthesis = document.createElement('div');
-    synthesis.className = 'rp-synthesis';
-
-    const synthLabel = document.createElement('p');
-    synthLabel.className = 'rp-synthesis__label';
-    synthLabel.textContent = '✦ The Thread Between Them ✦';
-
-    const synthText = document.createElement('p');
-    synthText.className = 'rp-synthesis__text';
-
-    const names = slots.map(s => s.card.arcana.name).join(', ');
-    synthText.textContent =
-      `The cards drawn — ${names} — do not answer in isolation. ` +
-      `Notice the movement between them: what shifts in tone, what theme recurs, where the energy turns. ` +
-      `That motion — the arc from one card to the next — is the true response the deck has given your question. ` +
-      `Let it work on you quietly, beyond the words on the page.`;
-
-    synthesis.append(synthLabel, synthText);
-    panel.appendChild(synthesis);
-  }
-
-  const note = document.createElement('p');
-  note.className = 'rp-ai-note';
-  note.textContent = '✦ Quick reading generated from card data ✦';
-  panel.appendChild(note);
-
-  return panel;
-}
-
 // ─── Web component ───────────────────────────────────────────────────────────
 
 class SpreadReveal extends HTMLElement {
@@ -291,6 +162,7 @@ class SpreadReveal extends HTMLElement {
   private timers: number[] = [];
   private question = '';
   private readingShown = false;
+  private currentDrawId: string | null = null;
 
   private instructionEl!: HTMLElement;
   private counterEl!: HTMLElement;
@@ -398,6 +270,7 @@ class SpreadReveal extends HTMLElement {
     this.taken = new Set();
     this.readingShown = false;
     this.fortuneRequested = false;
+    this.currentDrawId = null;
     this.readingPanelEl.hidden = true;
     this.readingPanelEl.replaceChildren();
     this.fortuneRowEl.hidden = true;
@@ -442,11 +315,36 @@ class SpreadReveal extends HTMLElement {
   }
 
   private showReadingPanel() {
+    const cards = this.serializeDrawCards();
     this.readingPanelEl.replaceChildren(
-      buildReadingPanel(this.question, this.slots, this.spreadSize)
+      renderTemplateReading({ question: this.question, spreadSize: this.spreadSize, cards })
     );
     this.readingPanelEl.hidden = false;
     this.fortuneRowEl.hidden = false;
+
+    // Auto-save the completed draw to this browser (no button, nothing to manage).
+    this.currentDrawId = saveDraw({
+      question: this.question,
+      spreadSize: this.spreadSize,
+      cards,
+      ai: null,
+    });
+  }
+
+  // Serializable, display-ready snapshot of the drawn cards for storage + rendering.
+  private serializeDrawCards(): DrawCard[] {
+    return this.slots.map((slot) => {
+      const meta = slot.card.arcana.metadata;
+      return {
+        position: slot.position,
+        arcanaName: slot.card.arcana.name,
+        pokemonName: slot.drawnMember ? capitalize(slot.drawnMember.name) : '',
+        pokemonSlug: slot.drawnMember?.slug ?? '',
+        pokemonFlavor: slot.drawnMember ? cleanFlavor(slot.drawnMember.flavorText) : '',
+        description: meta?.description ?? '',
+        uprightMeaning: meta?.uprightMeaning ?? '',
+      };
+    });
   }
 
   private async requestFortune() {
@@ -493,60 +391,13 @@ class SpreadReveal extends HTMLElement {
   }
 
   private renderFortune(data: ReadingApiSuccess) {
-    const panel = document.createElement('div');
-
-    const header = document.createElement('div');
-    header.className = 'ai-header';
-
-    const kicker = document.createElement('p');
-    kicker.className = 'ai-kicker';
-    kicker.textContent = '✦ The AI Reading ✦';
-
-    const subtitle = document.createElement('p');
-    subtitle.className = 'ai-subtitle';
-    subtitle.textContent = 'A deeper interpretation, woven fresh for your question.';
-
-    header.append(kicker, subtitle);
-    panel.appendChild(header);
-
-    for (const card of data.cards) {
-      const section = document.createElement('div');
-      section.className = 'ai-card';
-
-      const title = document.createElement('h3');
-      title.className = 'ai-card__title';
-      title.textContent = `${card.position} · ${card.arcana} · ${card.pokemon}`;
-
-      const text = document.createElement('p');
-      text.className = 'ai-card__text';
-      text.textContent = card.interpretation;
-
-      section.append(title, text);
-      panel.appendChild(section);
-    }
-
-    const synthesis = document.createElement('div');
-    synthesis.className = 'ai-synthesis';
-
-    const synthLabel = document.createElement('p');
-    synthLabel.className = 'ai-synthesis__label';
-    synthLabel.textContent = '✦ The Thread Between Them ✦';
-
-    const synthText = document.createElement('p');
-    synthText.className = 'ai-synthesis__text';
-    synthText.textContent = data.synthesis;
-
-    synthesis.append(synthLabel, synthText);
-    panel.appendChild(synthesis);
-
-    const attribution = document.createElement('p');
-    attribution.className = 'ai-attribution';
-    attribution.textContent = `✦ read by ${data.provider} ✦`;
-    panel.appendChild(attribution);
-
-    this.aiReadingEl.replaceChildren(panel);
+    const ai = { provider: data.provider, cards: data.cards, synthesis: data.synthesis };
+    this.aiReadingEl.replaceChildren(renderAiReading(ai));
     this.aiReadingEl.hidden = false;
     this.fortuneRowEl.hidden = true;
+
+    // Fold the AI reading into this draw's saved record (same record, no duplicate).
+    if (this.currentDrawId) updateDraw(this.currentDrawId, { ai });
   }
 
   private updateSlotLabel(slot: Slot) {

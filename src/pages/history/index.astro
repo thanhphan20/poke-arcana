@@ -1,0 +1,248 @@
+---
+export const prerender = true;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import '../../styles/reading.css';
+---
+
+<BaseLayout title="My Draws — Poké-Arcana" description="Revisit your past Poké-Arcana readings.">
+  <section class="history pa-rise">
+    <p class="history__kicker">Kept For You</p>
+    <h1 class="history__title">My Draws</h1>
+    <p class="history__note">
+      Saved only in this browser — private to you, and gone if you clear your data or switch device.
+    </p>
+
+    <div data-history-root class="history__root"></div>
+
+    <template data-empty>
+      <div class="history-empty">
+        <p class="history-empty__text">You have no saved draws yet.</p>
+        <a href="/reading" class="history-empty__cta">Consult the Oracle</a>
+      </div>
+    </template>
+  </section>
+</BaseLayout>
+
+<script>
+  import { listDraws, getDraw } from '../../lib/history';
+  import { renderAiReading, renderTemplateReading } from '../../lib/reading-render';
+
+  const root = document.querySelector<HTMLElement>('[data-history-root]');
+  const emptyTpl = document.querySelector<HTMLTemplateElement>('[data-empty]');
+  if (root && emptyTpl) {
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get('id');
+    if (id) renderDetail(id, root, emptyTpl);
+    else renderList(root, emptyTpl);
+  }
+
+  function showEmpty(root: HTMLElement, emptyTpl: HTMLTemplateElement) {
+    root.replaceChildren(emptyTpl.content.cloneNode(true));
+  }
+
+  function formatDate(ms: number): string {
+    try {
+      return new Date(ms).toLocaleString(undefined, {
+        year: 'numeric', month: 'short', day: 'numeric',
+        hour: 'numeric', minute: '2-digit',
+      });
+    } catch {
+      return '';
+    }
+  }
+
+  function renderList(root: HTMLElement, emptyTpl: HTMLTemplateElement) {
+    const draws = listDraws();
+    if (draws.length === 0) {
+      showEmpty(root, emptyTpl);
+      return;
+    }
+
+    const list = document.createElement('ul');
+    list.className = 'history-list';
+
+    for (const draw of draws) {
+      const item = document.createElement('li');
+      item.className = 'history-item';
+
+      const link = document.createElement('a');
+      link.className = 'history-item__link';
+      link.href = `/history/?id=${encodeURIComponent(draw.id)}`;
+
+      const q = document.createElement('p');
+      q.className = 'history-item__question';
+      q.textContent = draw.question ? `"${draw.question}"` : 'An unspoken question';
+
+      const meta = document.createElement('p');
+      meta.className = 'history-item__meta';
+      const spread = draw.spreadSize === 1 ? '1 card' : `${draw.spreadSize} cards`;
+      const flags: string[] = [formatDate(draw.createdAt), spread];
+      if (draw.ai) flags.push('AI reading');
+      meta.textContent = flags.filter(Boolean).join(' · ');
+
+      const names = document.createElement('p');
+      names.className = 'history-item__cards';
+      names.textContent = draw.cards.map((c) => c.arcanaName).join(' · ');
+
+      link.append(q, meta, names);
+      item.appendChild(link);
+      list.appendChild(item);
+    }
+
+    root.replaceChildren(list);
+  }
+
+  function renderDetail(id: string, root: HTMLElement, emptyTpl: HTMLTemplateElement) {
+    const draw = getDraw(id);
+    if (!draw) {
+      showEmpty(root, emptyTpl);
+      return;
+    }
+
+    const back = document.createElement('a');
+    back.className = 'history-back';
+    back.href = '/history/';
+    back.textContent = '← All draws';
+
+    const templatePanel = document.createElement('div');
+    templatePanel.className = 'reading-panel';
+    templatePanel.appendChild(
+      renderTemplateReading({ question: draw.question, spreadSize: draw.spreadSize, cards: draw.cards })
+    );
+
+    root.replaceChildren(back, templatePanel);
+
+    if (draw.ai) {
+      const aiPanel = document.createElement('div');
+      aiPanel.className = 'ai-reading-panel';
+      aiPanel.appendChild(renderAiReading(draw.ai));
+      root.appendChild(aiPanel);
+    }
+  }
+</script>
+
+<style>
+  .history {
+    padding: 52px 0 80px;
+    text-align: center;
+  }
+  .history__kicker {
+    margin: 0 0 14px;
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: #a78bfa;
+  }
+  .history__title {
+    margin: 0;
+    font-family: 'Cinzel Decorative', serif;
+    font-weight: 700;
+    font-size: clamp(38px, 5vw, 58px);
+    color: #f3dfa2;
+  }
+  .history__note {
+    max-width: 520px;
+    margin: 16px auto 0;
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 15px;
+    line-height: 1.6;
+    color: #8f86ac;
+  }
+  .history__root {
+    margin-top: 44px;
+  }
+
+  .history-list {
+    list-style: none;
+    margin: 0 auto;
+    padding: 0;
+    max-width: 680px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    text-align: left;
+  }
+  .history-item__link {
+    display: block;
+    padding: 20px 24px;
+    border-radius: 12px;
+    border: 1px solid rgba(203, 168, 90, 0.2);
+    background: rgba(124, 92, 255, 0.05);
+    text-decoration: none;
+    transition: border-color 0.25s, transform 0.2s, background 0.25s;
+  }
+  .history-item__link:hover {
+    transform: translateY(-2px);
+    border-color: rgba(203, 168, 90, 0.5);
+    background: rgba(124, 92, 255, 0.1);
+  }
+  .history-item__question {
+    margin: 0 0 8px;
+    font-family: 'Cinzel Decorative', serif;
+    font-weight: 700;
+    font-size: 18px;
+    color: #f3dfa2;
+    line-height: 1.3;
+  }
+  .history-item__meta {
+    margin: 0 0 8px;
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #a78bfa;
+  }
+  .history-item__cards {
+    margin: 0;
+    font-family: 'EB Garamond', serif;
+    font-size: 15px;
+    color: #8f86ac;
+  }
+
+  .history-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    padding: 40px 0;
+  }
+  .history-empty__text {
+    margin: 0;
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 18px;
+    color: #c8bfe0;
+  }
+  .history-empty__cta {
+    padding: 13px 34px;
+    border-radius: 999px;
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #0b0714;
+    text-decoration: none;
+    background: linear-gradient(160deg, #e3cf95, #c39a45);
+    transition: transform 0.2s;
+  }
+  .history-empty__cta:hover {
+    transform: translateY(-1px);
+  }
+
+  .history-back {
+    display: inline-block;
+    margin-bottom: 8px;
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #a78bfa;
+    text-decoration: none;
+  }
+  .history-back:hover {
+    color: #e3cf95;
+  }
+</style>
