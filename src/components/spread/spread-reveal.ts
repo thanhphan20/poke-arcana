@@ -50,6 +50,19 @@ interface Slot {
   drawn: boolean;
 }
 
+interface ReadingApiCard {
+  position: string;
+  arcana: string;
+  pokemon: string;
+  interpretation: string;
+}
+
+interface ReadingApiSuccess {
+  provider: string;
+  cards: ReadingApiCard[];
+  synthesis: string;
+}
+
 // ─── Constants ───────────────────────────────────────────────────────────────
 
 const FAN_TOTAL = 78;
@@ -228,14 +241,9 @@ function buildPokemonReading(member: SpreadMember): HTMLElement {
 
 // ─── Full reading panel ───────────────────────────────────────────────────────
 //
-// Currently generates template-based prose from card data.
-//
-// TO SWAP IN AN AI PROVIDER:
-//   1. Add `@astrojs/vercel` (or your adapter) to astro.config.mjs with output: 'hybrid'
-//   2. Create `src/pages/api/reading.ts` as a POST endpoint
-//   3. Replace `buildReadingPanel()` below with a fetch call to that endpoint,
-//      sending { question, cards: slots.map(s => ({ position, arcana, pokemon })) }
-//   4. Stream or await the response and inject the returned HTML/text into the panel.
+// Renders template-based prose immediately so a reading is never blocked on
+// the network. `requestFortune()` below (triggered by the "Read My Fortune"
+// button) overwrites this prose in place with a POST /api/reading response.
 
 function buildCardReadingSection(slot: Slot): HTMLElement {
   const { card, position, drawnMember } = slot;
@@ -333,10 +341,9 @@ function buildReadingPanel(question: string, slots: Slot[], spreadSize: number):
     panel.appendChild(synthesis);
   }
 
-  // Stub note — visible cue that AI is not yet wired in
   const note = document.createElement('p');
   note.className = 'rp-ai-note';
-  note.textContent = '✦ Reading generated from card data · AI interpretation coming soon ✦';
+  note.textContent = '✦ Quick reading generated from card data ✦';
   panel.appendChild(note);
 
   return panel;
@@ -361,6 +368,11 @@ class SpreadReveal extends HTMLElement {
   private resetRow!: HTMLElement;
   private fanHintEl!: HTMLElement;
   private fanEl!: HTMLElement;
+  private fortuneRowEl!: HTMLElement;
+  private fortuneBtnEl!: HTMLButtonElement;
+  private fortuneErrorEl!: HTMLElement;
+  private aiReadingEl!: HTMLElement;
+  private fortuneRequested = false;
 
   connectedCallback() {
     const initial = parseInt(this.dataset.defaultSpread ?? '3', 10);
@@ -378,12 +390,17 @@ class SpreadReveal extends HTMLElement {
     this.resetRow        = this.querySelector('[data-reset-row]')      as HTMLElement;
     this.fanHintEl       = this.querySelector('[data-fan-hint]')       as HTMLElement;
     this.fanEl           = this.querySelector('[data-fan]')            as HTMLElement;
+    this.fortuneRowEl    = this.querySelector('[data-fortune-row]')    as HTMLElement;
+    this.fortuneBtnEl    = this.querySelector('[data-read-fortune]')   as HTMLButtonElement;
+    this.fortuneErrorEl  = this.querySelector('[data-fortune-error]')  as HTMLElement;
+    this.aiReadingEl     = this.querySelector('[data-ai-reading]')     as HTMLElement;
 
     this.onDocumentClick   = this.onDocumentClick.bind(this);
     this.onQuestionChange  = this.onQuestionChange.bind(this);
 
     document.addEventListener('click', this.onDocumentClick);
     window.addEventListener('question-change', this.onQuestionChange);
+    this.fortuneBtnEl.addEventListener('click', () => this.requestFortune());
 
     this.shufflePool();
     this.renderFan();
@@ -449,8 +466,15 @@ class SpreadReveal extends HTMLElement {
     this.slots = [];
     this.taken = new Set();
     this.readingShown = false;
+    this.fortuneRequested = false;
     this.readingPanelEl.hidden = true;
     this.readingPanelEl.replaceChildren();
+    this.fortuneRowEl.hidden = true;
+    this.fortuneBtnEl.disabled = false;
+    this.fortuneBtnEl.textContent = 'Read My Fortune';
+    this.fortuneErrorEl.hidden = true;
+    this.aiReadingEl.hidden = true;
+    this.aiReadingEl.replaceChildren();
     this.shufflePool();
     this.renderFan();
     this.renderSlots();
@@ -491,6 +515,107 @@ class SpreadReveal extends HTMLElement {
       buildReadingPanel(this.question, this.slots, this.spreadSize)
     );
     this.readingPanelEl.hidden = false;
+    this.fortuneRowEl.hidden = false;
+  }
+
+  private async requestFortune() {
+    if (this.fortuneRequested) return;
+    this.fortuneRequested = true;
+    this.fortuneBtnEl.disabled = true;
+    this.fortuneBtnEl.textContent = 'The oracle is listening…';
+    this.fortuneErrorEl.hidden = true;
+
+    const spread = this.slots.map((slot) => ({
+      position: slot.position,
+      arcana: { kind: slot.card.arcana.kind, name: slot.card.arcana.name },
+      pokemon: {
+        name: slot.drawnMember ? capitalize(slot.drawnMember.name) : '',
+        flavor: slot.drawnMember ? cleanFlavor(slot.drawnMember.flavorText) : '',
+      },
+    }));
+
+    try {
+      const res = await fetch('/api/reading', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question: this.question, spread }),
+      });
+
+      if (!res.ok) {
+        this.showFortuneError();
+        return;
+      }
+
+      const data = (await res.json()) as ReadingApiSuccess;
+      this.renderFortune(data);
+    } catch {
+      this.showFortuneError();
+    }
+  }
+
+  private showFortuneError() {
+    this.fortuneRequested = false;
+    this.fortuneBtnEl.disabled = false;
+    this.fortuneBtnEl.textContent = 'Read My Fortune';
+    this.fortuneErrorEl.textContent = 'The oracle is quiet — try again in a moment.';
+    this.fortuneErrorEl.hidden = false;
+  }
+
+  private renderFortune(data: ReadingApiSuccess) {
+    const panel = document.createElement('div');
+
+    const header = document.createElement('div');
+    header.className = 'ai-header';
+
+    const kicker = document.createElement('p');
+    kicker.className = 'ai-kicker';
+    kicker.textContent = '✦ The AI Reading ✦';
+
+    const subtitle = document.createElement('p');
+    subtitle.className = 'ai-subtitle';
+    subtitle.textContent = 'A deeper interpretation, woven fresh for your question.';
+
+    header.append(kicker, subtitle);
+    panel.appendChild(header);
+
+    for (const card of data.cards) {
+      const section = document.createElement('div');
+      section.className = 'ai-card';
+
+      const title = document.createElement('h3');
+      title.className = 'ai-card__title';
+      title.textContent = `${card.position} · ${card.arcana} · ${card.pokemon}`;
+
+      const text = document.createElement('p');
+      text.className = 'ai-card__text';
+      text.textContent = card.interpretation;
+
+      section.append(title, text);
+      panel.appendChild(section);
+    }
+
+    const synthesis = document.createElement('div');
+    synthesis.className = 'ai-synthesis';
+
+    const synthLabel = document.createElement('p');
+    synthLabel.className = 'ai-synthesis__label';
+    synthLabel.textContent = '✦ The Thread Between Them ✦';
+
+    const synthText = document.createElement('p');
+    synthText.className = 'ai-synthesis__text';
+    synthText.textContent = data.synthesis;
+
+    synthesis.append(synthLabel, synthText);
+    panel.appendChild(synthesis);
+
+    const attribution = document.createElement('p');
+    attribution.className = 'ai-attribution';
+    attribution.textContent = `✦ read by ${data.provider} ✦`;
+    panel.appendChild(attribution);
+
+    this.aiReadingEl.replaceChildren(panel);
+    this.aiReadingEl.hidden = false;
+    this.fortuneRowEl.hidden = true;
   }
 
   private updateSlotLabel(slot: Slot) {

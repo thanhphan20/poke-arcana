@@ -29,6 +29,8 @@ bun run preview    # serve the built output
 bun run sync       # sync Pokémon data from PokéAPI
 ```
 
+AI-generated readings on `/reading` require at least one of `GEMINI_API_KEY`, `GROQ_API_KEY`, or `OPENROUTER_API_KEY` to be set (locally in `.env`, or as a Vercel project env var) — see `.env.example`. Without any key set, the page still works and falls back to a template-based reading.
+
 ## How It Works
 
 ### Pokémon → Tarot Mapping

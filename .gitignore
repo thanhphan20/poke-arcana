@@ -37,3 +37,6 @@ public/sprites/
 
 # jetbrains setting folder
 .idea/
+
+# vercel output
+.vercel/
