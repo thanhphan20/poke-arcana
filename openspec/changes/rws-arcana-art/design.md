@@ -2,7 +2,7 @@
 
 `spread-reveal.ts` renders the arcana-front of a drawn card as a CSS-only card face — paper texture, flourish corners, a suit- or major-themed kicker, a banner with the arcana name, and a central `.arcana-card__vignette` containing purely decorative CSS elements (`.arcana-card__rays`, `.arcana-card__horizon`, `.arcana-card__glyph`). Because the vignette has no imagery, users treat the required second tap (which flips to the Pokémon front) as a broken step rather than intentional pacing.
 
-The project already hosts Pokémon **sprites** on Vercel Blob (`spriteUrl` + `SPRITES_BASE` in `src/lib/sprites.ts`), a decision driven by scale: ~772 sprites, ~53MB, previously re-fetched per deploy (see `openspec/changes/cdn-sprites-static-build/design.md`). Tarot art is a different scale — 78 static, rarely-changing JPGs totalling ~3.6MB — so that rationale does not transfer, and this change hosts them differently (see Decisions).
+The project already hosts Pokémon **sprites** on Vercel Blob (`spriteUrl` + `SPRITES_BASE` in `src/lib/sprites.ts`), a decision driven by scale: ~772 sprites, ~53MB, previously re-fetched per deploy (see `openspec/changes/cdn-sprites-static-build/design.md`). Tarot art is a different scale — 78 static, rarely-changing images, ~2.8MB after optimization — so that rationale does not transfer, and this change hosts them differently (see Decisions).
 
 Arcana identity is already on every content record: `arcana.kind`, `arcana.name`, `arcana.majorNumber` (0–21, defined by the `MAJOR_ARCANA` array order), `arcana.suit`, and `arcana.rankIndex` (0–13). Rich per-card meanings already live, typed, in `src/lib/arcana/tarot-metadata.ts` (`MAJOR_ARCANA_METADATA` keyed by name, `MINOR_ARCANA_METADATA` keyed by suit + rank name from `RANKS`).
 
@@ -19,7 +19,7 @@ Arcana identity is already on every content record: `arcana.kind`, `arcana.name`
 - Collapsing the two-tap flow into one tap.
 - Changing `pokemonFrontHtml`, the sprite pipeline, or content-schema fields (beyond passing `rankIndex` through the reveal payload).
 - Custom Pokémon-themed arcana illustrations (generic RWS chosen for scope).
-- Image optimization (WebP, responsive srcset).
+- Responsive `srcset` / multiple resolutions per image (a single optimized WebP is served). WebP conversion + downscaling itself is in scope (see Decisions).
 - Extending the Pokémon dataset with individual stats/abilities (needs a sync change + regen).
 - Adopting the richer external-JSON metadata fields (fortune_telling, light/shadow, archetype, …). The typed `tarot-metadata.ts` stays the single source of truth.
 
@@ -33,9 +33,9 @@ Serve the art as same-origin static files under `public/tarot/`, committed to gi
 - **Trade-off**: ~3.6MB enters git history permanently, and re-touching images would grow history. Accepted because tarot art is static and rarely churns.
 - **Alternatives**: (a) Vercel Blob like sprites — rejected, over-engineered for this scale, adds an env var and a runtime CDN dependency; (b) a slim manifest JSON in `public/` — rejected, still ships an asset read by nothing at runtime.
 
-### Decision: Derivable local path scheme — `m{NN}.jpg` (majors) and `{suit-letter}{NN}.jpg` (minors)
+### Decision: Derivable local path scheme — `m{NN}.webp` (majors) and `{suit-letter}{NN}.webp` (minors)
 
-`tarotArtUrl` returns `/tarot/m{majorNumber:02}.jpg` for majors and `/tarot/{c|s|w|p}{rankIndex+1:02}.jpg` for minors (`c`=cups, `s`=swords, `w`=wands, `p`=pentacles).
+`tarotArtUrl` returns `/tarot/m{majorNumber:02}.webp` for majors and `/tarot/{c|s|w|p}{rankIndex+1:02}.webp` for minors (`c`=cups, `s`=swords, `w`=wands, `p`=pentacles).
 
 - **Why**: The scheme is fully derivable from data already on the record — no lookup table, no per-record URL, no JSON. `majorNumber` is defined by the `MAJOR_ARCANA` array index, so filenames stay in lockstep with what the runtime requests. `SUIT_LETTER` in `sprites.ts` and the suit order in the download script are the single point that must agree.
 - **Alternatives**: (a) `tarot/major/{slug}.jpg` + `tarot/minor/{suit}/{rank}.jpg` (the earlier Blob design) — more human-readable but needs slug/rank-name derivation and doesn't match the source dataset's own `mNN`/`cNN` convention; (b) a numeric 1–78 map — needs a second identifier. Rejected.
@@ -46,15 +46,15 @@ Add alongside `spriteUrl`. Accepts `{ kind: 'major', majorNumber } | { kind: 'mi
 
 - **Why**: Colocates all image-URL derivation in one module. The signature takes the minimal identity the callers already hold (`spread-reveal.ts` payload, and the detail pages' `arcana`). Majors key on `majorNumber` because that's what the filename encodes.
 
-### Decision: JPG, reuse `SPRITE_FALLBACK`, swap vignette inner content only
+### Decision: Optimized WebP, reuse `SPRITE_FALLBACK`, swap vignette inner content only
 
-- **JPG** for all 78 — filled rectangular region, no alpha needed, small payload; matches the source scans (~30–120KB each).
+- **WebP** for all 78 — filled rectangular region, no alpha needed. Each source scan is downscaled to ≤560px wide (the art never renders above ~340 CSS px; ~156px in the reveal) and re-encoded at quality 75 in the download script, since `public/` files are served as-is and can't go through `astro:assets`. This is where the size win comes from — the source JPGs are already small, so format conversion alone is a near no-op; downscale + q75 cuts the set from ~3.6MB to ~2.8MB (−22%). `srcset` was not worth it: the art loads at most ~10 images on a 10-card reading and one on a detail page, never in bulk.
 - **Fallback**: wire the existing `/sprite-fallback.svg` on the `<img onerror>`; one placeholder, honest generic "image unavailable" mark. A tarot-specific placeholder is a trivial follow-up if wanted.
 - **Vignette markup**: replace the three vignette children with a single `<img class="arcana-card__art" … loading="lazy" onerror="…">`; the `.arcana-card__vignette` frame and all sibling chrome are untouched. `.arcana-card__art` (absolute-inset, `object-fit: cover`) lives in `global.css` next to the other `arcana-card` styles. `object-fit: cover` crops the full RWS scan to fill the vignette — the card's own banner already shows the name, so cropping the scan's title band is acceptable.
 
 ### Decision: Repo-run download script, images committed — no upload step
 
-`scripts/download-tarot-images.ts` fetches the 78 scans once from `github.com/krates98/tarotcardapi` and writes them to `public/tarot/` under the derivable names. It derives its `name → source-file` and `name → target-file` maps from `MAJOR_ARCANA` + `RANKS` (no external JSON), with two source-name overrides (`TheLovers.jpg`, `thestrength.jpeg`) because that repo's naming is irregular. Existing files are skipped, so re-runs are cheap.
+`scripts/download-tarot-images.ts` fetches the 78 scans once from `github.com/krates98/tarotcardapi`, downscales + re-encodes each to WebP with `sharp`, and writes them to `public/tarot/` under the derivable names. It derives its `name → source-file` and `name → target-file` maps from `MAJOR_ARCANA` + `RANKS` (no external JSON), with two source-name overrides (`TheLovers.jpg`, `thestrength.jpeg`) because that repo's naming is irregular. Existing files are skipped, so re-runs are cheap.
 
 - **Why**: Documents provenance and makes a refresh reproducible, while the committed images mean the build and production never fetch anything. The source repo's descriptive filenames are normalized to this project's `mNN`/`{suit}NN` scheme on save so the runtime needs no rename table.
 - **Note**: `public/tarot-images.json` (a 139KB metadata blob that shipped in `public/` but was read by nothing at runtime) was deleted; the script no longer depends on it.

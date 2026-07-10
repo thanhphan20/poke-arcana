@@ -1,6 +1,6 @@
 ## 1. URL helper
 
-- [x] 1.1 Add `SUIT_LETTER` map + `tarotArtUrl(arcana)` to `src/lib/sprites.ts`, accepting `{ kind: 'major', majorNumber } | { kind: 'minor', suit, rankIndex }` and returning local `/tarot/m{NN}.jpg` (majors) / `/tarot/{suit-letter}{NN}.jpg` (minors). No Blob base, no env var.
+- [x] 1.1 Add `SUIT_LETTER` map + `tarotArtUrl(arcana)` to `src/lib/sprites.ts`, accepting `{ kind: 'major', majorNumber } | { kind: 'minor', suit, rankIndex }` and returning local `/tarot/m{NN}.webp` (majors) / `/tarot/{suit-letter}{NN}.webp` (minors). No Blob base, no env var.
 - [x] 1.2 Remove the earlier `TAROT_BASE` / `PUBLIC_TAROT_BASE` plumbing from `src/lib/sprites.ts` and `.env.example`.
 
 ## 2. Arcana-front vignette markup
@@ -13,10 +13,11 @@
 
 ## 3. Image assets
 
-- [x] 3.1 Add `scripts/download-tarot-images.ts` deriving `name → source` (from `krates98/tarotcardapi`, with the `TheLovers.jpg` / `thestrength.jpeg` overrides) and `name → target` (`mNN.jpg` / `{suit}NN.jpg`) from `MAJOR_ARCANA` + `RANKS`; skip existing files; fail loudly on a failed fetch.
-- [x] 3.2 Register `download-tarot-images` in `package.json` scripts.
-- [x] 3.3 Run the script; commit the 78 JPGs (~3.6MB) under `public/tarot/`.
-- [x] 3.4 Delete `public/tarot-images.json` (139KB, shipped but unused at runtime).
+- [x] 3.1 Add `scripts/download-tarot-images.ts` deriving `name → source` (from `krates98/tarotcardapi`, with the `TheLovers.jpg` / `thestrength.jpeg` overrides) and `name → target` (`mNN.webp` / `{suit}NN.webp`) from `MAJOR_ARCANA` + `RANKS`; skip existing files; fail loudly on a failed fetch.
+- [x] 3.2 Optimize in the download pipeline: `sharp` downscale to ≤560px wide + WebP q75 before writing (public/ can't use astro:assets). Cuts the set ~3.6MB → ~2.8MB (−22%).
+- [x] 3.3 Register `download-tarot-images` in `package.json` scripts.
+- [x] 3.4 Run the script; commit the 78 optimized WebP images (~2.8MB) under `public/tarot/`.
+- [x] 3.5 Delete `public/tarot-images.json` (139KB, shipped but unused at runtime).
 
 ## 4. Detail-page wiring
 
@@ -29,7 +30,7 @@
 
 - [x] 5.1 `bun typecheck` passes (0 errors / 0 warnings).
 - [x] 5.2 `astro build` prerenders every `card/[slug]` and `deck/[slug]` offline with no errors.
-- [x] 5.3 Built HTML confirmed: major card page has `/tarot/mNN.jpg` + keywords + upright/reversed + attributes; minor card page has art + meanings and NO attributes row; a legendary's deck page has the badge + `/card/…` link + arcana keywords.
+- [x] 5.3 Built HTML confirmed: major card page has `/tarot/mNN.webp` + keywords + upright/reversed + attributes; minor card page has art + meanings and NO attributes row; a legendary's deck page has the badge + `/card/…` link + arcana keywords.
 - [x] 5.4 Reveal flow functionally verified: arcana `<img>` gets the derived `/tarot/…` src, and an unreachable image falls back to `SPRITE_FALLBACK` with chrome intact.
 
 ## 6. Follow-ups (out of scope here)

@@ -16,9 +16,9 @@ export function spriteUrl(id: number, variant: SpriteVariant): string {
 
 export const SPRITE_FALLBACK = '/sprite-fallback.svg';
 
-// Rider-Waite-Smith card art is committed under public/tarot/ (populated by
-// scripts/download-tarot-images.ts). Filenames follow tarot-images.json:
-// majors are m{majorNumber}.jpg; minors are {suit-letter}{rankIndex+1}.jpg.
+// Rider-Waite-Smith card art is committed under public/tarot/ as optimized
+// WebP (populated by scripts/download-tarot-images.ts): majors are
+// m{majorNumber}.webp; minors are {suit-letter}{rankIndex+1}.webp.
 const SUIT_LETTER: Record<Suit, string> = {
   cups: 'c',
   swords: 's',
@@ -32,7 +32,7 @@ export type TarotArtIdentity =
 
 export function tarotArtUrl(arcana: TarotArtIdentity): string {
   if (arcana.kind === 'major') {
-    return `/tarot/m${String(arcana.majorNumber).padStart(2, '0')}.jpg`;
+    return `/tarot/m${String(arcana.majorNumber).padStart(2, '0')}.webp`;
   }
-  return `/tarot/${SUIT_LETTER[arcana.suit]}${String(arcana.rankIndex + 1).padStart(2, '0')}.jpg`;
+  return `/tarot/${SUIT_LETTER[arcana.suit]}${String(arcana.rankIndex + 1).padStart(2, '0')}.webp`;
 }

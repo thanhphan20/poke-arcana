@@ -6,17 +6,17 @@ The system SHALL provide a `tarotArtUrl(arcana)` helper that derives the local p
 
 The helper SHALL accept either `{ kind: 'major', majorNumber: number }` or `{ kind: 'minor', suit: Suit, rankIndex: number }` and MUST return a path that is deterministic and stable for a given arcana identity.
 
-Majors MUST map to `/tarot/m{NN}.jpg`, where `{NN}` is `majorNumber` zero-padded to two digits (`0` → `m00.jpg`, `21` → `m21.jpg`).
+Majors MUST map to `/tarot/m{NN}.webp`, where `{NN}` is `majorNumber` zero-padded to two digits (`0` → `m00.webp`, `21` → `m21.webp`).
 
-Minors MUST map to `/tarot/{suit-letter}{NN}.jpg`, where `suit-letter` is `c` (cups), `s` (swords), `w` (wands), or `p` (pentacles), and `{NN}` is `rankIndex + 1` zero-padded to two digits (Ace → `01`, King → `14`).
+Minors MUST map to `/tarot/{suit-letter}{NN}.webp`, where `suit-letter` is `c` (cups), `s` (swords), `w` (wands), or `p` (pentacles), and `{NN}` is `rankIndex + 1` zero-padded to two digits (Ace → `01`, King → `14`).
 
 #### Scenario: Major arcana path
 - **WHEN** `tarotArtUrl({ kind: 'major', majorNumber: 0 })` is called
-- **THEN** it returns `/tarot/m00.jpg`
+- **THEN** it returns `/tarot/m00.webp`
 
 #### Scenario: Minor arcana path
 - **WHEN** `tarotArtUrl({ kind: 'minor', suit: 'cups', rankIndex: 0 })` is called
-- **THEN** it returns `/tarot/c01.jpg`
+- **THEN** it returns `/tarot/c01.webp`
 
 #### Scenario: Same identity yields same path
 - **WHEN** `tarotArtUrl` is called twice with the same arcana identity
@@ -45,6 +45,14 @@ The system SHALL provide a repo-run script that populates `public/tarot/` from a
 #### Scenario: Re-running the download
 - **WHEN** the download script is run again after `public/tarot/` is already populated
 - **THEN** existing files are skipped and the resulting filenames are unchanged
+
+### Requirement: Art is optimized for delivery
+
+The committed tarot art MUST be optimized before release: each image is downscaled to a maximum width sized for its display use (the art never renders above ~340 CSS px) and encoded as WebP. Optimization happens in the download script (public/ files are served as-is and cannot go through `astro:assets`), so the committed files are the optimized artifacts.
+
+#### Scenario: Committed files are optimized WebP
+- **WHEN** a committed tarot image is inspected
+- **THEN** it is a WebP file no wider than the configured maximum, served with `Content-Type: image/webp`
 
 ### Requirement: Build stays network-free
 

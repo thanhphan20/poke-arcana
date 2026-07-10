@@ -1,8 +1,9 @@
-import { mkdir, rename, unlink } from 'node:fs/promises';
+import { mkdir, unlink } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawn } from 'node:child_process';
+import sharp from 'sharp';
 import { MAJOR_ARCANA } from '../src/lib/arcana/majorArcana';
 import { RANKS } from '../src/lib/arcana/ranks';
 
@@ -11,11 +12,21 @@ const OUT_DIR = join(ROOT, 'public', 'tarot');
 
 // Rider-Waite-Smith scans sourced from github.com/krates98/tarotcardapi.
 // That repo names files descriptively (thefool.jpeg, aceofcups.jpeg); we save
-// them under this project's derivable scheme (m00.jpg / c01.jpg / …) so the
+// them under this project's derivable scheme (m00.webp / c01.webp / …) so the
 // runtime lookup in src/lib/sprites.ts needs no rename table. The target names
 // are derived from MAJOR_ARCANA order (which defines majorNumber) and RANKS,
 // keeping them in lockstep with tarotArtUrl().
+//
+// Each source scan is downscaled (the art never renders wider than ~340 CSS px,
+// so ~720px covers retina) and re-encoded to WebP before it is committed —
+// public/ files are served as-is, so the optimization has to happen here rather
+// than through astro:assets (which only processes imports from src/).
 const SOURCE_BASE = 'https://raw.githubusercontent.com/krates98/tarotcardapi/main/images';
+
+// The art never renders above ~340 CSS px (≈156px in the reveal), so 560px
+// stays sharp even at ~1.75x on the largest surface while cutting real bytes.
+const MAX_WIDTH = 560;
+const WEBP_QUALITY = 75;
 
 // Two files in the source repo don't follow the normalize(name)+".jpeg" rule.
 const SOURCE_OVERRIDES: Record<string, string> = {
@@ -47,12 +58,12 @@ function sourceFileFor(name: string): string {
 function buildJobs(): Job[] {
   const jobs: Job[] = [];
   MAJOR_ARCANA.forEach((name, majorNumber) => {
-    jobs.push({ name, img: `m${String(majorNumber).padStart(2, '0')}.jpg`, source: sourceFileFor(name) });
+    jobs.push({ name, img: `m${String(majorNumber).padStart(2, '0')}.webp`, source: sourceFileFor(name) });
   });
   for (const { label, letter } of SUITS) {
     RANKS.forEach((rank, rankIndex) => {
       const name = `${rank} of ${label}`;
-      jobs.push({ name, img: `${letter}${String(rankIndex + 1).padStart(2, '0')}.jpg`, source: sourceFileFor(name) });
+      jobs.push({ name, img: `${letter}${String(rankIndex + 1).padStart(2, '0')}.webp`, source: sourceFileFor(name) });
     });
   }
   return jobs;
@@ -68,10 +79,8 @@ function runCurl(args: string[]): Promise<{ exitCode: number; stdout: string }> 
   });
 }
 
-async function downloadImage(url: string, destPath: string): Promise<void> {
-  if (existsSync(destPath)) return;
+async function fetchToFile(url: string, tmp: string): Promise<void> {
   for (let attempt = 0; attempt <= IMAGE_RETRIES; attempt++) {
-    const tmp = `${destPath}.tmp`;
     const { exitCode, stdout } = await runCurl([
       '-sL', '--max-time', '60', '--output', tmp, '-w', '%{http_code}', url,
     ]);
@@ -94,23 +103,36 @@ async function downloadImage(url: string, destPath: string): Promise<void> {
       if (attempt < IMAGE_RETRIES) { await sleep(2 ** attempt * 500); continue; }
       throw new Error(`HTTP ${status} for ${url}`);
     }
-    await rename(tmp, destPath);
     return;
   }
-  throw new Error(`Failed to download after ${IMAGE_RETRIES} retries: ${url}`);
+  throw new Error(`Failed to fetch after ${IMAGE_RETRIES} retries: ${url}`);
+}
+
+async function downloadAndOptimize(url: string, destPath: string): Promise<void> {
+  if (existsSync(destPath)) return;
+  const tmp = `${destPath}.src`;
+  await fetchToFile(url, tmp);
+  try {
+    await sharp(tmp)
+      .resize({ width: MAX_WIDTH, withoutEnlargement: true })
+      .webp({ quality: WEBP_QUALITY })
+      .toFile(destPath);
+  } finally {
+    await unlink(tmp).catch(() => {});
+  }
 }
 
 async function main() {
   const jobs = buildJobs();
   await mkdir(OUT_DIR, { recursive: true });
 
-  console.log(`Downloading ${jobs.length} tarot images to public/tarot/ ...`);
+  console.log(`Downloading + optimizing ${jobs.length} tarot images to public/tarot/ (WebP, ≤${MAX_WIDTH}px, q${WEBP_QUALITY}) ...`);
   let failed = 0;
   for (const job of jobs) {
     const url = `${SOURCE_BASE}/${job.source}`;
     const dest = join(OUT_DIR, job.img);
     try {
-      await downloadImage(url, dest);
+      await downloadAndOptimize(url, dest);
       console.log(`  ✓ ${job.name} -> ${job.img}`);
     } catch (err) {
       failed++;
@@ -119,7 +141,7 @@ async function main() {
     await sleep(80);
   }
 
-  console.log(`\nDone. ${jobs.length - failed}/${jobs.length} downloaded to public/tarot/`);
+  console.log(`\nDone. ${jobs.length - failed}/${jobs.length} optimized into public/tarot/`);
   if (failed > 0) process.exit(1);
 }
 
