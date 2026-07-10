@@ -64,6 +64,30 @@ Each card's `interpretation` SHALL explicitly connect the drawn Pokemon's nature
 - **WHEN** an interpretation only restates the Pokemon's flavor text and the card's traditional meaning back to back without connecting them
 - **THEN** the prompt's instructions are not being followed as specified (this is a prompt-content requirement verified by human review of sample output, not a machine-checkable schema field).
 
+### Requirement: Interpretation must not require Pokemon knowledge to parse
+
+The symbolic link SHALL be built from the Pokemon's temperament translated into plain language (e.g. calm, restless, protective, playful, watchful, methodical), not from Pokedex trivia, anatomy, biology, or lore cited verbatim. A reader with zero Pokemon knowledge SHALL be able to read the full interpretation as self-contained tarot prose without needing to look anything up.
+
+#### Scenario: No verbatim trivia or quoted flavor text
+
+- **WHEN** the system prompt is built
+- **THEN** it MUST instruct the model to translate flavor text into a plain-language temperament before use, and MUST explicitly prohibit citing Pokedex trivia/anatomy/lore verbatim or quoting the flavor text in quotation marks.
+
+#### Scenario: Reads as complete tarot prose without Pokemon context
+
+- **WHEN** a card's `interpretation` references the Pokemon's character
+- **THEN** it MUST NOT require the reader to already know an unexplained Pokemon-specific fact (e.g. a species relationship, a numeric anatomical detail, a named in-game mechanic) to understand the sentence.
+
+#### Scenario: No game-mechanic vocabulary, even with an everyday double meaning
+
+- **WHEN** the system prompt is built
+- **THEN** it MUST explicitly prohibit "evolve"/"evolution"/"evolves into" (this Pokemon's own game mechanic, not a universal metaphor) and other game-specific vocabulary (battle, level, stats, ability, move, type, catch, breed, hatch), instructing the model to use plain-English alternatives (transforms, unfolds, grows into, blossoms) instead.
+
+#### Scenario: Warm, empowering register — not clinical or accusatory
+
+- **WHEN** the system prompt is built
+- **THEN** it MUST instruct the model to keep the emotional register warm and empowering, reframing a Pokemon's defensive or predatory traits as a strength being named for the querent (e.g. "sharp instinct", "fierce self-protection") rather than a clinical or accusatory description (e.g. "predatory") applied to the querent's own behavior.
+
 ### Requirement: Response schema
 
 The system SHALL request and return a response conforming exactly to:
