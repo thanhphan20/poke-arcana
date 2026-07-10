@@ -1,3 +1,4 @@
+// @ts-nocheck - z is marked as deprecated in astro:content but is the correct API for content collections
 import { defineCollection, z } from 'astro:content';
 import { file } from 'astro/loaders';
 

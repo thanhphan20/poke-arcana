@@ -43,7 +43,7 @@ const payload = cards.map((c) => {
 ---
 
 <spread-reveal data-default-spread="3">
-    <script type="application/json" set:html={JSON.stringify(payload)} />
+    <script type="application/json" set:html={JSON.stringify(payload)} is:inline />
 
     <p data-instruction class="spread-instruction">
         Draw three cards from the deck below.
@@ -60,6 +60,8 @@ const payload = cards.map((c) => {
         >
         <p data-fortune-error class="fortune-error" hidden></p>
     </div>
+
+    <div data-ai-reading class="ai-reading-panel" hidden></div>
 
     <div data-reset-row class="spread-reset" hidden>
         <button type="button" data-reset class="spread-reset-btn"
@@ -135,13 +137,86 @@ const payload = cards.map((c) => {
         font-size: 14px;
         color: #c8bfe0;
     }
-    :global(.rp-attribution) {
-        margin-top: 14px;
+    /* ── AI reading panel — appended below the template reading, never replaces it ── */
+    .ai-reading-panel {
+        margin: 40px auto 0;
+        max-width: 680px;
+        text-align: left;
+        animation: rp-rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+    :global(.ai-header) {
+        text-align: center;
+        margin-bottom: 32px;
+        padding: 22px 0 24px;
+        border-top: 1px solid rgba(124, 92, 255, 0.25);
+        border-bottom: 1px solid rgba(124, 92, 255, 0.2);
+    }
+    :global(.ai-kicker) {
+        font-family: "Cinzel", serif;
+        font-size: 11px;
+        letter-spacing: 0.32em;
+        text-transform: uppercase;
+        color: #a78bfa;
+        margin: 0 0 10px;
+    }
+    :global(.ai-subtitle) {
+        font-family: "EB Garamond", serif;
+        font-style: italic;
+        font-size: 15px;
+        color: #8f86ac;
+        margin: 0;
+    }
+    :global(.ai-card) {
+        margin-bottom: 32px;
+        padding-left: 20px;
+        border-left: 2px solid rgba(124, 92, 255, 0.4);
+    }
+    :global(.ai-card__title) {
+        font-family: "Cinzel", serif;
+        font-size: 12px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: #a78bfa;
+        margin: 0 0 10px;
+    }
+    :global(.ai-card__text) {
+        font-family: "EB Garamond", serif;
+        font-size: 17px;
+        line-height: 1.7;
+        color: #c8bfe0;
+        margin: 0;
+    }
+    :global(.ai-synthesis) {
+        margin-top: 36px;
+        padding: 24px 28px;
+        border-radius: 12px;
+        border: 1px solid rgba(124, 92, 255, 0.3);
+        background: rgba(124, 92, 255, 0.08);
+        text-align: center;
+    }
+    :global(.ai-synthesis__label) {
+        font-family: "Cinzel", serif;
+        font-size: 11px;
+        letter-spacing: 0.28em;
+        text-transform: uppercase;
+        color: #a78bfa;
+        margin: 0 0 12px;
+    }
+    :global(.ai-synthesis__text) {
+        font-family: "EB Garamond", serif;
+        font-style: italic;
+        font-size: 16px;
+        line-height: 1.7;
+        color: #c8bfe0;
+        margin: 0;
+    }
+    :global(.ai-attribution) {
+        margin-top: 18px;
         font-family: "Cinzel", serif;
         font-size: 10px;
         letter-spacing: 0.18em;
         text-transform: uppercase;
-        color: #3d3455;
+        color: #5a5273;
         text-align: center;
     }
 
