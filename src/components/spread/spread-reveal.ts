@@ -5,7 +5,7 @@ import {
   SUIT_CARD_THEME,
   SUIT_META,
 } from '../../lib/arcana/meanings';
-import { spriteUrl, SPRITE_FALLBACK } from '../../lib/sprites';
+import { spriteUrl, tarotArtUrl, SPRITE_FALLBACK } from '../../lib/sprites';
 import type { Suit } from '../../lib/arcana/types';
 
 // ─── Interfaces ──────────────────────────────────────────────────────────────
@@ -21,6 +21,7 @@ interface SpreadArcana {
   name: string;
   suit?: Suit;
   majorNumber?: number;
+  rankIndex?: number;
   metadata?: SpreadMetadata | null;
 }
 
@@ -134,6 +135,11 @@ function emblemFrontHtml(card: SpreadCard): string {
     ? (ROMAN[card.arcana.majorNumber ?? 0] ?? '✦')
     : (SUIT_META[card.arcana.suit ?? 'cups']?.glyph ?? '✦');
   const arcanaName = esc(card.arcana.name);
+  const artUrl = esc(
+    isMajor
+      ? tarotArtUrl({ kind: 'major', name: card.arcana.name })
+      : tarotArtUrl({ kind: 'minor', suit: card.arcana.suit ?? 'cups', rankIndex: card.arcana.rankIndex ?? 0 })
+  );
 
   return `<div class="arcana-card" style="--accent:${theme.accent}; --wash:${theme.wash};">
     <div class="arcana-card__paper">
@@ -145,9 +151,7 @@ function emblemFrontHtml(card: SpreadCard): string {
       <span class="arcana-card__flourish" style="bottom:5px;right:7px">✦</span>
       <div class="arcana-card__kicker">${esc(kicker)}</div>
       <div class="arcana-card__vignette">
-        <div class="arcana-card__rays"></div>
-        <div class="arcana-card__horizon"></div>
-        <span class="arcana-card__glyph">${esc(kicker)}</span>
+        <img class="arcana-card__art" src="${artUrl}" alt="${arcanaName}" loading="lazy" onerror="this.onerror=null;this.src='${SPRITE_FALLBACK}';">
       </div>
       <div class="arcana-card__banner">
         <span class="arcana-card__star">✦</span>
