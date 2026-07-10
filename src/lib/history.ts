@@ -1,5 +1,6 @@
 // Client-side persistence of completed draws in the visitor's own browser.
 // No server, no accounts — a rolling window of recent readings in localStorage.
+/* global crypto, localStorage */
 
 const STORAGE_KEY = 'poke-arcana:draws:v1';
 const SCHEMA_VERSION = 1;
