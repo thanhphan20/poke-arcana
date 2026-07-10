@@ -6,7 +6,8 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import TarotCard from '../../components/TarotCard.astro';
 import { SUIT_META, ROMAN, uiAccent, arcanaMeaning } from '../../lib/arcana/meanings';
-import { spriteUrl, SPRITE_FALLBACK } from '../../lib/sprites';
+import { arcanaMetadata } from '../../lib/arcana/tarot-metadata';
+import { spriteUrl, tarotArtUrl, SPRITE_FALLBACK } from '../../lib/sprites';
 
 export const getStaticPaths = (async () => {
   const cards = await getCollection('tarotCards');
@@ -25,8 +26,20 @@ const isMajor = arcana.kind === 'major';
 
 const kicker = isMajor ? (ROMAN[arcana.majorNumber ?? 0] ?? '✦') : (SUIT_META[arcana.suit ?? 'cups']?.glyph ?? '✦');
 const arcanaLabel = isMajor ? 'Major Arcana' : `Minor Arcana · ${arcana.suit}`;
-const meaning = arcanaMeaning(arcana);
+const meta = arcanaMetadata(arcana);
+const meaning = meta?.description ?? arcanaMeaning(arcana);
 const accentBorder = `color-mix(in srgb, ${accent} 40%, transparent)`;
+
+const artUrl = isMajor
+  ? tarotArtUrl({ kind: 'major', majorNumber: arcana.majorNumber ?? 0 })
+  : tarotArtUrl({ kind: 'minor', suit: arcana.suit ?? 'cups', rankIndex: arcana.rankIndex ?? 0 });
+
+// element/astrology/numerology are major-only; collect the ones that exist.
+const attributes = [
+  ['Element', meta?.element],
+  ['Astrology', meta?.astrology],
+  ['Numerology', meta?.numerology],
+].filter((a): a is [string, string] => Boolean(a[1]));
 ---
 
 <BaseLayout title={`${arcana.name} — Poké-Arcana`} description={`${arcana.name}, one of the 78 cards of the Poké-Arcana.`}>
@@ -42,6 +55,16 @@ const accentBorder = `color-mix(in srgb, ${accent} 40%, transparent)`;
             <TarotCard arcana={arcana} />
           )
         }
+
+        <figure class="pa-rws">
+          <img
+            src={artUrl}
+            alt={`${arcana.name} — Rider–Waite–Smith`}
+            loading="lazy"
+            onerror={`this.onerror=null;this.src='${SPRITE_FALLBACK}';`}
+          />
+          <figcaption>Rider–Waite–Smith</figcaption>
+        </figure>
       </div>
 
       <div class="pa-right">
@@ -51,10 +74,48 @@ const accentBorder = `color-mix(in srgb, ${accent} 40%, transparent)`;
 
         <h1 class="pa-name">{arcana.name}</h1>
 
+        {
+          meta && meta.keywords.length > 0 && (
+            <div class="pa-keywords">
+              {meta.keywords.map((kw) => (
+                <span class="pa-keyword" style={`border-color:${accentBorder};`}>{kw}</span>
+              ))}
+            </div>
+          )
+        }
+
         <div class="pa-arcanabox" style={`border-color:${accentBorder};`}>
           <div class="pa-watermark" style={`color:${accent};`}>{kicker}</div>
           <p class="pa-meaning">{meaning}</p>
         </div>
+
+        {
+          meta && (
+            <div class="pa-meanings">
+              <div class="pa-meaningcol">
+                <h3 class="pa-meaninglabel" style={`color:${accent};`}>Upright</h3>
+                <p class="pa-meaningtext">{meta.uprightMeaning}</p>
+              </div>
+              <div class="pa-meaningcol">
+                <h3 class="pa-meaninglabel pa-meaninglabel-rev">Reversed</h3>
+                <p class="pa-meaningtext">{meta.reversedMeaning}</p>
+              </div>
+            </div>
+          )
+        }
+
+        {
+          attributes.length > 0 && (
+            <div class="pa-attrs">
+              {attributes.map(([label, value]) => (
+                <div class="pa-attr">
+                  <div class="pa-attrlabel">{label}</div>
+                  <div class="pa-attrval" style={`color:${accent};`}>{value}</div>
+                </div>
+              ))}
+            </div>
+          )
+        }
 
         <h2 class="pa-memberstitle">
           {members.length === 1 ? '1 Pokémon' : `${members.length} Pokémon`} on this card
@@ -119,6 +180,26 @@ const accentBorder = `color-mix(in srgb, ${accent} 40%, transparent)`;
     top: 100px;
   }
 
+  .pa-rws {
+    margin: 18px 0 0;
+  }
+  .pa-rws img {
+    width: 100%;
+    border-radius: 10px;
+    border: 1px solid rgba(203, 168, 90, 0.28);
+    box-shadow: 0 14px 30px -14px rgba(0, 0, 0, 0.7);
+    display: block;
+  }
+  .pa-rws figcaption {
+    margin-top: 8px;
+    text-align: center;
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #5a5273;
+  }
+
   .pa-idrow {
     display: flex;
     align-items: center;
@@ -138,6 +219,24 @@ const accentBorder = `color-mix(in srgb, ${accent} 40%, transparent)`;
     color: #f3dfa2;
   }
 
+  .pa-keywords {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 18px;
+  }
+  .pa-keyword {
+    padding: 5px 14px;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #c8bfe0;
+    background: rgba(21, 14, 43, 0.5);
+  }
+
   .pa-arcanabox {
     margin-top: 22px;
     padding: 22px 24px;
@@ -146,6 +245,48 @@ const accentBorder = `color-mix(in srgb, ${accent} 40%, transparent)`;
     background: linear-gradient(160deg, rgba(21, 14, 43, 0.7), rgba(11, 7, 20, 0.5));
     position: relative;
     overflow: hidden;
+  }
+
+  .pa-meanings {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-top: 22px;
+  }
+  .pa-meaninglabel {
+    margin: 0 0 8px;
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+  .pa-meaninglabel-rev { color: #8f86ac; }
+  .pa-meaningtext {
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.6;
+    color: #c8bfe0;
+  }
+
+  .pa-attrs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 32px;
+    margin-top: 24px;
+    padding-top: 22px;
+    border-top: 1px solid rgba(203, 168, 90, 0.18);
+  }
+  .pa-attrlabel {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #8f86ac;
+  }
+  .pa-attrval {
+    margin-top: 4px;
+    font-family: 'Cinzel', serif;
+    font-size: 16px;
   }
   .pa-watermark {
     position: absolute;
@@ -224,6 +365,10 @@ const accentBorder = `color-mix(in srgb, ${accent} 40%, transparent)`;
     .pa-left {
       position: static;
       justify-self: center;
+    }
+    .pa-meanings {
+      grid-template-columns: 1fr;
+      gap: 18px;
     }
   }
 </style>

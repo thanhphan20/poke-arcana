@@ -6,6 +6,8 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import TarotCard from '../../components/TarotCard.astro';
 import { SUIT_META, TYPE_COLOR, ROMAN, uiAccent, arcanaMeaning } from '../../lib/arcana/meanings';
+import { arcanaMetadata } from '../../lib/arcana/tarot-metadata';
+import { slugForArcana } from '../../lib/arcana/index';
 
 export const getStaticPaths = (async () => {
   const cards = await getCollection('pokemonCards');
@@ -27,6 +29,10 @@ const arcanaLabel = isMajor ? 'Major Arcana' : `Minor Arcana · ${arcana.suit}`;
 const arcanaKind = isMajor ? 'Major' : arcana.suit;
 const meaning = arcanaMeaning(arcana);
 const accentBorder = `color-mix(in srgb, ${accent} 40%, transparent)`;
+
+const meta = arcanaMetadata(arcana);
+const cardHref = '/card/' + slugForArcana(arcana);
+const rarity = card.isMythical ? 'Mythical' : card.isLegendary ? 'Legendary' : null;
 ---
 
 <BaseLayout title={`${card.name} — Poké-Arcana`} description={`${card.name}, the ${arcana.name} of the Poké-Arcana.`}>
@@ -43,16 +49,29 @@ const accentBorder = `color-mix(in srgb, ${accent} 40%, transparent)`;
           <span>№ {paddedId}</span>
           <span class="pa-sep">·</span>
           <span>{card.genus}</span>
+          {rarity && (
+            <span class="pa-rarity" style={`border-color:${accentBorder}; color:${accent};`}>{rarity}</span>
+          )}
         </div>
 
         <h1 class="pa-name">{card.name}</h1>
 
-        <div class="pa-arcanabox" style={`border-color:${accentBorder};`}>
+        <a class="pa-arcanabox pa-arcanabox-link" href={cardHref} style={`border-color:${accentBorder};`}>
           <div class="pa-watermark" style={`color:${accent};`}>{kicker}</div>
           <p class="pa-arcanalabel">{arcanaLabel}</p>
           <p class="pa-arcananame" style={`color:${accent};`}>{arcana.name}</p>
-          <p class="pa-meaning">{meaning}</p>
-        </div>
+          {
+            meta && meta.keywords.length > 0 && (
+              <div class="pa-arcanakeywords">
+                {meta.keywords.slice(0, 5).map((kw) => (
+                  <span class="pa-arcanakeyword">{kw}</span>
+                ))}
+              </div>
+            )
+          }
+          <p class="pa-meaning">{meta?.uprightMeaning ?? meaning}</p>
+          <span class="pa-arcanacta" style={`color:${accent};`}>View the {arcana.name} card →</span>
+        </a>
 
         <div class="pa-types">
           {
@@ -129,6 +148,15 @@ const accentBorder = `color-mix(in srgb, ${accent} 40%, transparent)`;
     color: #8f86ac;
   }
   .pa-sep { opacity: 0.5; }
+  .pa-rarity {
+    padding: 3px 12px;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
 
   .pa-name {
     font-family: 'Cinzel Decorative', serif;
@@ -148,6 +176,15 @@ const accentBorder = `color-mix(in srgb, ${accent} 40%, transparent)`;
     position: relative;
     overflow: hidden;
   }
+  .pa-arcanabox-link {
+    display: block;
+    text-decoration: none;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .pa-arcanabox-link:hover {
+    border-color: color-mix(in srgb, #a78bfa 55%, transparent);
+    transform: translateY(-2px);
+  }
   .pa-watermark {
     position: absolute;
     top: -30px;
@@ -155,6 +192,31 @@ const accentBorder = `color-mix(in srgb, ${accent} 40%, transparent)`;
     font-size: 120px;
     opacity: 0.06;
     font-family: 'Cinzel Decorative', serif;
+  }
+  .pa-arcanakeywords {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-top: 14px;
+  }
+  .pa-arcanakeyword {
+    padding: 4px 11px;
+    border-radius: 999px;
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #c8bfe0;
+    background: rgba(11, 7, 20, 0.45);
+    border: 1px solid rgba(167, 139, 250, 0.18);
+  }
+  .pa-arcanacta {
+    display: inline-block;
+    margin-top: 16px;
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
   }
   .pa-arcanalabel {
     margin: 0;

@@ -12,6 +12,7 @@
     "astro": "astro",
     "sync": "bun run scripts/sync-pokedex.ts",
     "download-sprites": "bun run scripts/download-sprites.ts",
+    "download-tarot-images": "bun run scripts/download-tarot-images.ts",
     "typecheck": "astro check",
     "lint": "eslint . --ext .ts,.astro"
   },

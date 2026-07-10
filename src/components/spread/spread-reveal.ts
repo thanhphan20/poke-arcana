@@ -137,7 +137,7 @@ function emblemFrontHtml(card: SpreadCard): string {
   const arcanaName = esc(card.arcana.name);
   const artUrl = esc(
     isMajor
-      ? tarotArtUrl({ kind: 'major', name: card.arcana.name })
+      ? tarotArtUrl({ kind: 'major', majorNumber: card.arcana.majorNumber ?? 0 })
       : tarotArtUrl({ kind: 'minor', suit: card.arcana.suit ?? 'cups', rankIndex: card.arcana.rankIndex ?? 0 })
   );
 
