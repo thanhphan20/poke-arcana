@@ -9,7 +9,7 @@ type CardData = CollectionEntry<'pokemonCards'>['data'];
 interface Props {
   /** Full Pokemon card: renders sprite + name + Pokedex id. */
   card?: CardData;
-  /** Face-only mode: renders pure tarot art, no sprite. Used for the 78-card deck grid. */
+  /** Face-only mode: renders the glyph fallback, no sprite. Used for the 78-card deck grid. */
   arcana?: ArcanaResult;
   href?: string;
   class?: string;

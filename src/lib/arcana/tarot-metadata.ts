@@ -1,4 +1,5 @@
-import type { TarotMetadata } from './types';
+import type { Suit, TarotMetadata } from './types';
+import { RANKS } from './ranks';
 
 export const MAJOR_ARCANA_METADATA: Record<string, TarotMetadata> = {
   'The Fool': {
@@ -554,3 +555,19 @@ export const MINOR_ARCANA_METADATA: Record<string, Record<string, MinorArcanaMet
     }
   }
 };
+
+/**
+ * Look up the rich per-card metadata for an arcana identity. Majors are keyed
+ * by name; minors by suit + rank name (derived from rankIndex via RANKS).
+ * Minor metadata lacks element/astrology/numerology — those are major-only.
+ */
+export function arcanaMetadata(arcana: {
+  kind: 'major' | 'minor';
+  name: string;
+  suit?: Suit;
+  rankIndex?: number;
+}): (TarotMetadata & { element?: string; astrology?: string; numerology?: string }) | undefined {
+  if (arcana.kind === 'major') return MAJOR_ARCANA_METADATA[arcana.name];
+  if (arcana.suit == null || arcana.rankIndex == null) return undefined;
+  return MINOR_ARCANA_METADATA[arcana.suit]?.[RANKS[arcana.rankIndex]];
+}

@@ -1,11 +1,5 @@
-import {
-  MAJOR_CARD_THEME,
-  ROMAN,
-  SPREAD_POSITIONS,
-  SUIT_CARD_THEME,
-  SUIT_META,
-} from '../../lib/arcana/meanings';
-import { spriteUrl, SPRITE_FALLBACK } from '../../lib/sprites';
+import { SPREAD_POSITIONS } from '../../lib/arcana/meanings';
+import { arcanaCardPaperHtml, arcanaCardThemeStyle, cardBackHtml } from '../../lib/card-html';
 import type { Suit } from '../../lib/arcana/types';
 
 // ─── Interfaces ──────────────────────────────────────────────────────────────
@@ -21,6 +15,7 @@ interface SpreadArcana {
   name: string;
   suit?: Suit;
   majorNumber?: number;
+  rankIndex?: number;
   metadata?: SpreadMetadata | null;
 }
 
@@ -122,82 +117,18 @@ function spreadIntro(size: number): string {
 }
 
 // ─── Card HTML builders ───────────────────────────────────────────────────────
-
-function cardBackHtml(): string {
-  return `<div class="card-back"><div class="card-back__field"><div class="card-back__ring"><span class="card-back__sigil">✦</span></div></div></div>`;
-}
+//
+// Markup lives in src/lib/card-html.ts (shared with TarotCard.astro and
+// HomeDraw). These thin wrappers add the per-face `.arcana-card` wrapper.
 
 function emblemFrontHtml(card: SpreadCard): string {
-  const isMajor = card.arcana.kind === 'major';
-  const theme = isMajor ? MAJOR_CARD_THEME : SUIT_CARD_THEME[card.arcana.suit ?? 'cups'];
-  const kicker = isMajor
-    ? (ROMAN[card.arcana.majorNumber ?? 0] ?? '✦')
-    : (SUIT_META[card.arcana.suit ?? 'cups']?.glyph ?? '✦');
-  const arcanaName = esc(card.arcana.name);
-
-  return `<div class="arcana-card" style="--accent:${theme.accent}; --wash:${theme.wash};">
-    <div class="arcana-card__paper">
-      <div class="arcana-card__grain"></div>
-      <div class="arcana-card__keyline"></div>
-      <span class="arcana-card__flourish" style="top:5px;left:7px">✦</span>
-      <span class="arcana-card__flourish" style="top:5px;right:7px">✦</span>
-      <span class="arcana-card__flourish" style="bottom:5px;left:7px">✦</span>
-      <span class="arcana-card__flourish" style="bottom:5px;right:7px">✦</span>
-      <div class="arcana-card__kicker">${esc(kicker)}</div>
-      <div class="arcana-card__vignette">
-        <div class="arcana-card__rays"></div>
-        <div class="arcana-card__horizon"></div>
-        <span class="arcana-card__glyph">${esc(kicker)}</span>
-      </div>
-      <div class="arcana-card__banner">
-        <span class="arcana-card__star">✦</span>
-        <span class="arcana-card__arcana">${arcanaName}</span>
-        <span class="arcana-card__star">✦</span>
-      </div>
-      <div class="arcana-card__footer">
-        <span class="arcana-card__name">${arcanaName}</span>
-      </div>
-    </div>
-  </div>`;
+  return `<div class="arcana-card" style="${arcanaCardThemeStyle(card.arcana)}">${arcanaCardPaperHtml({ arcana: card.arcana, face: 'art' })}</div>`;
 }
 
 function pokemonFrontHtml(card: SpreadCard, member: SpreadMember): string {
-  const isMajor = card.arcana.kind === 'major';
-  const theme = isMajor ? MAJOR_CARD_THEME : SUIT_CARD_THEME[card.arcana.suit ?? 'cups'];
-  const kicker = isMajor
-    ? (ROMAN[card.arcana.majorNumber ?? 0] ?? '✦')
-    : (SUIT_META[card.arcana.suit ?? 'cups']?.glyph ?? '✦');
-  const paddedId = String(member.id).padStart(3, '0');
-  const name = esc(member.name);
-  const arcanaName = esc(card.arcana.name);
-  const slug = esc(member.slug);
-  const sprite = esc(spriteUrl(member.id, 'artwork'));
-
-  return `<a class="arcana-card is-link" style="--accent:${theme.accent}; --wash:${theme.wash};" href="/deck/${slug}">
-    <div class="arcana-card__paper">
-      <div class="arcana-card__grain"></div>
-      <div class="arcana-card__keyline"></div>
-      <span class="arcana-card__flourish" style="top:5px;left:7px">✦</span>
-      <span class="arcana-card__flourish" style="top:5px;right:7px">✦</span>
-      <span class="arcana-card__flourish" style="bottom:5px;left:7px">✦</span>
-      <span class="arcana-card__flourish" style="bottom:5px;right:7px">✦</span>
-      <div class="arcana-card__kicker">${esc(kicker)}</div>
-      <div class="arcana-card__vignette">
-        <div class="arcana-card__rays"></div>
-        <div class="arcana-card__horizon"></div>
-        <img class="arcana-card__sprite" src="${sprite}" alt="${name}" loading="lazy" onerror="this.onerror=null;this.src='${SPRITE_FALLBACK}';">
-      </div>
-      <div class="arcana-card__banner">
-        <span class="arcana-card__star">✦</span>
-        <span class="arcana-card__arcana">${arcanaName}</span>
-        <span class="arcana-card__star">✦</span>
-      </div>
-      <div class="arcana-card__footer">
-        <span class="arcana-card__name">${name}</span>
-        <span class="arcana-card__id">№ ${paddedId}</span>
-      </div>
-    </div>
-  </a>`;
+  return `<a class="arcana-card is-link" style="${arcanaCardThemeStyle(card.arcana)}" href="/deck/${esc(member.slug)}">${arcanaCardPaperHtml(
+    { arcana: card.arcana, face: 'sprite', pokemon: { id: member.id, name: member.name } },
+  )}</a>`;
 }
 
 // ─── Per-slot reading panels ──────────────────────────────────────────────────

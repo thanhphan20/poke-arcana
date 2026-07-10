@@ -89,7 +89,7 @@ export function assignArcana(pokemon: PokemonRaw[]): Map<number, ArcanaResult> {
   return results;
 }
 
-function slugForArcana(arcana: ArcanaResult): string {
+export function slugForArcana(arcana: { name: string }): string {
   return arcana.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 }
 
