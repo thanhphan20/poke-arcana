@@ -37,6 +37,7 @@
 ## 6. Reading domain layer
 
 - [x] 6.1 Create `src/lib/ai/reading/prompt.ts`. Export `buildSystemPrompt()` (static, includes TOON legend + persona + JSON output instructions) and `buildUserPrompt(question, spread)` which composes the TOON payload from question + `SpreadCard[]`.
+- [x] 6.1.1 Revised after user feedback: the system prompt now explicitly requires each interpretation to state *why* the drawn Pokemon's nature embodies that Arcana card (not just mention both facts side by side) — includes a contrastive bad/good example. Verified against real Gemini output: interpretations now open with lines like "Pikachu's untamed, building electricity mirrors the raw, spontaneous energy of The Fool" instead of listing the Pokemon fact and the tarot fact separately.
 - [x] 6.2 Create `src/lib/ai/reading/validate.ts` with a request-side validator: `question` 1–200 chars trimmed, `spread` length ∈ {1,3,10}, each `arcana.name` is a key of `MAJOR_ARCANA_METADATA` or a valid Minor Arcana `{Rank} of {Suit}` combination.
 - [x] 6.3 Create `src/lib/ai/reading/enrich.ts` that, given a client-supplied `spread` (arcana names + pokémon), looks up `keywords` and `uprightMeaning` from `MAJOR_ARCANA_METADATA` / `MINOR_ARCANA_METADATA`. The client does not need to send meaning data — the server pulls it from committed data to avoid trusting client-side text.
 
@@ -53,7 +54,7 @@
 - [x] 8.1 Edit `src/components/spread/SpreadReveal.astro` to add a `<button data-read-fortune hidden>` element inside the reading panel container after `data-reading-panel`. Add matching styles for the button (Cinzel font, accent border, disabled state, loading spinner via CSS).
 - [x] 8.2 Edit `src/components/spread/spread-reveal.ts`: in `showReadingPanel()`, after rendering the template panel, un-hide the button and wire a click handler.
 - [x] 8.3 Click handler flow: disable button, swap label to "The oracle is listening…", POST to `/api/reading` with `{ question, spread: this.slots.map(...) }`, await response.
-- [x] 8.4 On 200: replace each slot's `.rp-card__text` `textContent` with the matching `card.interpretation`, replace `.rp-synthesis__text` with `synthesis`, remove `.rp-ai-note`, append a small "read by <provider>" attribution line.
+- [x] 8.4 **Revised after user feedback** — original version replaced `.rp-card__text`/`.rp-synthesis__text` in place; user felt this discarded the existing reading rather than adding to it. Reworked: added a new `<div data-ai-reading hidden>` container in `SpreadReveal.astro` (after the fortune row), with its own `.ai-card`/`.ai-synthesis`/`.ai-attribution` styling distinct from the template's `.rp-*` classes. `renderFortune()` in `spread-reveal.ts` now builds a fresh DOM tree there and un-hides it, leaving `data-reading-panel` completely untouched — attribution line included in the new section.
 - [x] 8.5 On 503 or fetch rejection: re-enable button, append a subtle inline notice element (class `rp-ai-error`) reading "The oracle is quiet — try again in a moment." Do not touch the existing template prose.
 - [x] 8.6 Verify keyboard accessibility: button is `<button type="button">`, focus ring visible, disabled state prevents double-submit.
 

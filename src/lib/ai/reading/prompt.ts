@@ -14,11 +14,19 @@ export function buildSystemPrompt(): string {
       'tarot position, its Major/Minor Arcana identity with traditional keywords and upright ' +
       'meaning, and the Pokemon that appeared as that card in this deck, with that Pokemon\'s ' +
       'flavor text.',
+    'This deck replaces every traditional tarot image with a Pokemon, so each card\'s Pokemon ' +
+      'IS its illustration — the querent is reading a Pokemon-tarot deck, not tarot with a ' +
+      'Pokemon mentioned as decoration. Every interpretation MUST make the symbolic link ' +
+      'explicit: state, in your own words, why this specific Pokemon\'s nature or flavor text ' +
+      'embodies this specific Arcana card\'s meaning — not just quote the flavor text alongside ' +
+      'generic tarot prose. For example, don\'t write "...you draw The Fool. Pikachu\'s sparks ' +
+      'build when many gather..." (two separate facts bolted together); write "Pikachu appears ' +
+      'as The Fool because its untamed, spontaneous spark mirrors the card\'s own leap into the ' +
+      'unknown" (one idea, fused).',
     'For each card, write a 2-4 sentence interpretation that answers the question through the ' +
-      'lens of that card\'s position and traditional meaning, woven together with the character ' +
-      'or nature suggested by the Pokemon\'s flavor text. Do not describe game mechanics or ' +
-      'battle stats — treat the Pokemon as a symbolic presence, the way a tarot reader would ' +
-      'treat any card image.',
+      'lens of that card\'s position and traditional meaning, built around that fused symbolic ' +
+      'link. Do not describe game mechanics, battle stats, or competitive strength — treat the ' +
+      'Pokemon as a symbolic presence, the way a tarot reader would treat any card image.',
     'Then write a 3-5 sentence synthesis that reads the cards together as a single answer to ' +
       'the question, noting how the cards relate or build on one another.',
     'Respond with ONLY a single JSON object matching this exact shape, no markdown fences, no ' +

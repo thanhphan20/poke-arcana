@@ -50,6 +50,20 @@ The system SHALL encode the user prompt in TOON (Token-Oriented Object Notation)
 - **WHEN** encoding a card into TOON
 - **THEN** each card entry MUST include `position`, `arcana_kind`, `arcana_name`, `arcana_keywords`, `upright_meaning`, `pokemon_name`, and `pokemon_flavor`.
 
+### Requirement: Interpretation must state the Pokemon–Arcana symbolic link
+
+Each card's `interpretation` SHALL explicitly connect the drawn Pokemon's nature or flavor text to the meaning of the Arcana card it represents in this deck — not merely mention the Pokemon and the tarot meaning as separate facts.
+
+#### Scenario: System prompt requires the explicit link
+
+- **WHEN** the system prompt is built
+- **THEN** it MUST instruct the model that the Pokemon IS the card's illustration in this deck, and that every interpretation must state why that Pokemon's nature embodies that Arcana card's meaning.
+
+#### Scenario: Not satisfied by juxtaposition alone
+
+- **WHEN** an interpretation only restates the Pokemon's flavor text and the card's traditional meaning back to back without connecting them
+- **THEN** the prompt's instructions are not being followed as specified (this is a prompt-content requirement verified by human review of sample output, not a machine-checkable schema field).
+
 ### Requirement: Response schema
 
 The system SHALL request and return a response conforming exactly to:
@@ -92,16 +106,19 @@ The `/reading` page SHALL render a "Read my fortune" button that becomes visible
 - **THEN** the button MUST enter a loading state with a "listening" affordance
 - **AND** the client MUST POST to `/api/reading` with the captured question and drawn spread.
 
-### Requirement: Successful reading replaces template prose
+### Requirement: Successful reading is appended, never overwrites the template
 
-On a successful `/api/reading` response, the client SHALL replace the per-card prose (`.rp-card__text`) and the synthesis text (`.rp-synthesis__text`) with the AI-generated content, preserving the surrounding DOM structure (titles, Pokémon witness lines, styling).
+On a successful `/api/reading` response, the client SHALL render the AI-generated interpretation as a new, distinctly-styled section appended after the existing template-based reading, and SHALL NOT modify, replace, or remove any node inside the template reading panel (`data-reading-panel`).
 
-#### Scenario: Text replacement scoped to prose nodes
+#### Scenario: Template reading stays untouched
 
 - **WHEN** the API returns a valid interpretation
-- **THEN** each `.rp-card__text` MUST be replaced with the matching card's `interpretation`
-- **AND** `.rp-synthesis__text` MUST be replaced with the `synthesis` field
-- **AND** the "AI interpretation coming soon" note (`.rp-ai-note`) MUST be removed from the panel.
+- **THEN** every node inside `data-reading-panel` (including `.rp-card__text`, `.rp-synthesis__text`, and `.rp-ai-note`) MUST be unchanged from what was rendered immediately after the last card was drawn.
+
+#### Scenario: AI reading rendered as its own section
+
+- **WHEN** the API returns a valid interpretation
+- **THEN** a new section (`data-ai-reading`) MUST become visible below the template reading, containing one entry per card (position, arcana, Pokémon, and that card's `interpretation`) followed by the `synthesis`.
 
 #### Scenario: Provider attribution shown
 

@@ -119,9 +119,10 @@ Requested via `response_format: { type: 'json_schema', json_schema: {...} }` on 
 
 ### 6. Prompt structure
 
-**System prompt** (static, ~150 tokens):
+**System prompt** (static, ~220 tokens):
 - Persona: "You are a tarot reader speaking to the querent."
 - Data format: TOON legend (see above).
+- **Explicit symbolic-link requirement**: the Pokemon IS this deck's illustration for that card, not a decoration mentioned alongside it — every per-card interpretation must state, in the model's own words, *why* that Pokemon's nature/flavor text embodies that specific Arcana card's meaning. The prompt includes a contrastive example (bad: two facts bolted together; good: one fused idea) because a plain instruction ("mention the Pokemon") reliably produced juxtaposition rather than synthesis in testing — an early version of this prompt asked the model to "weave together" the Pokemon and the card, and Gemini still produced "you draw The Fool. Pikachu's sparks fly when many gather..." style output that names both facts without connecting them.
 - Task: interpret each card in context of its position and the Pokémon that appeared, then synthesize.
 - Constraints: exact JSON output, no markdown, no preamble.
 
@@ -157,9 +158,10 @@ Free-tier defaults, all overridable by env (`GEMINI_MODEL`, `GROQ_MODEL`, `OPENR
 
 ### 9. UI wiring
 
-- `SpreadReveal.astro` adds a hidden `<button data-read-fortune>` element that is `hidden` until all cards are drawn.
-- `spread-reveal.ts` — the existing `showReadingPanel()` renders the *template* panel immediately, then reveals the "Read my fortune" button. On click: disable button, show a loading state ("The oracle is listening…"), POST to `/api/reading`, replace the template panel content with the AI response.
-- On 503 from `/api/reading`: leave the template panel intact and show a small inline notice: "The oracle is quiet — try again in a moment."
+- `SpreadReveal.astro` adds a hidden `<button data-read-fortune>` element that is `hidden` until all cards are drawn, plus a separate hidden `<div data-ai-reading>` container placed after the fortune row.
+- `spread-reveal.ts` — the existing `showReadingPanel()` renders the *template* panel immediately (unchanged), then reveals the "Read my fortune" button. On click: disable button, show a loading state ("The oracle is listening…"), POST to `/api/reading`.
+- **On success, the AI response is appended as its own distinct section — it never mutates the template panel.** An earlier version of this design overwrote `.rp-card__text`/`.rp-synthesis__text` in place; that was reverted after user feedback that replacing the existing reading felt like it discarded work rather than adding to it. `renderFortune()` now builds a fresh DOM tree (`.ai-card`, `.ai-synthesis`, `.ai-attribution` — visually distinct from the template's `.rp-*` classes) and reveals it via `data-ai-reading`, leaving every node inside `data-reading-panel` untouched.
+- On 503 from `/api/reading`: leave both the template panel and the (still-hidden) AI section alone, and show a small inline notice: "The oracle is quiet — try again in a moment."
 
 This keeps the *first* reading instant (template prose renders while the user reads the cards) and makes the AI reading an opt-in second act. It also means a total provider outage is invisible unless the user clicks the button — good failure mode for hobby infra.
 

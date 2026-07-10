@@ -341,10 +341,9 @@ function buildReadingPanel(question: string, slots: Slot[], spreadSize: number):
     panel.appendChild(synthesis);
   }
 
-  // Stub note — visible cue that AI is not yet wired in
   const note = document.createElement('p');
   note.className = 'rp-ai-note';
-  note.textContent = '✦ Reading generated from card data · AI interpretation coming soon ✦';
+  note.textContent = '✦ Quick reading generated from card data ✦';
   panel.appendChild(note);
 
   return panel;
@@ -372,6 +371,7 @@ class SpreadReveal extends HTMLElement {
   private fortuneRowEl!: HTMLElement;
   private fortuneBtnEl!: HTMLButtonElement;
   private fortuneErrorEl!: HTMLElement;
+  private aiReadingEl!: HTMLElement;
   private fortuneRequested = false;
 
   connectedCallback() {
@@ -393,6 +393,7 @@ class SpreadReveal extends HTMLElement {
     this.fortuneRowEl    = this.querySelector('[data-fortune-row]')    as HTMLElement;
     this.fortuneBtnEl    = this.querySelector('[data-read-fortune]')   as HTMLButtonElement;
     this.fortuneErrorEl  = this.querySelector('[data-fortune-error]')  as HTMLElement;
+    this.aiReadingEl     = this.querySelector('[data-ai-reading]')     as HTMLElement;
 
     this.onDocumentClick   = this.onDocumentClick.bind(this);
     this.onQuestionChange  = this.onQuestionChange.bind(this);
@@ -472,6 +473,8 @@ class SpreadReveal extends HTMLElement {
     this.fortuneBtnEl.disabled = false;
     this.fortuneBtnEl.textContent = 'Read My Fortune';
     this.fortuneErrorEl.hidden = true;
+    this.aiReadingEl.hidden = true;
+    this.aiReadingEl.replaceChildren();
     this.shufflePool();
     this.renderFan();
     this.renderSlots();
@@ -559,39 +562,59 @@ class SpreadReveal extends HTMLElement {
   }
 
   private renderFortune(data: ReadingApiSuccess) {
-    const cardSections = this.readingPanelEl.querySelectorAll<HTMLElement>('.rp-card');
+    const panel = document.createElement('div');
 
-    cardSections.forEach((section, i) => {
-      const apiCard = data.cards[i];
-      if (!apiCard) return;
-      const textEl = section.querySelector<HTMLElement>('.rp-card__text');
-      if (textEl) textEl.textContent = apiCard.interpretation;
-    });
+    const header = document.createElement('div');
+    header.className = 'ai-header';
 
-    let synthesisTextEl = this.readingPanelEl.querySelector<HTMLElement>('.rp-synthesis__text');
-    if (!synthesisTextEl) {
-      const synthesis = document.createElement('div');
-      synthesis.className = 'rp-synthesis';
+    const kicker = document.createElement('p');
+    kicker.className = 'ai-kicker';
+    kicker.textContent = '✦ The AI Reading ✦';
 
-      const label = document.createElement('p');
-      label.className = 'rp-synthesis__label';
-      label.textContent = '✦ The Thread Between Them ✦';
+    const subtitle = document.createElement('p');
+    subtitle.className = 'ai-subtitle';
+    subtitle.textContent = 'A deeper interpretation, woven fresh for your question.';
 
-      synthesisTextEl = document.createElement('p');
-      synthesisTextEl.className = 'rp-synthesis__text';
+    header.append(kicker, subtitle);
+    panel.appendChild(header);
 
-      synthesis.append(label, synthesisTextEl);
-      this.readingPanelEl.appendChild(synthesis);
+    for (const card of data.cards) {
+      const section = document.createElement('div');
+      section.className = 'ai-card';
+
+      const title = document.createElement('h3');
+      title.className = 'ai-card__title';
+      title.textContent = `${card.position} · ${card.arcana} · ${card.pokemon}`;
+
+      const text = document.createElement('p');
+      text.className = 'ai-card__text';
+      text.textContent = card.interpretation;
+
+      section.append(title, text);
+      panel.appendChild(section);
     }
-    synthesisTextEl.textContent = data.synthesis;
 
-    this.readingPanelEl.querySelector('.rp-ai-note')?.remove();
+    const synthesis = document.createElement('div');
+    synthesis.className = 'ai-synthesis';
+
+    const synthLabel = document.createElement('p');
+    synthLabel.className = 'ai-synthesis__label';
+    synthLabel.textContent = '✦ The Thread Between Them ✦';
+
+    const synthText = document.createElement('p');
+    synthText.className = 'ai-synthesis__text';
+    synthText.textContent = data.synthesis;
+
+    synthesis.append(synthLabel, synthText);
+    panel.appendChild(synthesis);
 
     const attribution = document.createElement('p');
-    attribution.className = 'rp-attribution';
+    attribution.className = 'ai-attribution';
     attribution.textContent = `✦ read by ${data.provider} ✦`;
-    this.readingPanelEl.appendChild(attribution);
+    panel.appendChild(attribution);
 
+    this.aiReadingEl.replaceChildren(panel);
+    this.aiReadingEl.hidden = false;
     this.fortuneRowEl.hidden = true;
   }
 
