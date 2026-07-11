@@ -142,5 +142,11 @@ const suitCards = [
       gap: 24px 16px;
       max-width: 420px;
     }
+    /* 5 items in a 2-col grid leaves the last one stranded in column 1;
+       span it across both columns and center it so it doesn't look offset. */
+    .suits > *:last-child {
+      grid-column: 1 / -1;
+      justify-self: center;
+    }
   }
 </style>

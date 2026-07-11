@@ -293,6 +293,9 @@ const rarity = card.isMythical ? 'Mythical' : card.isLegendary ? 'Legendary' : n
     }
     .pa-left {
       position: static;
+      /* justify-self:center alone shrinks the grid item to its min-content width,
+         collapsing the 100%-width card inside it; give it an explicit width instead. */
+      width: min(320px, 100%);
       justify-self: center;
     }
   }
