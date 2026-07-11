@@ -408,8 +408,26 @@ class SpreadReveal extends HTMLElement {
 
   // ─── Fan ────────────────────────────────────────────────────────────────────
 
+  // Fan geometry (radius/spread/card size) was tuned for a ~1150px-wide container;
+  // scale it down proportionally so the arc's horizontal reach never exceeds the
+  // fan's actual width on narrow viewports.
+  // The spread section starts `hidden` until a question is picked, so clientWidth
+  // reads 0 the first time this runs; fall back to the viewport minus the page's
+  // side padding rather than the full window width, or the fan overflows its box.
+  private containerWidthFallback(): number {
+    return window.innerWidth - 64;
+  }
+
+  private fanScale(): number {
+    const width = this.fanEl.clientWidth || this.containerWidthFallback();
+    // 0.9 safety factor: linear width/radius scaling still slightly underestimates
+    // reach (card half-width + rotation add extra), so shave a margin off every size.
+    return Math.max(0.25, Math.min(1, width / 1150) * 0.9);
+  }
+
   private renderFan() {
     this.fanEl.replaceChildren();
+    const scale = this.fanScale();
 
     for (let i = 0; i < FAN_TOTAL; i++) {
       const row = Math.floor(i / PER_ROW);
@@ -421,12 +439,18 @@ class SpreadReveal extends HTMLElement {
       const angle = (-cfg.arc / 2 + t * cfg.arc).toFixed(2);
       const baseTransform = `translateX(-50%) rotate(${angle}deg)`;
       const baseZ = cfg.zBase + indexInRow;
+      const bottom = cfg.bottom * scale;
+      const radius = cfg.radius * scale;
+      const width = 100 * scale;
+      const height = 180 * scale;
+      const lift = 28 * scale;
+      const pickLift = 64 * scale;
 
       const card = document.createElement('div');
       card.style.cssText = [
         'position:absolute', 'left:50%',
-        `bottom:${cfg.bottom}px`, 'width:100px', 'height:180px',
-        `transform-origin:50% ${cfg.radius}px`, `transform:${baseTransform}`,
+        `bottom:${bottom}px`, `width:${width}px`, `height:${height}px`,
+        `transform-origin:50% ${radius}px`, `transform:${baseTransform}`,
         `z-index:${baseZ}`, 'cursor:pointer',
         'transition:transform .45s cubic-bezier(.2,.7,.2,1), opacity .55s, filter .3s',
       ].join(';');
@@ -440,7 +464,7 @@ class SpreadReveal extends HTMLElement {
 
       card.addEventListener('mouseenter', () => {
         if (!this.canPick || this.taken.has(i)) return;
-        card.style.transform = `${baseTransform} translateY(-28px)`;
+        card.style.transform = `${baseTransform} translateY(-${lift}px)`;
         card.style.filter = 'drop-shadow(0 12px 20px rgba(0,0,0,.65))';
         card.style.zIndex = '400';
       });
@@ -450,18 +474,18 @@ class SpreadReveal extends HTMLElement {
         card.style.filter = '';
         card.style.zIndex = String(baseZ);
       });
-      card.addEventListener('click', () => this.pickFan(i, card, baseTransform));
+      card.addEventListener('click', () => this.pickFan(i, card, baseTransform, pickLift));
       this.fanEl.appendChild(card);
     }
   }
 
-  private pickFan(i: number, cardEl: HTMLElement, baseTransform: string) {
+  private pickFan(i: number, cardEl: HTMLElement, baseTransform: string, pickLift: number) {
     if (!this.canPick || this.taken.has(i)) return;
 
     this.taken.add(i);
     cardEl.style.cursor = 'default';
     cardEl.style.opacity = '0';
-    cardEl.style.transform = `${baseTransform} translateY(-64px)`;
+    cardEl.style.transform = `${baseTransform} translateY(-${pickLift}px)`;
     cardEl.style.zIndex = '0';
 
     const group = this.pool[this.slots.length];
@@ -489,9 +513,15 @@ class SpreadReveal extends HTMLElement {
   // ─── Slots ──────────────────────────────────────────────────────────────────
 
   private slotWidth(): string {
+    const containerWidth = this.slotsEl.clientWidth || this.containerWidthFallback();
     if (this.spreadSize === 10) return '132px';
-    if (this.spreadSize === 1) return '240px';
-    return '196px';
+    if (this.spreadSize === 1) return `${Math.min(240, containerWidth)}px`;
+
+    // 3-card spread: always keep a single row, shrinking to fit narrow viewports
+    // rather than letting flex-wrap stack the cards into 3 rows.
+    const gap = parseFloat(getComputedStyle(this.slotsEl).columnGap) || 24;
+    const fit = (containerWidth - gap * 2) / 3;
+    return `${Math.min(196, Math.max(88, fit))}px`;
   }
 
   private renderSlots() {

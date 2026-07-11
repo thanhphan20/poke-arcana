@@ -192,3 +192,18 @@
   color: #5a5273;
   text-align: center;
 }
+
+@media (max-width: 640px) {
+  .rp-synthesis,
+  .ai-synthesis {
+    padding: 20px 18px;
+  }
+  .rp-card,
+  .ai-card {
+    padding-left: 14px;
+  }
+  .rp-card__text,
+  .ai-card__text {
+    font-size: 16px;
+  }
+}

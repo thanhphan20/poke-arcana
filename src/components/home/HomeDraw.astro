@@ -19,11 +19,12 @@ interface Props {
 const { deck, featured } = Astro.props;
 
 // Featured fan transforms (design renderVals fanTf / z-index).
+// dx/dy scale with --fan-scale so the fan narrows on small viewports without overflowing.
 const fan = [
-  { transform: 'rotate(-13deg) translate(-118px,18px)', z: 2 },
-  { transform: 'rotate(-4.5deg) translate(-40px,-6px)', z: 3 },
-  { transform: 'rotate(4.5deg) translate(40px,-6px)', z: 3 },
-  { transform: 'rotate(13deg) translate(118px,18px)', z: 2 },
+  { angle: -13, dx: -118, dy: 18, z: 2 },
+  { angle: -4.5, dx: -40, dy: -6, z: 3 },
+  { angle: 4.5, dx: 40, dy: -6, z: 3 },
+  { angle: 13, dx: 118, dy: 18, z: 2 },
 ];
 ---
 
@@ -46,7 +47,8 @@ const fan = [
       {
         featured.map((card, i) => (
           <div
-            style={`position:absolute; width:186px; left:calc(50% - 95px); top:70px; transform:${fan[i].transform}; z-index:${fan[i].z}; filter:drop-shadow(0 20px 30px rgba(0,0,0,.55)); pointer-events:none;`}
+            class="home-draw__fan-card"
+            style={`position:absolute; width:calc(186px * var(--fan-scale, 1)); left:calc(50% - 95px * var(--fan-scale, 1)); top:70px; transform:rotate(${fan[i].angle}deg) translate(calc(${fan[i].dx}px * var(--fan-scale, 1)), calc(${fan[i].dy}px * var(--fan-scale, 1))); z-index:${fan[i].z}; filter:drop-shadow(0 20px 30px rgba(0,0,0,.55)); pointer-events:none;`}
           >
             <TarotCard card={card} />
           </div>
@@ -70,6 +72,22 @@ const fan = [
 
   <script type="application/json" data-home-deck set:html={JSON.stringify(deck)} is:inline></script>
 </div>
+
+<style>
+  .home-draw {
+    --fan-scale: 1;
+  }
+  @media (max-width: 640px) {
+    .home-draw {
+      --fan-scale: 0.78;
+    }
+  }
+  @media (max-width: 480px) {
+    .home-draw {
+      --fan-scale: 0.58;
+    }
+  }
+</style>
 
 <script>
   import { uiAccent, arcanaMeaning } from '../../lib/arcana/meanings';
@@ -98,7 +116,7 @@ const fan = [
     return `
       <div style="display:flex; flex-direction:column; align-items:center; animation:pa-rise .5s ease both;">
         <div style="perspective:1400px;">
-          <div class="home-draw__flip" style="position:relative; width:236px; aspect-ratio:63/100; transform-style:preserve-3d; transition:transform .85s cubic-bezier(.4,.1,.2,1); transform:rotateY(180deg);">
+          <div class="home-draw__flip" style="position:relative; width:min(236px, 62vw); aspect-ratio:63/100; transform-style:preserve-3d; transition:transform .85s cubic-bezier(.4,.1,.2,1); transform:rotateY(180deg);">
             <div style="position:absolute; inset:0; backface-visibility:hidden; transform:rotateY(180deg);">
               ${cardBackHtml()}
             </div>

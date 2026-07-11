@@ -205,6 +205,26 @@ const payload = cards.map((c) => {
         margin: 0;
     }
 
+    @media (max-width: 640px) {
+        .spread-slots {
+            gap: 12px;
+            margin-top: 20px;
+        }
+        .spread-fan-hint {
+            margin: 20px 0 0;
+        }
+        .spread-fan {
+            height: 170px;
+            margin: 0 auto 32px;
+        }
+        .fortune-row {
+            margin-top: 24px;
+        }
+        .spread-reset {
+            margin-top: 20px;
+        }
+    }
+
 </style>
 
 <script src="./spread-reveal.ts"></script>

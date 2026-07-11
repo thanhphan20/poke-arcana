@@ -58,7 +58,7 @@ const suitCards = [
           One hundred fifty-one creatures of the first age, each dealt a place in the arcana. The legendary rise to the
           Major; the rest fall to four elemental suits. Browse the full deck, or draw a spread and let the cards speak.
         </p>
-        <div style="display:flex; gap:14px; margin-top:34px; flex-wrap:wrap;">
+        <div class="hero__ctas" style="display:flex; gap:14px; margin-top:34px; flex-wrap:wrap;">
           <a
             href="/deck"
             style="padding:13px 26px; border-radius:999px; text-decoration:none; font-family:'Cinzel',serif; font-size:13px; letter-spacing:.12em; text-transform:uppercase; color:#0b0714; background:linear-gradient(160deg,#e3cf95,#c39a45); box-shadow:0 8px 24px -8px rgba(203,168,90,.6);"
@@ -126,6 +126,16 @@ const suitCards = [
     .hero__grid {
       grid-template-columns: 1fr;
       gap: 24px;
+    }
+    .hero__intro {
+      text-align: center;
+    }
+    .hero__intro :global(div:not(.hero__ctas)) {
+      margin-left: auto !important;
+      margin-right: auto !important;
+    }
+    .hero__intro :global(.hero__ctas) {
+      justify-content: center;
     }
     .suits {
       grid-template-columns: repeat(2, 1fr);
