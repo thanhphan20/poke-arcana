@@ -74,18 +74,45 @@ import '../../styles/reading.css';
       q.className = 'history-item__question';
       q.textContent = draw.question ? `"${draw.question}"` : 'An unspoken question';
 
-      const meta = document.createElement('p');
+      const meta = document.createElement('div');
       meta.className = 'history-item__meta';
-      const spread = draw.spreadSize === 1 ? '1 card' : `${draw.spreadSize} cards`;
-      const flags: string[] = [formatDate(draw.createdAt), spread];
-      if (draw.ai) flags.push('AI reading');
-      meta.textContent = flags.filter(Boolean).join(' · ');
 
-      const names = document.createElement('p');
-      names.className = 'history-item__cards';
-      names.textContent = draw.cards.map((c) => c.arcanaName).join(' · ');
+      const date = document.createElement('span');
+      date.className = 'history-item__date';
+      date.textContent = formatDate(draw.createdAt);
+      meta.appendChild(date);
 
-      link.append(q, meta, names);
+      const spreadBadge = document.createElement('span');
+      spreadBadge.className = 'history-item__badge';
+      spreadBadge.textContent = draw.spreadSize === 1 ? '1 card' : `${draw.spreadSize} cards`;
+      meta.appendChild(spreadBadge);
+
+      if (draw.ai) {
+        const aiBadge = document.createElement('span');
+        aiBadge.className = 'history-item__badge history-item__badge--ai';
+        aiBadge.textContent = 'AI reading';
+        meta.appendChild(aiBadge);
+      }
+
+      const cardList = document.createElement('ul');
+      cardList.className = 'history-item__cards';
+      for (const card of draw.cards) {
+        const chip = document.createElement('li');
+        chip.className = 'history-item__card-chip';
+
+        const pos = document.createElement('span');
+        pos.className = 'history-item__card-position';
+        pos.textContent = card.position;
+
+        const name = document.createElement('span');
+        name.className = 'history-item__card-name';
+        name.textContent = card.arcanaName;
+
+        chip.append(pos, name);
+        cardList.appendChild(chip);
+      }
+
+      link.append(q, meta, cardList);
       item.appendChild(link);
       list.appendChild(item);
     }
@@ -188,18 +215,60 @@ import '../../styles/reading.css';
     line-height: 1.3;
   }
   .history-item__meta {
-    margin: 0 0 8px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 14px;
+  }
+  .history-item__date {
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 13px;
+    color: #8f86ac;
+  }
+  .history-item__badge {
+    padding: 3px 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(167, 139, 250, 0.35);
     font-family: 'Cinzel', serif;
-    font-size: 10px;
-    letter-spacing: 0.16em;
+    font-size: 9px;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
     color: #a78bfa;
   }
+  .history-item__badge--ai {
+    border-color: rgba(227, 207, 149, 0.5);
+    color: #e3cf95;
+  }
   .history-item__cards {
+    list-style: none;
     margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .history-item__card-chip {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    background: rgba(11, 7, 20, 0.4);
+    border: 1px solid rgba(203, 168, 90, 0.15);
+  }
+  .history-item__card-position {
+    font-family: 'Cinzel', serif;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #6f6690;
+  }
+  .history-item__card-name {
     font-family: 'EB Garamond', serif;
-    font-size: 15px;
-    color: #8f86ac;
+    font-size: 14px;
+    color: #c8bfe0;
   }
 
   .history-empty {
