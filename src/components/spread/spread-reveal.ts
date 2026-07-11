@@ -176,6 +176,7 @@ class SpreadReveal extends HTMLElement {
   private fortuneErrorEl!: HTMLElement;
   private aiReadingEl!: HTMLElement;
   private fortuneRequested = false;
+  private slotsResizeObserver: ResizeObserver | null = null;
 
   connectedCallback() {
     const initial = parseInt(this.dataset.defaultSpread ?? '3', 10);
@@ -210,16 +211,38 @@ class SpreadReveal extends HTMLElement {
     this.renderSlots();
     this.syncUI();
     this.syncSpreadButtons();
+
+    // The spread section starts `hidden`, so the very first render measures a
+    // zero-width container. Re-apply slot widths whenever the container's real
+    // size becomes available (reveal, resize, orientation change) instead of
+    // trusting a single measurement to stay correct forever.
+    this.slotsResizeObserver = new ResizeObserver(() => this.updateSlotWidths());
+    this.slotsResizeObserver.observe(this.slotsEl);
   }
 
   disconnectedCallback() {
     document.removeEventListener('click', this.onDocumentClick);
     window.removeEventListener('question-change', this.onQuestionChange);
+    this.slotsResizeObserver?.disconnect();
     this.clearTimers();
   }
 
   private onQuestionChange(e: Event) {
     this.question = (e as CustomEvent<{ question: string }>).detail?.question ?? '';
+
+    // reading.astro un-hides the spread section on this same event, via its own
+    // listener on the same event, whose relative order isn't guaranteed. The
+    // fan/slots were first rendered while that section was `display:none` (zero
+    // width), so defer past this task (setTimeout, not rAF - rAF is paused in
+    // backgrounded/inactive tabs) and re-measure once real dimensions exist.
+    // Only safe pre-pick, which this always is: the section reveals before the
+    // user can tap any fan card.
+    window.setTimeout(() => {
+      if (this.taken.size === 0) {
+        this.renderFan();
+        this.updateSlotWidths();
+      }
+    }, 0);
   }
 
   private onDocumentClick(e: Event) {
@@ -522,6 +545,16 @@ class SpreadReveal extends HTMLElement {
     const gap = parseFloat(getComputedStyle(this.slotsEl).columnGap) || 24;
     const fit = (containerWidth - gap * 2) / 3;
     return `${Math.min(196, Math.max(88, fit))}px`;
+  }
+
+  // Re-applies the current slot width to every slot wrapper (placeholder or
+  // activated) without touching their content, so a resize/reveal after cards
+  // have already been drawn doesn't leave stale widths behind.
+  private updateSlotWidths() {
+    const w = this.slotWidth();
+    this.slotsEl.querySelectorAll<HTMLElement>(':scope > div').forEach((wrapper) => {
+      wrapper.style.width = w;
+    });
   }
 
   private renderSlots() {
