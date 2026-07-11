@@ -68,7 +68,9 @@ export default [
         setTimeout: 'readonly',
         Response: 'readonly',
         RequestInit: 'readonly',
-        AbortController: 'readonly'
+        AbortController: 'readonly',
+        ResizeObserver: 'readonly',
+        getComputedStyle: 'readonly'
       }
     }
   },
