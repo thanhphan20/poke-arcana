@@ -1,0 +1,219 @@
+---
+const MONTHS = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December',
+] as const;
+---
+
+<div class="birth-form" data-birth-form>
+  <p class="birth-form__kicker">Find Your Sign</p>
+  <form class="birth-form__row" data-birth-form-el>
+    <div class="birth-form__select-wrap">
+      <select class="birth-form__select" data-birth-month aria-label="Birth month" required>
+        <option value="" disabled selected>Month</option>
+        {MONTHS.map((m, i) => <option value={i + 1}>{m}</option>)}
+      </select>
+    </div>
+    <div class="birth-form__select-wrap">
+      <select class="birth-form__select birth-form__select--day" data-birth-day aria-label="Birth day" required>
+        <option value="" disabled selected>Day</option>
+        {Array.from({ length: 31 }, (_, i) => <option value={i + 1}>{i + 1}</option>)}
+      </select>
+    </div>
+    <button type="submit" class="birth-form__submit">Locate My Sign</button>
+  </form>
+
+  <p class="birth-form__result" data-birth-result hidden aria-live="polite">
+    <span data-birth-result-text></span>
+    <button type="button" class="birth-form__clear" data-birth-clear aria-label="Forget my birth date">✕</button>
+  </p>
+</div>
+
+<script>
+  import { signForDate } from '../../lib/arcana/zodiac';
+  import { getBirthDate, saveBirthDate, clearBirthDate } from '../../lib/birth';
+
+  // Days-in-month, ignoring leap years (day-of-month only matters here for
+  // narrowing the <select>, not for real calendar validity).
+  const DAYS_IN_MONTH = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
+  const root = document.querySelector<HTMLElement>('[data-birth-form]');
+  if (root) {
+    const form = root.querySelector<HTMLFormElement>('[data-birth-form-el]')!;
+    const monthSelect = root.querySelector<HTMLSelectElement>('[data-birth-month]')!;
+    const daySelect = root.querySelector<HTMLSelectElement>('[data-birth-day]')!;
+    const result = root.querySelector<HTMLElement>('[data-birth-result]')!;
+    const resultText = root.querySelector<HTMLElement>('[data-birth-result-text]')!;
+    const clearBtn = root.querySelector<HTMLButtonElement>('[data-birth-clear]')!;
+
+    function locate(sign: string | null) {
+      window.dispatchEvent(new CustomEvent('star-map:locate', { detail: { sign } }));
+    }
+
+    function showResult(sign: string) {
+      resultText.textContent = `Your sun sign is ${sign} ✦`;
+      result.hidden = false;
+    }
+
+    // Hide day options past the selected month's length, clamping the
+    // current selection down if needed (e.g. switching from Jan 31 to Feb).
+    function syncDayOptions() {
+      const max = DAYS_IN_MONTH[Number(monthSelect.value) - 1] ?? 31;
+      let clampedSelection = false;
+      for (const opt of Array.from(daySelect.options)) {
+        if (!opt.value) continue;
+        const hide = Number(opt.value) > max;
+        opt.hidden = hide;
+        opt.disabled = hide;
+        if (hide && opt.selected) clampedSelection = true;
+      }
+      if (clampedSelection) daySelect.value = '';
+    }
+
+    monthSelect.addEventListener('change', syncDayOptions);
+
+    // Restore a birth date saved on a previous visit, and re-locate its sign
+    // once the star-map custom element has finished connecting.
+    const saved = getBirthDate();
+    if (saved) {
+      const [month, day] = saved.split('-').map(Number);
+      const sign = signForDate(month, day);
+      monthSelect.value = String(month);
+      syncDayOptions();
+      daySelect.value = String(day);
+      showResult(sign);
+      customElements.whenDefined('star-map').then(() => locate(sign));
+    }
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (!monthSelect.value || !daySelect.value) return;
+      const month = Number(monthSelect.value);
+      const day = Number(daySelect.value);
+      const sign = signForDate(month, day);
+      saveBirthDate(`${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`);
+      showResult(sign);
+      locate(sign);
+    });
+
+    clearBtn.addEventListener('click', () => {
+      clearBirthDate();
+      monthSelect.value = '';
+      daySelect.value = '';
+      syncDayOptions();
+      result.hidden = true;
+      locate(null);
+    });
+  }
+</script>
+
+<style>
+  .birth-form {
+    max-width: 420px;
+    margin: 24px auto 0;
+    text-align: center;
+  }
+  .birth-form__kicker {
+    margin: 0 0 10px;
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: #5a5273;
+  }
+  .birth-form__row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .birth-form__select-wrap {
+    position: relative;
+  }
+  .birth-form__select-wrap::after {
+    content: '▾';
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 10px;
+    color: #cba85a;
+    pointer-events: none;
+  }
+  .birth-form__select {
+    appearance: none;
+    -webkit-appearance: none;
+    padding: 9px 30px 9px 16px;
+    border-radius: 999px;
+    border: 1px solid rgba(203, 168, 90, 0.28);
+    background: rgba(11, 7, 20, 0.55);
+    color: #e9e4f5;
+    font-family: 'EB Garamond', serif;
+    font-size: 15px;
+    outline: none;
+    cursor: pointer;
+    transition: border-color 0.25s, box-shadow 0.25s;
+  }
+  .birth-form__select--day {
+    padding-right: 26px;
+  }
+  .birth-form__select:focus {
+    border-color: rgba(167, 139, 250, 0.6);
+    box-shadow: 0 0 0 3px rgba(124, 92, 255, 0.12);
+  }
+  .birth-form__select option {
+    background: #1c1526;
+    color: #e9e4f5;
+  }
+
+  .birth-form__submit {
+    padding: 9px 20px;
+    border-radius: 999px;
+    cursor: pointer;
+    font-family: 'Cinzel', serif;
+    font-size: 11.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #0b0714;
+    border: none;
+    background: linear-gradient(160deg, #e3cf95, #c39a45);
+  }
+
+  .birth-form__result[hidden] {
+    display: none;
+  }
+  .birth-form__result {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin: 14px auto 0;
+    padding: 8px 8px 8px 18px;
+    border-radius: 999px;
+    border: 1px solid rgba(167, 139, 250, 0.32);
+    background: rgba(124, 92, 255, 0.1);
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 15px;
+    color: #f3dfa2;
+  }
+  .birth-form__clear {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 11px;
+    color: #c8bfe0;
+    border: 1px solid rgba(203, 168, 90, 0.3);
+    background: transparent;
+  }
+  .birth-form__clear:hover {
+    color: #e9e4f5;
+    border-color: rgba(203, 168, 90, 0.6);
+  }
+</style>
