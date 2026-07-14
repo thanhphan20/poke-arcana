@@ -1,0 +1,48 @@
+---
+export const prerender = true;
+
+import BaseLayout from '../layouts/BaseLayout.astro';
+import StarMap from '../components/starmap/StarMap.astro';
+import BirthForm from '../components/starmap/BirthForm.astro';
+import { getZodiacCards } from '../lib/arcana/zodiac';
+
+const zodiacCards = getZodiacCards();
+---
+
+<BaseLayout title="Star Map — Poké-Arcana" description="Trace the zodiac wheel and uncover each sign's Major Arcana card.">
+  <section class="star-map-page pa-rise">
+    <p class="star-map-page__kicker">Trace the Wheel</p>
+    <h1 class="star-map-page__title">Star Map</h1>
+    <p class="star-map-page__lede">
+      Tap a sign of the zodiac to reveal the Major Arcana card written in its stars.
+    </p>
+
+    <BirthForm />
+    <StarMap zodiacCards={zodiacCards} />
+  </section>
+</BaseLayout>
+
+<style>
+  .star-map-page__kicker {
+    margin: 0;
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: #cba85a;
+  }
+  .star-map-page__title {
+    margin: 6px 0 10px;
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(32px, 5vw, 48px);
+    color: #e3cf95;
+  }
+  .star-map-page__lede {
+    max-width: 46ch;
+    margin: 0;
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 17px;
+    color: #c8bfe0;
+  }
+</style>

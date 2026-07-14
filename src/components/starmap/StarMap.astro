@@ -1,0 +1,377 @@
+---
+import { tarotArtUrl } from '../../lib/sprites';
+import type { ZodiacCard } from '../../lib/arcana/zodiac';
+
+interface Props {
+  zodiacCards: ZodiacCard[];
+}
+
+const { zodiacCards } = Astro.props;
+
+// A large virtual sky, bigger than the viewport, so pan/zoom actually means
+// something instead of just re-centering a circle that already fit on screen.
+const CANVAS_W = 1600;
+const CANVAS_H = 900;
+const CLUSTER_W = 190;
+const CLUSTER_H = 140;
+
+// Scatter the 12 constellations along a wavy "ecliptic band" across the
+// canvas (not a neat circle) so exploring the map by dragging feels worthwhile.
+const clusters = zodiacCards.map((z, i) => {
+  const t = i / (zodiacCards.length - 1);
+  const x = 40 + t * (CANVAS_W - 80 - CLUSTER_W);
+  const y = CANVAS_H / 2 - CLUSTER_H / 2 + Math.sin(t * Math.PI * 2.5) * (CANVAS_H / 2 - CLUSTER_H / 2 - 40);
+  const brightest = z.stars.reduce(
+    (best, _, idx, arr) => (arr[idx][1] < arr[best][1] ? idx : best),
+    0,
+  );
+  return { ...z, x, y, thumb: tarotArtUrl({ kind: 'major', majorNumber: z.majorNumber }), brightest };
+});
+
+// Deterministic decorative background stars (no Math.random — stable across rebuilds).
+const bgStars = Array.from({ length: 140 }, (_, i) => {
+  const a = (i * 137.51) % 360; // golden-angle scatter
+  const r = ((i * 53) % CANVAS_H) / 2 + ((i * 29) % 200);
+  const x = (CANVAS_W / 2 + r * Math.cos((a * Math.PI) / 180)) % CANVAS_W;
+  const y = (i * 61 + i * i * 3) % CANVAS_H;
+  const size = 0.6 + ((i * 17) % 5) * 0.25;
+  return { x: Math.abs(x), y: Math.abs(y), size };
+});
+---
+
+<star-map>
+  <p class="star-map__hint">✧ Drag to pan · Scroll or pinch to zoom · Tap a constellation ✧</p>
+
+  <div class="star-map__stage" data-stage>
+    <div class="star-map__controls">
+      <button type="button" data-zoom-in class="star-map__zoom-btn" aria-label="Zoom in">+</button>
+      <button type="button" data-zoom-out class="star-map__zoom-btn" aria-label="Zoom out">−</button>
+      <button type="button" data-zoom-reset class="star-map__zoom-btn" aria-label="Reset view">⟳</button>
+    </div>
+
+    <div class="star-map__viewport" data-viewport>
+      <div class="star-map__canvas" data-canvas style={`width:${CANVAS_W}px; height:${CANVAS_H}px;`}>
+        <svg class="star-map__bg-stars" width={CANVAS_W} height={CANVAS_H} viewBox={`0 0 ${CANVAS_W} ${CANVAS_H}`} aria-hidden="true">
+          {bgStars.map((s) => (
+            <circle cx={s.x} cy={s.y} r={s.size} />
+          ))}
+        </svg>
+
+        {clusters.map((c) => (
+          <button
+            type="button"
+            class="star-map__hotspot"
+            style={`left:${c.x}px; top:${c.y}px; width:${CLUSTER_W}px; height:${CLUSTER_H}px;`}
+            data-sign={c.sign}
+            data-symbol={c.symbol}
+            data-daterange={c.dateRange}
+            data-card={c.cardName}
+            data-thumb={c.thumb}
+            data-meaning={c.uprightMeaning}
+            aria-label={`${c.sign} — ${c.cardName}`}
+          >
+            <svg class="star-map__constellation" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+              {c.lines.map(([a, b]) => (
+                <line
+                  x1={c.stars[a][0] * 100} y1={c.stars[a][1] * 100}
+                  x2={c.stars[b][0] * 100} y2={c.stars[b][1] * 100}
+                />
+              ))}
+              {c.stars.map((p, idx) => (
+                <circle cx={p[0] * 100} cy={p[1] * 100} r={idx === c.brightest ? 3.2 : 1.9} />
+              ))}
+            </svg>
+            <span class="star-map__glyph" aria-hidden="true">{c.symbol}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+
+    <div class="star-map__popup" data-popup hidden role="dialog" aria-live="polite">
+      <button type="button" class="star-map__popup-close" data-popup-close aria-label="Close">✕</button>
+      <img data-popup-thumb class="star-map__popup-thumb" alt="" loading="lazy" />
+      <div class="star-map__popup-body">
+        <p class="star-map__popup-sign">
+          <span data-popup-symbol class="star-map__popup-glyph"></span>
+          <span data-popup-sign></span>
+          <span data-popup-daterange class="star-map__popup-daterange"></span>
+        </p>
+        <p class="star-map__popup-card" data-popup-card></p>
+        <p class="star-map__popup-meaning" data-popup-meaning></p>
+      </div>
+    </div>
+  </div>
+</star-map>
+
+<style>
+  star-map {
+    display: block;
+    position: relative;
+  }
+
+  .star-map__hint {
+    margin: 28px 0 8px;
+    text-align: center;
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: #5a5273;
+  }
+
+  .star-map__stage {
+    position: relative;
+    width: 100%;
+    height: 460px;
+    margin: 16px auto 40px;
+    border-radius: 16px;
+    border: 1px solid rgba(203, 168, 90, 0.3);
+    background: radial-gradient(ellipse at 50% 40%, rgba(124, 92, 255, 0.12), #0b0714 75%);
+    overflow: hidden;
+  }
+
+  .star-map__viewport {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    cursor: grab;
+    touch-action: none;
+  }
+  .star-map__viewport:active {
+    cursor: grabbing;
+  }
+
+  .star-map__canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform-origin: 0 0;
+    will-change: transform;
+  }
+
+  .star-map__bg-stars {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+  .star-map__bg-stars circle {
+    fill: #ffffff;
+    opacity: 0.5;
+  }
+
+  .star-map__controls {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 20;
+    display: flex;
+    gap: 6px;
+  }
+  .star-map__zoom-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 1px solid rgba(203, 168, 90, 0.45);
+    background: rgba(11, 7, 20, 0.75);
+    color: #e3cf95;
+    font-size: 15px;
+    line-height: 1;
+    cursor: pointer;
+  }
+  .star-map__zoom-btn:hover {
+    background: rgba(203, 168, 90, 0.2);
+  }
+
+  .star-map__hotspot {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    padding: 0;
+    border-radius: 10px;
+    transition: background 0.2s ease;
+  }
+  .star-map__hotspot:hover,
+  .star-map__hotspot.is-active {
+    background: rgba(167, 139, 250, 0.08);
+  }
+  .star-map__hotspot:focus-visible {
+    outline: 2px solid #a78bfa;
+    outline-offset: 2px;
+  }
+
+  .star-map__constellation {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+  .star-map__constellation line {
+    stroke: rgba(167, 139, 250, 0.55);
+    stroke-width: 0.6;
+  }
+  .star-map__constellation circle {
+    fill: #f3dfa2;
+    filter: drop-shadow(0 0 3px rgba(203, 168, 90, 0.8));
+    animation: star-map-twinkle 3s ease-in-out infinite;
+  }
+  .star-map__hotspot:hover .star-map__constellation line,
+  .star-map__hotspot.is-active .star-map__constellation line {
+    stroke: rgba(203, 168, 90, 0.9);
+    stroke-width: 0.9;
+  }
+  .star-map__hotspot:hover .star-map__constellation circle,
+  .star-map__hotspot.is-active .star-map__constellation circle {
+    filter: drop-shadow(0 0 6px rgba(203, 168, 90, 1));
+  }
+
+  /* Persistent highlights for the visitor's own Sun/Moon signs (set via
+     BirthForm), distinct from the transient hover/open state above. Both can
+     apply to the same button when Sun and Moon share a sign. */
+  .star-map__hotspot.is-natal-sun {
+    background: rgba(203, 168, 90, 0.1);
+    border-radius: 50%;
+    box-shadow: 0 0 0 1.5px rgba(203, 168, 90, 0.55);
+  }
+  .star-map__hotspot.is-natal-sun .star-map__constellation line {
+    stroke: rgba(243, 223, 162, 0.85);
+  }
+  .star-map__hotspot.is-natal-sun .star-map__constellation circle {
+    fill: #fff3d1;
+    filter: drop-shadow(0 0 7px rgba(243, 223, 162, 1));
+  }
+  .star-map__hotspot.is-natal-sun .star-map__glyph {
+    color: #f3dfa2;
+    opacity: 1;
+  }
+  .star-map__hotspot.is-natal-sun .star-map__glyph::before {
+    content: '★ ';
+  }
+
+  .star-map__hotspot.is-natal-moon {
+    box-shadow: 0 0 0 1.5px rgba(167, 139, 250, 0.55), 0 0 0 4px rgba(203, 168, 90, 0.55);
+  }
+  .star-map__hotspot.is-natal-moon .star-map__constellation line {
+    stroke: rgba(196, 208, 250, 0.85);
+  }
+  .star-map__hotspot.is-natal-moon .star-map__constellation circle {
+    fill: #dbe4ff;
+    filter: drop-shadow(0 0 7px rgba(196, 208, 250, 1));
+  }
+  .star-map__hotspot.is-natal-moon .star-map__glyph::after {
+    content: ' ☾';
+    color: #c4d0fa;
+  }
+
+  @keyframes star-map-twinkle {
+    0%, 100% { opacity: 0.75; }
+    50%      { opacity: 1; }
+  }
+
+  .star-map__glyph {
+    position: absolute;
+    bottom: 2px;
+    right: 6px;
+    font-size: 15px;
+    color: #cba85a;
+    text-shadow: 0 0 8px rgba(203, 168, 90, 0.6);
+    opacity: 0.8;
+  }
+
+  .star-map__popup {
+    position: absolute;
+    z-index: 50;
+    width: min(260px, 78vw);
+    transform: translate(-50%, -110%);
+    display: flex;
+    gap: 12px;
+    padding: 14px;
+    border-radius: 10px;
+    border: 1px solid rgba(203, 168, 90, 0.45);
+    background: linear-gradient(160deg, #1c1526, #0b0714);
+    box-shadow: 0 14px 30px -10px rgba(0, 0, 0, 0.75);
+  }
+
+  .star-map__popup-close {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    border: none;
+    background: transparent;
+    color: #8f86ac;
+    cursor: pointer;
+    font-size: 12px;
+  }
+  .star-map__popup-close:hover {
+    color: #e3cf95;
+  }
+
+  .star-map__popup-thumb {
+    width: 56px;
+    aspect-ratio: 63 / 100;
+    object-fit: cover;
+    border-radius: 5px;
+    border: 1px solid rgba(203, 168, 90, 0.3);
+    flex-shrink: 0;
+  }
+
+  .star-map__popup-body {
+    min-width: 0;
+  }
+
+  .star-map__popup-sign {
+    margin: 0 0 4px;
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #cba85a;
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+  }
+  .star-map__popup-glyph {
+    font-size: 14px;
+  }
+  .star-map__popup-daterange {
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 10px;
+    letter-spacing: normal;
+    text-transform: none;
+    color: #5a5273;
+  }
+
+  .star-map__popup-card {
+    margin: 0 0 4px;
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 14px;
+    color: #e3cf95;
+  }
+
+  .star-map__popup-meaning {
+    margin: 0;
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 12.5px;
+    line-height: 1.45;
+    color: #c8bfe0;
+  }
+
+  @media (max-width: 640px) {
+    .star-map__stage {
+      height: 340px;
+      margin: 12px auto 24px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .star-map__constellation circle {
+      animation: none;
+    }
+  }
+</style>
+
+<script src="./star-map.ts"></script>
