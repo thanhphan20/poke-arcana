@@ -122,6 +122,17 @@ export function signForDate(month: number, day: number): string {
   return range.sign;
 }
 
+/** The one Major Arcana card whose `astrology` field names `sign`. */
+export function cardNameForSign(sign: string): string {
+  const cardName = Object.keys(MAJOR_ARCANA_METADATA).find(
+    (name) => MAJOR_ARCANA_METADATA[name].astrology === sign,
+  );
+  if (!cardName) {
+    throw new Error(`No Major Arcana card has astrology "${sign}" in MAJOR_ARCANA_METADATA.`);
+  }
+  return cardName;
+}
+
 /**
  * Re-projects each zodiac sign onto the one Major Arcana card whose
  * `astrology` field names that sign (10 of the 22 majors carry a ruling
@@ -130,12 +141,7 @@ export function signForDate(month: number, day: number): string {
  */
 export function getZodiacCards(): ZodiacCard[] {
   return ZODIAC_WHEEL.map(({ sign, symbol, dateRange }) => {
-    const cardName = Object.keys(MAJOR_ARCANA_METADATA).find(
-      (name) => MAJOR_ARCANA_METADATA[name].astrology === sign,
-    );
-    if (!cardName) {
-      throw new Error(`No Major Arcana card has astrology "${sign}" in MAJOR_ARCANA_METADATA.`);
-    }
+    const cardName = cardNameForSign(sign);
     const meta = MAJOR_ARCANA_METADATA[cardName];
     const majorNumber = MAJOR_ARCANA.indexOf(cardName as (typeof MAJOR_ARCANA)[number]);
     const shape = CONSTELLATION_SHAPES[sign];

@@ -20,7 +20,8 @@ class StarMap extends HTMLElement {
   private cardEl!: HTMLElement;
   private meaningEl!: HTMLElement;
   private activeBtn: HTMLButtonElement | null = null;
-  private natalBtn: HTMLButtonElement | null = null;
+  private natalSunBtn: HTMLButtonElement | null = null;
+  private natalMoonBtn: HTMLButtonElement | null = null;
 
   // ─── Zoom/pan state ──────────────────────────────────────────────────────
   private zoom = 1;
@@ -98,33 +99,53 @@ class StarMap extends HTMLElement {
     window.removeEventListener('star-map:locate', this.onLocate as EventListener);
   }
 
-  // ─── Natal sign (from BirthForm) ───────────────────────────────────────────
+  // ─── Natal signs (from BirthForm) ──────────────────────────────────────────
 
-  private onLocate(e: CustomEvent<{ sign: string | null }>) {
-    const sign = e.detail?.sign ?? null;
+  private onLocate(e: CustomEvent<{ sunSign: string | null; moonSign: string | null }>) {
+    const { sunSign = null, moonSign = null } = e.detail ?? {};
 
-    this.natalBtn?.classList.remove('is-natal');
-    this.natalBtn = null;
-    if (!sign) return;
+    this.natalSunBtn?.classList.remove('is-natal-sun');
+    this.natalMoonBtn?.classList.remove('is-natal-moon');
+    this.natalSunBtn = sunSign ? this.findHotspot(sunSign) : null;
+    this.natalMoonBtn = moonSign ? this.findHotspot(moonSign) : null;
+    this.natalSunBtn?.classList.add('is-natal-sun');
+    this.natalMoonBtn?.classList.add('is-natal-moon');
 
-    const btn = this.querySelector<HTMLButtonElement>(`.star-map__hotspot[data-sign="${sign}"]`);
-    if (!btn) return;
-
-    btn.classList.add('is-natal');
-    this.natalBtn = btn;
-    this.centerOn(btn);
-    this.open(btn);
+    const targets = [this.natalSunBtn, this.natalMoonBtn].filter(
+      (b): b is HTMLButtonElement => b !== null,
+    );
+    // De-dupe: when Sun and Moon land on the same sign, only one button exists.
+    const unique = [...new Set(targets)];
+    if (unique.length > 0) this.centerOnMany(unique);
   }
 
-  /** Pans/zooms so `btn`'s constellation is centered in the viewport. */
-  private centerOn(btn: HTMLButtonElement) {
-    const vpRect = this.viewportEl.getBoundingClientRect();
-    const cx = btn.offsetLeft + btn.offsetWidth / 2;
-    const cy = btn.offsetTop + btn.offsetHeight / 2;
+  private findHotspot(sign: string): HTMLButtonElement | null {
+    return this.querySelector<HTMLButtonElement>(`.star-map__hotspot[data-sign="${sign}"]`);
+  }
 
-    this.zoom = clamp(1.3, MIN_ZOOM, MAX_ZOOM);
-    this.panX = vpRect.width / 2 - cx * this.zoom;
-    this.panY = vpRect.height / 2 - cy * this.zoom;
+  /** Pans/zooms so every button in `btns` fits in view, centered as a group. */
+  private centerOnMany(btns: HTMLButtonElement[]) {
+    const vpRect = this.viewportEl.getBoundingClientRect();
+    const centers = btns.map((b) => ({
+      x: b.offsetLeft + b.offsetWidth / 2,
+      y: b.offsetTop + b.offsetHeight / 2,
+    }));
+
+    const minX = Math.min(...centers.map((c) => c.x));
+    const maxX = Math.max(...centers.map((c) => c.x));
+    const minY = Math.min(...centers.map((c) => c.y));
+    const maxY = Math.max(...centers.map((c) => c.y));
+    const midX = (minX + maxX) / 2;
+    const midY = (minY + maxY) / 2;
+
+    // Padding around the box so a single point still gets a comfortable close-up.
+    const spanX = Math.max(maxX - minX, 1) + 300;
+    const spanY = Math.max(maxY - minY, 1) + 300;
+    const fitZoom = Math.min(vpRect.width / spanX, vpRect.height / spanY);
+
+    this.zoom = clamp(Math.min(fitZoom, 1.4), MIN_ZOOM, MAX_ZOOM);
+    this.panX = vpRect.width / 2 - midX * this.zoom;
+    this.panY = vpRect.height / 2 - midY * this.zoom;
     this.applyTransform();
   }
 

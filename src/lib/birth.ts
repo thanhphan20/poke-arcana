@@ -1,10 +1,12 @@
-// Client-side persistence of the visitor's birth date, so their sun sign can
-// be re-highlighted on the star map on return visits. No server, no accounts.
+// Client-side persistence of the visitor's birth date, so their sun/moon
+// signs can be re-highlighted on the star map on return visits. No server,
+// no accounts.
 /* global localStorage */
 
-const STORAGE_KEY = 'poke-arcana:birth-date:v1';
+// v2: full YYYY-MM-DD (v1 stored MM-DD only, before the moon sign needed a year).
+const STORAGE_KEY = 'poke-arcana:birth-date:v2';
 
-/** Stored as `MM-DD` (year is irrelevant to a sun sign, and left out on purpose). */
+/** Stored as `YYYY-MM-DD`. */
 export function getBirthDate(): string | null {
   try {
     return localStorage.getItem(STORAGE_KEY);
@@ -13,9 +15,9 @@ export function getBirthDate(): string | null {
   }
 }
 
-export function saveBirthDate(monthDay: string): void {
+export function saveBirthDate(isoDate: string): void {
   try {
-    localStorage.setItem(STORAGE_KEY, monthDay);
+    localStorage.setItem(STORAGE_KEY, isoDate);
   } catch {
     // Quota exceeded, private-mode restriction, or storage disabled — never break the page.
   }

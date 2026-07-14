@@ -3,6 +3,10 @@ const MONTHS = [
   'January', 'February', 'March', 'April', 'May', 'June',
   'July', 'August', 'September', 'October', 'November', 'December',
 ] as const;
+
+const CURRENT_YEAR = new Date().getFullYear();
+const EARLIEST_YEAR = 1925;
+const YEARS = Array.from({ length: CURRENT_YEAR - EARLIEST_YEAR + 1 }, (_, i) => CURRENT_YEAR - i);
 ---
 
 <div class="birth-form" data-birth-form>
@@ -20,7 +24,13 @@ const MONTHS = [
         {Array.from({ length: 31 }, (_, i) => <option value={i + 1}>{i + 1}</option>)}
       </select>
     </div>
-    <button type="submit" class="birth-form__submit">Locate My Sign</button>
+    <div class="birth-form__select-wrap">
+      <select class="birth-form__select birth-form__select--year" data-birth-year aria-label="Birth year" required>
+        <option value="" disabled selected>Year</option>
+        {YEARS.map((y) => <option value={y}>{y}</option>)}
+      </select>
+    </div>
+    <button type="submit" class="birth-form__submit">Locate My Signs</button>
   </form>
 
   <p class="birth-form__result" data-birth-result hidden aria-live="polite">
@@ -30,7 +40,8 @@ const MONTHS = [
 </div>
 
 <script>
-  import { signForDate } from '../../lib/arcana/zodiac';
+  import { signForDate, cardNameForSign } from '../../lib/arcana/zodiac';
+  import { moonSignForDate } from '../../lib/arcana/moon';
   import { getBirthDate, saveBirthDate, clearBirthDate } from '../../lib/birth';
 
   // Days-in-month, ignoring leap years (day-of-month only matters here for
@@ -42,16 +53,19 @@ const MONTHS = [
     const form = root.querySelector<HTMLFormElement>('[data-birth-form-el]')!;
     const monthSelect = root.querySelector<HTMLSelectElement>('[data-birth-month]')!;
     const daySelect = root.querySelector<HTMLSelectElement>('[data-birth-day]')!;
+    const yearSelect = root.querySelector<HTMLSelectElement>('[data-birth-year]')!;
     const result = root.querySelector<HTMLElement>('[data-birth-result]')!;
     const resultText = root.querySelector<HTMLElement>('[data-birth-result-text]')!;
     const clearBtn = root.querySelector<HTMLButtonElement>('[data-birth-clear]')!;
 
-    function locate(sign: string | null) {
-      window.dispatchEvent(new CustomEvent('star-map:locate', { detail: { sign } }));
+    function locate(sunSign: string | null, moonSign: string | null) {
+      window.dispatchEvent(new CustomEvent('star-map:locate', { detail: { sunSign, moonSign } }));
     }
 
-    function showResult(sign: string) {
-      resultText.textContent = `Your sun sign is ${sign} ✦`;
+    function showResult(sunSign: string, moonSign: string) {
+      const sunLine = `Sun in ${sunSign} → ${cardNameForSign(sunSign)}`;
+      const moonLine = `Moon in ${moonSign} → ${cardNameForSign(moonSign)}`;
+      resultText.textContent = sunSign === moonSign ? sunLine : `${sunLine} · ${moonLine}`;
       result.hidden = false;
     }
 
@@ -72,44 +86,49 @@ const MONTHS = [
 
     monthSelect.addEventListener('change', syncDayOptions);
 
-    // Restore a birth date saved on a previous visit, and re-locate its sign
+    // Restore a birth date saved on a previous visit, and re-locate its signs
     // once the star-map custom element has finished connecting.
     const saved = getBirthDate();
     if (saved) {
-      const [month, day] = saved.split('-').map(Number);
-      const sign = signForDate(month, day);
+      const [year, month, day] = saved.split('-').map(Number);
+      const sunSign = signForDate(month, day);
+      const moonSign = moonSignForDate(year, month, day);
       monthSelect.value = String(month);
       syncDayOptions();
       daySelect.value = String(day);
-      showResult(sign);
-      customElements.whenDefined('star-map').then(() => locate(sign));
+      yearSelect.value = String(year);
+      showResult(sunSign, moonSign);
+      customElements.whenDefined('star-map').then(() => locate(sunSign, moonSign));
     }
 
     form.addEventListener('submit', (e) => {
       e.preventDefault();
-      if (!monthSelect.value || !daySelect.value) return;
+      if (!monthSelect.value || !daySelect.value || !yearSelect.value) return;
       const month = Number(monthSelect.value);
       const day = Number(daySelect.value);
-      const sign = signForDate(month, day);
-      saveBirthDate(`${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`);
-      showResult(sign);
-      locate(sign);
+      const year = Number(yearSelect.value);
+      const sunSign = signForDate(month, day);
+      const moonSign = moonSignForDate(year, month, day);
+      saveBirthDate(`${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`);
+      showResult(sunSign, moonSign);
+      locate(sunSign, moonSign);
     });
 
     clearBtn.addEventListener('click', () => {
       clearBirthDate();
       monthSelect.value = '';
       daySelect.value = '';
+      yearSelect.value = '';
       syncDayOptions();
       result.hidden = true;
-      locate(null);
+      locate(null, null);
     });
   }
 </script>
 
 <style>
   .birth-form {
-    max-width: 420px;
+    max-width: 460px;
     margin: 24px auto 0;
     text-align: center;
   }
@@ -156,7 +175,8 @@ const MONTHS = [
     cursor: pointer;
     transition: border-color 0.25s, box-shadow 0.25s;
   }
-  .birth-form__select--day {
+  .birth-form__select--day,
+  .birth-form__select--year {
     padding-right: 26px;
   }
   .birth-form__select:focus {

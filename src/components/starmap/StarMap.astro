@@ -110,7 +110,7 @@ const bgStars = Array.from({ length: 140 }, (_, i) => {
   }
 
   .star-map__hint {
-    margin: 0 0 8px;
+    margin: 28px 0 8px;
     text-align: center;
     font-family: 'Cinzel', serif;
     font-size: 11px;
@@ -227,26 +227,42 @@ const bgStars = Array.from({ length: 140 }, (_, i) => {
     filter: drop-shadow(0 0 6px rgba(203, 168, 90, 1));
   }
 
-  /* Persistent highlight for the visitor's own sun sign (set via BirthForm),
-     distinct from the transient hover/open state above. */
-  .star-map__hotspot.is-natal {
+  /* Persistent highlights for the visitor's own Sun/Moon signs (set via
+     BirthForm), distinct from the transient hover/open state above. Both can
+     apply to the same button when Sun and Moon share a sign. */
+  .star-map__hotspot.is-natal-sun {
     background: rgba(203, 168, 90, 0.1);
     border-radius: 50%;
     box-shadow: 0 0 0 1.5px rgba(203, 168, 90, 0.55);
   }
-  .star-map__hotspot.is-natal .star-map__constellation line {
+  .star-map__hotspot.is-natal-sun .star-map__constellation line {
     stroke: rgba(243, 223, 162, 0.85);
   }
-  .star-map__hotspot.is-natal .star-map__constellation circle {
+  .star-map__hotspot.is-natal-sun .star-map__constellation circle {
     fill: #fff3d1;
     filter: drop-shadow(0 0 7px rgba(243, 223, 162, 1));
   }
-  .star-map__hotspot.is-natal .star-map__glyph {
+  .star-map__hotspot.is-natal-sun .star-map__glyph {
     color: #f3dfa2;
     opacity: 1;
   }
-  .star-map__hotspot.is-natal .star-map__glyph::before {
+  .star-map__hotspot.is-natal-sun .star-map__glyph::before {
     content: '★ ';
+  }
+
+  .star-map__hotspot.is-natal-moon {
+    box-shadow: 0 0 0 1.5px rgba(167, 139, 250, 0.55), 0 0 0 4px rgba(203, 168, 90, 0.55);
+  }
+  .star-map__hotspot.is-natal-moon .star-map__constellation line {
+    stroke: rgba(196, 208, 250, 0.85);
+  }
+  .star-map__hotspot.is-natal-moon .star-map__constellation circle {
+    fill: #dbe4ff;
+    filter: drop-shadow(0 0 7px rgba(196, 208, 250, 1));
+  }
+  .star-map__hotspot.is-natal-moon .star-map__glyph::after {
+    content: ' ☾';
+    color: #c4d0fa;
   }
 
   @keyframes star-map-twinkle {
