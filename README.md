@@ -55,7 +55,7 @@ Pokémon data is fetched **once at build time**, never at runtime:
 2. Results are written to `src/data/generated/` and committed to git
 3. `astro build` reads the committed data (no network calls)
 
-Configure the Pokédex range in `.env` (v1 = Gen 1, #1–151). Expanding to new generations is a matter of updating `DEX_START` / `DEX_END` and rerunning `sync`.
+Configure the Pokédex range in `.env`. The default range is Gen 1–3 (#1–386, i.e. 386 Pokémon), which supplies the 21 legendaries/mythicals plus 1 promoted pseudo-legendary needed to fill all 22 Major Arcana slots. Expanding to further generations is a matter of updating `DEX_START` / `DEX_END` and rerunning `sync`.
 
 ## Routes
 
