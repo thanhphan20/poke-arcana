@@ -352,6 +352,10 @@ class SpreadReveal extends HTMLElement {
       cards,
       ai: null,
     });
+
+    // Tell the page the fortune button is now in the DOM so it can hint the
+    // user to scroll to it if it's below the fold.
+    window.dispatchEvent(new CustomEvent('spread-reading-ready'));
   }
 
   // Serializable, display-ready snapshot of the drawn cards for storage + rendering.
@@ -425,7 +429,15 @@ class SpreadReveal extends HTMLElement {
 
   private updateSlotLabel(slot: Slot) {
     const canTap = slot.revealed && !slot.drawn;
-    slot.label.textContent = slot.position + (canTap ? ' · Tap to Reveal' : '');
+    if (canTap) {
+      slot.label.innerHTML =
+        `<span class="slot-label-pos">${esc(slot.position)}</span>` +
+        `<span class="slot-tap-cta">↓ Tap card to reveal ↓</span>`;
+      slot.label.classList.add('slot-label--tap');
+    } else {
+      slot.label.textContent = slot.position;
+      slot.label.classList.remove('slot-label--tap');
+    }
     slot.label.style.color = slot.revealed ? '#e3cf95' : '#5a5273';
   }
 
@@ -526,6 +538,7 @@ class SpreadReveal extends HTMLElement {
     const tid = window.setTimeout(() => {
       slot.revealed = true;
       slot.flip.style.transform = 'rotateY(0deg)';
+      slot.flip.classList.add('slot-card--pulse');
       slot.arcanaReading.hidden = false;
       this.updateSlotLabel(slot);
       this.syncUI();
@@ -640,8 +653,9 @@ class SpreadReveal extends HTMLElement {
     const slot = this.slots[index];
     if (!slot || slot.drawn || slot.card.members.length === 0) return;
 
-    const member = slot.card.members[Math.floor(Math.random() * slot.card.members.length)];
     slot.drawn = true;
+    slot.flip.classList.remove('slot-card--pulse');
+    const member = slot.card.members[Math.floor(Math.random() * slot.card.members.length)];
     slot.drawnMember = member;
     this.updateSlotLabel(slot);
 

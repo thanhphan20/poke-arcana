@@ -26,11 +26,57 @@ const cards = allCards.filter((c) => c.data.members.length > 0);
       <SpreadReveal cards={cards} />
     </div>
   </section>
+
+  <!-- Fixed bottom hint — OUTSIDE pa-rise so position:fixed works -->
+  <div data-scroll-hint class="scroll-hint" aria-hidden="true">
+    <span data-scroll-hint-label class="scroll-hint__label">Scroll down to draw your cards</span>
+    <svg class="scroll-hint__chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="6 9 12 15 18 9" />
+    </svg>
+    <svg class="scroll-hint__chevron scroll-hint__chevron--2" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="6 9 12 15 18 9" />
+    </svg>
+  </div>
 </BaseLayout>
 
 <script>
   // Reveal the spread once a question is set; never re-hide once a reading has begun.
   let revealed = false;
+  const hint = document.querySelector<HTMLElement>('[data-scroll-hint]');
+  const hintLabel = document.querySelector<HTMLElement>('[data-scroll-hint-label]');
+  let activeObserver: IntersectionObserver | null = null;
+  let activeTimer: number | null = null;
+
+  function hideHint() {
+    if (!hint) return;
+    hint.classList.remove('scroll-hint--visible');
+    hint.classList.add('scroll-hint--hidden');
+    activeObserver?.disconnect();
+    activeObserver = null;
+    if (activeTimer !== null) {
+      window.clearTimeout(activeTimer);
+      activeTimer = null;
+    }
+  }
+
+  // Show the hint pointing at `target`; auto-dismisses when target enters viewport.
+  function showHint(label: string, target: Element | null, timeoutMs = 15000) {
+    if (!hint || !hintLabel) return;
+    activeObserver?.disconnect();
+    if (activeTimer !== null) window.clearTimeout(activeTimer);
+    hintLabel.textContent = label;
+    hint.classList.remove('scroll-hint--hidden');
+    hint.classList.add('scroll-hint--visible');
+    if (target && 'IntersectionObserver' in window) {
+      activeObserver = new IntersectionObserver(
+        (entries) => { if (entries.some((e) => e.isIntersecting)) hideHint(); },
+        { threshold: 0.35 },
+      );
+      activeObserver.observe(target);
+    }
+    activeTimer = window.setTimeout(hideHint, timeoutMs);
+  }
+
   window.addEventListener('question-change', (e) => {
     if (revealed) return;
     const question = (e as CustomEvent<{ question: string }>).detail?.question ?? '';
@@ -40,6 +86,21 @@ const cards = allCards.filter((c) => c.data.members.length > 0);
     section.hidden = false;
     section.classList.add('spread-section--entering');
     revealed = true;
+
+    // Point users down to the fan; dismiss once the fan is on-screen.
+    window.setTimeout(() => {
+      const fan = document.querySelector<HTMLElement>('[data-fan]');
+      showHint('Scroll down to draw your cards', fan);
+    }, 250);
+  });
+
+  // Second-stage hint: reading panel is open, but the fortune button is offscreen.
+  window.addEventListener('spread-reading-ready', () => {
+    const btn = document.querySelector<HTMLElement>('[data-read-fortune]');
+    if (!btn) return;
+    const rect = btn.getBoundingClientRect();
+    if (rect.top < window.innerHeight * 0.9) return; // already visible, skip
+    showHint('Scroll down for Read My Fortune', btn);
   });
 </script>
 
@@ -81,9 +142,65 @@ const cards = allCards.filter((c) => c.data.members.length > 0);
     from { opacity: 0; transform: translateY(18px); }
     to   { opacity: 1; transform: translateY(0); }
   }
+  /* ── Scroll hint (fixed bottom bar) ─────────────────────────── */
+  .scroll-hint {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 18px 0 22px;
+    background: linear-gradient(to top, rgba(12, 8, 24, 0.95) 60%, transparent);
+    color: #c8bfe0;
+    z-index: 40;
+    opacity: 0;
+    transform: translateY(100%);
+    transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+    pointer-events: none;
+  }
+  .scroll-hint--visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+  .scroll-hint--hidden {
+    opacity: 0 !important;
+    transform: translateY(100%) !important;
+    pointer-events: none;
+  }
+  .scroll-hint__label {
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    opacity: 0.7;
+  }
+  .scroll-hint__chevron {
+    animation: scroll-bounce 1.8s ease-in-out infinite;
+    opacity: 0.6;
+  }
+  .scroll-hint__chevron--2 {
+    margin-top: -8px;
+    animation-delay: 0.25s;
+  }
+  @keyframes scroll-bounce {
+    0%, 100% { transform: translateY(0); opacity: 0.5; }
+    50%      { transform: translateY(6px); opacity: 1; }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .spread-section--entering {
       animation: none;
+    }
+    .scroll-hint {
+      transition: none;
+    }
+    .scroll-hint__chevron {
+      animation: none;
+      opacity: 0.5;
     }
   }
 </style>
