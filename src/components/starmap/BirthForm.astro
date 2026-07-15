@@ -226,12 +226,15 @@ const MINUTES = Array.from({ length: 60 }, (_, i) => i);
       const row = document.createElement('div');
       row.className = 'birth-form__reading-row';
 
-      const head = document.createElement('div');
-      head.className = 'birth-form__reading-head';
+      const badge = document.createElement('span');
+      badge.className = 'birth-form__reading-badge';
+      badge.innerHTML = group.map((p) => p.icon).join('');
 
-      const iconsEl = document.createElement('span');
-      iconsEl.className = 'birth-form__reading-icons';
-      iconsEl.innerHTML = group.map((p) => p.icon).join('');
+      const body = document.createElement('div');
+      body.className = 'birth-form__reading-body';
+
+      const head = document.createElement('p');
+      head.className = 'birth-form__reading-head';
 
       const nameEl = document.createElement('span');
       nameEl.className = 'birth-form__reading-point';
@@ -241,7 +244,9 @@ const MINUTES = Array.from({ length: 60 }, (_, i) => i);
       hintEl.className = 'birth-form__reading-hint';
       hintEl.textContent = group[0].hint;
 
-      head.append(iconsEl, nameEl, hintEl);
+      // A real text-node separator (not just a CSS gap) so copy/pasted text
+      // doesn't jam "Sun & Venuswho you are..." together.
+      head.append(nameEl, document.createTextNode(' — '), hintEl);
 
       const cardLine = document.createElement('p');
       cardLine.className = 'birth-form__reading-card';
@@ -251,7 +256,8 @@ const MINUTES = Array.from({ length: 60 }, (_, i) => i);
       meaning.className = 'birth-form__reading-meaning';
       meaning.textContent = info.uprightMeaning;
 
-      row.append(head, cardLine, meaning);
+      body.append(head, cardLine, meaning);
+      row.append(badge, body);
       return row;
     }
 
@@ -640,41 +646,55 @@ const MINUTES = Array.from({ length: 60 }, (_, i) => i);
     gap: 12px;
   }
   .birth-form__reading-row {
-    padding: 12px 16px;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px 16px;
     border-radius: 12px;
     border: 1px solid rgba(167, 139, 250, 0.28);
     background: rgba(124, 92, 255, 0.08);
   }
-  .birth-form__reading-head {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 4px;
-  }
-  .birth-form__reading-icons {
+  .birth-form__reading-badge {
     display: inline-flex;
     align-items: center;
-    gap: 2px;
+    justify-content: center;
     flex-shrink: 0;
+    flex-wrap: wrap;
+    gap: 2px;
+    min-width: 34px;
+    max-width: 76px;
+    min-height: 34px;
+    padding: 4px;
+    border-radius: 12px;
+    background: rgba(11, 7, 20, 0.5);
+    border: 1px solid rgba(203, 168, 90, 0.25);
   }
-  .birth-form__reading-icons svg {
+  .birth-form__reading-badge svg {
     display: block;
+  }
+  .birth-form__reading-body {
+    min-width: 0;
+    flex: 1;
+  }
+  .birth-form__reading-head {
+    margin: 0 0 6px;
+    line-height: 1.4;
   }
   .birth-form__reading-point {
     font-family: 'Cinzel', serif;
     font-size: 12px;
-    letter-spacing: 0.12em;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
     color: #cba85a;
   }
   .birth-form__reading-hint {
     font-family: 'EB Garamond', serif;
     font-style: italic;
-    font-size: 12px;
+    font-size: 13px;
     color: #8f86ac;
   }
   .birth-form__reading-card {
-    margin: 0 0 4px;
+    margin: 0 0 6px;
     font-family: 'Cinzel Decorative', serif;
     font-size: 15px;
     color: #f3dfa2;
