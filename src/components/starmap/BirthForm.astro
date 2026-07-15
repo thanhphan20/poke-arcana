@@ -84,7 +84,7 @@ const MINUTES = Array.from({ length: 60 }, (_, i) => i);
 </div>
 
 <script>
-  import { signForDate, cardInfoForSign, type SignCardInfo } from '../../lib/arcana/zodiac';
+  import { signForDate, cardInfoForSign } from '../../lib/arcana/zodiac';
   import { moonSignForDate } from '../../lib/arcana/moon';
   import { risingSignForBirth } from '../../lib/arcana/ascendant';
   import { planetSignForDate, type PlanetKey } from '../../lib/arcana/planets';
@@ -222,63 +222,9 @@ const MINUTES = Array.from({ length: 60 }, (_, i) => i);
     };
     const PLANET_ORDER: PlanetKey[] = ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune', 'pluto'];
 
-    function buildReadingRow(group: Point[], sign: string, info: SignCardInfo): HTMLElement {
-      const row = document.createElement('div');
-      row.className = 'birth-form__reading-row';
-
-      const badge = document.createElement('span');
-      badge.className = 'birth-form__reading-badge';
-      badge.innerHTML = group.map((p) => p.icon).join('');
-
-      const body = document.createElement('div');
-      body.className = 'birth-form__reading-body';
-
-      const head = document.createElement('p');
-      head.className = 'birth-form__reading-head';
-
-      const nameEl = document.createElement('span');
-      nameEl.className = 'birth-form__reading-point';
-      nameEl.textContent = group.map((p) => p.name).join(' & ');
-
-      const hintEl = document.createElement('span');
-      hintEl.className = 'birth-form__reading-hint';
-      hintEl.textContent = group[0].hint;
-
-      // A real text-node separator (not just a CSS gap) so copy/pasted text
-      // doesn't jam "Sun & Venuswho you are..." together.
-      head.append(nameEl, document.createTextNode(' — '), hintEl);
-
-      const cardLine = document.createElement('p');
-      cardLine.className = 'birth-form__reading-card';
-      cardLine.textContent = `${sign} → ${info.cardName} (${info.pokemonName})`;
-
-      const meaning = document.createElement('p');
-      meaning.className = 'birth-form__reading-meaning';
-      meaning.textContent = info.uprightMeaning;
-
-      body.append(head, cardLine, meaning);
-      row.append(badge, body);
-      return row;
-    }
-
-    // Groups points that land on the same sign into one row (preserving
-    // Sun → Moon → Rising → planets order) instead of repeating an identical
-    // card line.
-    function showResult(
-      sunSign: string, moonSign: string, risingSign: string | null,
-      planetSigns: Record<PlanetKey, string>,
-    ) {
-      readingEl.replaceChildren();
-
-      const points: Point[] = [
-        { ...POINT_INFO.sun, sign: sunSign },
-        { ...POINT_INFO.moon, sign: moonSign },
-      ];
-      if (risingSign) points.push({ ...POINT_INFO.rising, sign: risingSign });
-      for (const key of PLANET_ORDER) {
-        points.push({ ...PLANET_POINT_INFO[key], sign: planetSigns[key] });
-      }
-
+    // Groups points that land on the same sign into one card (preserving
+    // input order) instead of repeating an identical card line per point.
+    function groupBySign(points: Point[]): Point[][] {
       const order: string[] = [];
       const groups = new Map<string, Point[]>();
       for (const p of points) {
@@ -288,13 +234,85 @@ const MINUTES = Array.from({ length: 60 }, (_, i) => i);
         }
         groups.get(p.sign)!.push(p);
       }
+      return order.map((sign) => groups.get(sign)!);
+    }
 
-      for (const sign of order) {
-        const group = groups.get(sign)!;
-        readingEl.appendChild(buildReadingRow(group, sign, cardInfoForSign(sign)));
-      }
+    function buildReadingCard(group: Point[], size: 'big' | 'compact'): HTMLElement {
+      const sign = group[0].sign;
+      const info = cardInfoForSign(sign);
 
-      currentPoints = points.map((p) => {
+      const card = document.createElement('div');
+      card.className = `birth-form__card birth-form__card--${size}`;
+
+      const badge = document.createElement('span');
+      badge.className = 'birth-form__card-badge';
+      badge.innerHTML = group.map((p) => p.icon).join('');
+
+      const body = document.createElement('div');
+      body.className = 'birth-form__card-body';
+
+      const head = document.createElement('p');
+      head.className = 'birth-form__card-head';
+
+      const nameEl = document.createElement('span');
+      nameEl.className = 'birth-form__card-point';
+      nameEl.textContent = group.map((p) => p.name).join(' & ');
+
+      const hintEl = document.createElement('span');
+      hintEl.className = 'birth-form__card-hint';
+      hintEl.textContent = group[0].hint;
+
+      // A real text-node separator (not just a CSS gap) so copy/pasted text
+      // doesn't jam "Sun & Venuswho you are..." together.
+      head.append(nameEl, document.createTextNode(' — '), hintEl);
+
+      const cardLine = document.createElement('p');
+      cardLine.className = 'birth-form__card-sign';
+      cardLine.textContent = `${sign} → ${info.cardName} (${info.pokemonName})`;
+
+      const meaning = document.createElement('p');
+      meaning.className = 'birth-form__card-meaning';
+      meaning.textContent = info.uprightMeaning;
+
+      body.append(head, cardLine, meaning);
+      card.append(badge, body);
+      return card;
+    }
+
+    function buildSection(title: string, groups: Point[][], size: 'big' | 'compact'): HTMLElement {
+      const section = document.createElement('section');
+      section.className = 'birth-form__section';
+
+      const heading = document.createElement('h3');
+      heading.className = 'birth-form__section-title';
+      heading.textContent = title;
+
+      const grid = document.createElement('div');
+      grid.className = `birth-form__grid birth-form__grid--${size}`;
+      for (const group of groups) grid.appendChild(buildReadingCard(group, size));
+
+      section.append(heading, grid);
+      return section;
+    }
+
+    function showResult(
+      sunSign: string, moonSign: string, risingSign: string | null,
+      planetSigns: Record<PlanetKey, string>,
+    ) {
+      readingEl.replaceChildren();
+
+      const bigThreePoints: Point[] = [
+        { ...POINT_INFO.sun, sign: sunSign },
+        { ...POINT_INFO.moon, sign: moonSign },
+      ];
+      if (risingSign) bigThreePoints.push({ ...POINT_INFO.rising, sign: risingSign });
+
+      const planetPoints: Point[] = PLANET_ORDER.map((key) => ({ ...PLANET_POINT_INFO[key], sign: planetSigns[key] }));
+
+      readingEl.appendChild(buildSection('The Big Three', groupBySign(bigThreePoints), 'big'));
+      readingEl.appendChild(buildSection('Your Planets', groupBySign(planetPoints), 'compact'));
+
+      currentPoints = [...bigThreePoints, ...planetPoints].map((p) => {
         const info = cardInfoForSign(p.sign);
         return {
           label: p.name, sign: p.sign, cardName: info.cardName,
@@ -496,7 +514,7 @@ const MINUTES = Array.from({ length: 60 }, (_, i) => i);
 
 <style>
   .birth-form {
-    max-width: 520px;
+    max-width: 780px;
     margin: 24px auto 0;
     text-align: center;
   }
@@ -605,7 +623,10 @@ const MINUTES = Array.from({ length: 60 }, (_, i) => i);
     box-shadow: 0 14px 30px -10px rgba(0, 0, 0, 0.75);
     text-align: left;
   }
-  .birth-form__city-option {
+  /* .birth-form__city-option is appended via document.createElement in the
+     client script, so it never receives Astro's scoped-style attribute —
+     :global() is required or these rules silently never match. */
+  :global(.birth-form__city-option) {
     padding: 8px 10px;
     border-radius: 8px;
     cursor: pointer;
@@ -613,7 +634,7 @@ const MINUTES = Array.from({ length: 60 }, (_, i) => i);
     font-size: 14px;
     color: #e9e4f5;
   }
-  .birth-form__city-option:hover {
+  :global(.birth-form__city-option:hover) {
     background: rgba(203, 168, 90, 0.15);
   }
 
@@ -635,26 +656,72 @@ const MINUTES = Array.from({ length: 60 }, (_, i) => i);
     display: none;
   }
   .birth-form__result {
-    margin: 20px auto 0;
-    max-width: 480px;
+    margin: 24px auto 0;
+    max-width: 720px;
     text-align: left;
   }
 
   .birth-form__reading {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 28px;
   }
-  .birth-form__reading-row {
+
+  /* Everything below is built via document.createElement in the client
+     script (sections/grids/cards are assembled per-submission), so none of
+     it receives Astro's scoped-style attribute — every selector here must
+     be wrapped in :global() or the rule silently never matches anything. */
+  :global(.birth-form__section-title) {
+    margin: 0 0 14px;
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: #cba85a;
+    text-align: center;
+  }
+  :global(.birth-form__section-title)::before,
+  :global(.birth-form__section-title)::after {
+    content: '✦';
+    display: inline-block;
+    margin: 0 10px;
+    font-size: 10px;
+    color: #5a5273;
+  }
+
+  :global(.birth-form__grid) {
+    display: grid;
+    gap: 14px;
+  }
+  :global(.birth-form__grid--big) {
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  }
+  :global(.birth-form__grid--compact) {
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  }
+
+  :global(.birth-form__card) {
     display: flex;
     align-items: flex-start;
-    gap: 14px;
-    padding: 14px 16px;
-    border-radius: 12px;
-    border: 1px solid rgba(167, 139, 250, 0.28);
+    gap: 12px;
+    padding: 16px;
+    border-radius: 14px;
     background: rgba(124, 92, 255, 0.08);
   }
-  .birth-form__reading-badge {
+  :global(.birth-form__card--big) {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 20px 16px;
+    border: 1px solid rgba(203, 168, 90, 0.4);
+    background: linear-gradient(160deg, rgba(203, 168, 90, 0.12), rgba(124, 92, 255, 0.08));
+  }
+  :global(.birth-form__card--compact) {
+    border: 1px solid rgba(167, 139, 250, 0.24);
+  }
+
+  :global(.birth-form__card-badge) {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -669,37 +736,47 @@ const MINUTES = Array.from({ length: 60 }, (_, i) => i);
     background: rgba(11, 7, 20, 0.5);
     border: 1px solid rgba(203, 168, 90, 0.25);
   }
-  .birth-form__reading-badge svg {
+  :global(.birth-form__card--big .birth-form__card-badge) {
+    min-width: 48px;
+    min-height: 48px;
+    max-width: 96px;
+    border-radius: 50%;
+  }
+  :global(.birth-form__card-badge) svg {
     display: block;
   }
-  .birth-form__reading-body {
+
+  :global(.birth-form__card-body) {
     min-width: 0;
     flex: 1;
   }
-  .birth-form__reading-head {
+  :global(.birth-form__card-head) {
     margin: 0 0 6px;
     line-height: 1.4;
   }
-  .birth-form__reading-point {
+  :global(.birth-form__card-point) {
     font-family: 'Cinzel', serif;
     font-size: 12px;
     letter-spacing: 0.1em;
     text-transform: uppercase;
     color: #cba85a;
   }
-  .birth-form__reading-hint {
+  :global(.birth-form__card--big .birth-form__card-point) {
+    font-size: 13px;
+  }
+  :global(.birth-form__card-hint) {
     font-family: 'EB Garamond', serif;
     font-style: italic;
     font-size: 13px;
     color: #8f86ac;
   }
-  .birth-form__reading-card {
+  :global(.birth-form__card-sign) {
     margin: 0 0 6px;
     font-family: 'Cinzel Decorative', serif;
     font-size: 15px;
     color: #f3dfa2;
   }
-  .birth-form__reading-meaning {
+  :global(.birth-form__card-meaning) {
     margin: 0;
     font-family: 'EB Garamond', serif;
     font-style: italic;
