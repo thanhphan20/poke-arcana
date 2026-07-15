@@ -67,6 +67,18 @@ const MINUTES = Array.from({ length: 60 }, (_, i) => i);
 
   <div class="birth-form__result" data-birth-result hidden aria-live="polite">
     <div class="birth-form__reading" data-birth-reading></div>
+
+    <div class="birth-form__synthesis-row" data-synthesis-row>
+      <p class="birth-form__synthesis-cue">✧ See how it all fits together ✧</p>
+      <button type="button" class="birth-form__synthesis-btn" data-synthesis-btn>Weave My Chart Together</button>
+      <p class="birth-form__synthesis-error" data-synthesis-error hidden></p>
+    </div>
+    <div class="birth-form__synthesis" data-synthesis-panel hidden aria-live="polite">
+      <p class="birth-form__synthesis-label">✦ Your Chart, Woven Together ✦</p>
+      <p class="birth-form__synthesis-text" data-synthesis-text></p>
+      <p class="birth-form__synthesis-attribution" data-synthesis-attribution></p>
+    </div>
+
     <button type="button" class="birth-form__clear" data-birth-clear>✕ Forget my birth details</button>
   </div>
 </div>
@@ -78,6 +90,7 @@ const MINUTES = Array.from({ length: 60 }, (_, i) => i);
   import { planetSignForDate, type PlanetKey } from '../../lib/arcana/planets';
   import { searchCities, type CityResult } from '../../lib/arcana/geocoding';
   import { getBirthDetails, saveBirthDetails, clearBirthDetails, type BirthCity } from '../../lib/birth';
+  import type { NatalPromptPoint } from '../../lib/ai/natal/prompt';
 
   // Days-in-month, ignoring leap years (day-of-month only matters here for
   // narrowing the <select>, not for real calendar validity).
@@ -96,10 +109,17 @@ const MINUTES = Array.from({ length: 60 }, (_, i) => i);
     const result = root.querySelector<HTMLElement>('[data-birth-result]')!;
     const readingEl = root.querySelector<HTMLElement>('[data-birth-reading]')!;
     const clearBtn = root.querySelector<HTMLButtonElement>('[data-birth-clear]')!;
+    const synthesisRow = root.querySelector<HTMLElement>('[data-synthesis-row]')!;
+    const synthesisBtn = root.querySelector<HTMLButtonElement>('[data-synthesis-btn]')!;
+    const synthesisError = root.querySelector<HTMLElement>('[data-synthesis-error]')!;
+    const synthesisPanel = root.querySelector<HTMLElement>('[data-synthesis-panel]')!;
+    const synthesisText = root.querySelector<HTMLElement>('[data-synthesis-text]')!;
+    const synthesisAttribution = root.querySelector<HTMLElement>('[data-synthesis-attribution]')!;
 
     let selectedCity: BirthCity | null = null;
     let cityQueryTimer: ReturnType<typeof setTimeout> | undefined;
     let cityAbort: AbortController | null = null;
+    let currentPoints: NatalPromptPoint[] = [];
 
     function locate(sunSign: string | null, moonSign: string | null, risingSign: string | null) {
       window.dispatchEvent(new CustomEvent('star-map:locate', { detail: { sunSign, moonSign, risingSign } }));
@@ -268,8 +288,55 @@ const MINUTES = Array.from({ length: 60 }, (_, i) => i);
         readingEl.appendChild(buildReadingRow(group, sign, cardInfoForSign(sign)));
       }
 
+      currentPoints = points.map((p) => {
+        const info = cardInfoForSign(p.sign);
+        return {
+          label: p.name, sign: p.sign, cardName: info.cardName,
+          keywords: info.keywords, uprightMeaning: info.uprightMeaning, pokemonName: info.pokemonName,
+        };
+      });
+      resetSynthesis();
       result.hidden = false;
     }
+
+    function resetSynthesis() {
+      synthesisPanel.hidden = true;
+      synthesisText.textContent = '';
+      synthesisAttribution.textContent = '';
+      synthesisError.hidden = true;
+      synthesisRow.hidden = false;
+      synthesisBtn.disabled = false;
+      synthesisBtn.textContent = 'Weave My Chart Together';
+    }
+
+    async function requestSynthesis() {
+      if (currentPoints.length < 2) return;
+      synthesisBtn.disabled = true;
+      synthesisBtn.textContent = 'The stars are aligning…';
+      synthesisError.hidden = true;
+
+      try {
+        const res = await fetch('/api/natal-reading', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ points: currentPoints }),
+        });
+        if (!res.ok) throw new Error('request failed');
+
+        const data = (await res.json()) as { provider: string; synthesis: string };
+        synthesisText.textContent = data.synthesis;
+        synthesisAttribution.textContent = `✦ read by ${data.provider} ✦`;
+        synthesisPanel.hidden = false;
+        synthesisRow.hidden = true;
+      } catch {
+        synthesisBtn.disabled = false;
+        synthesisBtn.textContent = 'Weave My Chart Together';
+        synthesisError.textContent = 'The stars are quiet — try again in a moment.';
+        synthesisError.hidden = false;
+      }
+    }
+
+    synthesisBtn.addEventListener('click', () => { void requestSynthesis(); });
 
     // Hide day options past the selected month's length, clamping the
     // current selection down if needed (e.g. switching from Jan 31 to Feb).
@@ -415,6 +482,7 @@ const MINUTES = Array.from({ length: 60 }, (_, i) => i);
       syncDayOptions();
       hideCityResults();
       result.hidden = true;
+      currentPoints = [];
       locate(null, null, null);
     });
   }
@@ -636,5 +704,86 @@ const MINUTES = Array.from({ length: 60 }, (_, i) => i);
   .birth-form__clear:hover {
     color: #e9e4f5;
     border-color: rgba(203, 168, 90, 0.6);
+  }
+
+  .birth-form__synthesis-row {
+    margin-top: 22px;
+    padding-top: 18px;
+    border-top: 1px solid rgba(203, 168, 90, 0.18);
+    text-align: center;
+  }
+  .birth-form__synthesis-cue {
+    margin: 0 0 12px;
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 14px;
+    color: #8f86ac;
+  }
+  .birth-form__synthesis-btn {
+    padding: 11px 26px;
+    border-radius: 999px;
+    cursor: pointer;
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #0b0714;
+    border: none;
+    background: linear-gradient(160deg, #e3cf95, #c39a45);
+    transition: opacity 0.25s, transform 0.2s;
+  }
+  .birth-form__synthesis-btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+  }
+  .birth-form__synthesis-btn:disabled {
+    cursor: default;
+    opacity: 0.65;
+  }
+  .birth-form__synthesis-error {
+    margin: 10px 0 0;
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 13.5px;
+    color: #c8bfe0;
+  }
+  .birth-form__synthesis-error[hidden] {
+    display: none;
+  }
+
+  .birth-form__synthesis[hidden] {
+    display: none;
+  }
+  .birth-form__synthesis {
+    margin-top: 22px;
+    padding: 20px 22px;
+    border-radius: 14px;
+    border: 1px solid rgba(203, 168, 90, 0.32);
+    background: linear-gradient(160deg, rgba(124, 92, 255, 0.1), rgba(11, 7, 20, 0.4));
+    text-align: center;
+  }
+  .birth-form__synthesis-label {
+    margin: 0 0 12px;
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #cba85a;
+  }
+  .birth-form__synthesis-text {
+    margin: 0;
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 16px;
+    line-height: 1.65;
+    color: #e9e4f5;
+    text-align: left;
+  }
+  .birth-form__synthesis-attribution {
+    margin: 14px 0 0;
+    font-family: 'Cinzel', serif;
+    font-size: 10.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #5a5273;
   }
 </style>
