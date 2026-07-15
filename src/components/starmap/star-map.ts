@@ -22,6 +22,7 @@ class StarMap extends HTMLElement {
   private activeBtn: HTMLButtonElement | null = null;
   private natalSunBtn: HTMLButtonElement | null = null;
   private natalMoonBtn: HTMLButtonElement | null = null;
+  private natalRisingBtn: HTMLButtonElement | null = null;
 
   // ─── Zoom/pan state ──────────────────────────────────────────────────────
   private zoom = 1;
@@ -101,20 +102,25 @@ class StarMap extends HTMLElement {
 
   // ─── Natal signs (from BirthForm) ──────────────────────────────────────────
 
-  private onLocate(e: CustomEvent<{ sunSign: string | null; moonSign: string | null }>) {
-    const { sunSign = null, moonSign = null } = e.detail ?? {};
+  private onLocate(
+    e: CustomEvent<{ sunSign: string | null; moonSign: string | null; risingSign: string | null }>,
+  ) {
+    const { sunSign = null, moonSign = null, risingSign = null } = e.detail ?? {};
 
     this.natalSunBtn?.classList.remove('is-natal-sun');
     this.natalMoonBtn?.classList.remove('is-natal-moon');
+    this.natalRisingBtn?.classList.remove('is-natal-rising');
     this.natalSunBtn = sunSign ? this.findHotspot(sunSign) : null;
     this.natalMoonBtn = moonSign ? this.findHotspot(moonSign) : null;
+    this.natalRisingBtn = risingSign ? this.findHotspot(risingSign) : null;
     this.natalSunBtn?.classList.add('is-natal-sun');
     this.natalMoonBtn?.classList.add('is-natal-moon');
+    this.natalRisingBtn?.classList.add('is-natal-rising');
 
-    const targets = [this.natalSunBtn, this.natalMoonBtn].filter(
+    const targets = [this.natalSunBtn, this.natalMoonBtn, this.natalRisingBtn].filter(
       (b): b is HTMLButtonElement => b !== null,
     );
-    // De-dupe: when Sun and Moon land on the same sign, only one button exists.
+    // De-dupe: signs that share a sign share one button.
     const unique = [...new Set(targets)];
     if (unique.length > 0) this.centerOnMany(unique);
   }

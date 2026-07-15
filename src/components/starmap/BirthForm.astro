@@ -7,42 +7,76 @@ const MONTHS = [
 const CURRENT_YEAR = new Date().getFullYear();
 const EARLIEST_YEAR = 1925;
 const YEARS = Array.from({ length: CURRENT_YEAR - EARLIEST_YEAR + 1 }, (_, i) => CURRENT_YEAR - i);
+
+const HOURS = Array.from({ length: 24 }, (_, i) => i);
+const MINUTES = Array.from({ length: 60 }, (_, i) => i);
 ---
 
 <div class="birth-form" data-birth-form>
-  <p class="birth-form__kicker">Find Your Sign</p>
-  <form class="birth-form__row" data-birth-form-el>
-    <div class="birth-form__select-wrap">
-      <select class="birth-form__select" data-birth-month aria-label="Birth month" required>
-        <option value="" disabled selected>Month</option>
-        {MONTHS.map((m, i) => <option value={i + 1}>{m}</option>)}
-      </select>
+  <p class="birth-form__kicker">Find Your Signs</p>
+  <form data-birth-form-el>
+    <div class="birth-form__row">
+      <div class="birth-form__select-wrap">
+        <select class="birth-form__select" data-birth-month aria-label="Birth month" required>
+          <option value="" disabled selected>Month</option>
+          {MONTHS.map((m, i) => <option value={i + 1}>{m}</option>)}
+        </select>
+      </div>
+      <div class="birth-form__select-wrap">
+        <select class="birth-form__select birth-form__select--day" data-birth-day aria-label="Birth day" required>
+          <option value="" disabled selected>Day</option>
+          {Array.from({ length: 31 }, (_, i) => <option value={i + 1}>{i + 1}</option>)}
+        </select>
+      </div>
+      <div class="birth-form__select-wrap">
+        <select class="birth-form__select birth-form__select--year" data-birth-year aria-label="Birth year" required>
+          <option value="" disabled selected>Year</option>
+          {YEARS.map((y) => <option value={y}>{y}</option>)}
+        </select>
+      </div>
     </div>
-    <div class="birth-form__select-wrap">
-      <select class="birth-form__select birth-form__select--day" data-birth-day aria-label="Birth day" required>
-        <option value="" disabled selected>Day</option>
-        {Array.from({ length: 31 }, (_, i) => <option value={i + 1}>{i + 1}</option>)}
-      </select>
+
+    <div class="birth-form__row birth-form__row--secondary">
+      <div class="birth-form__select-wrap">
+        <select class="birth-form__select birth-form__select--time" data-birth-hour aria-label="Birth hour (optional, for rising sign)">
+          <option value="" selected>Hour</option>
+          {HOURS.map((h) => <option value={h}>{String(h).padStart(2, '0')}</option>)}
+        </select>
+      </div>
+      <div class="birth-form__select-wrap">
+        <select class="birth-form__select birth-form__select--time" data-birth-minute aria-label="Birth minute (optional, for rising sign)">
+          <option value="" selected>Min</option>
+          {MINUTES.map((m) => <option value={m}>{String(m).padStart(2, '0')}</option>)}
+        </select>
+      </div>
+      <div class="birth-form__city-wrap">
+        <input
+          type="text"
+          class="birth-form__city-input"
+          data-birth-city
+          placeholder="Birth city (optional, for rising sign)"
+          autocomplete="off"
+          aria-label="Birth city"
+        />
+        <ul class="birth-form__city-results" data-birth-city-results hidden></ul>
+      </div>
     </div>
-    <div class="birth-form__select-wrap">
-      <select class="birth-form__select birth-form__select--year" data-birth-year aria-label="Birth year" required>
-        <option value="" disabled selected>Year</option>
-        {YEARS.map((y) => <option value={y}>{y}</option>)}
-      </select>
-    </div>
+
     <button type="submit" class="birth-form__submit">Locate My Signs</button>
   </form>
 
   <p class="birth-form__result" data-birth-result hidden aria-live="polite">
     <span data-birth-result-text></span>
-    <button type="button" class="birth-form__clear" data-birth-clear aria-label="Forget my birth date">✕</button>
+    <button type="button" class="birth-form__clear" data-birth-clear aria-label="Forget my birth details">✕</button>
   </p>
 </div>
 
 <script>
   import { signForDate, cardNameForSign } from '../../lib/arcana/zodiac';
   import { moonSignForDate } from '../../lib/arcana/moon';
-  import { getBirthDate, saveBirthDate, clearBirthDate } from '../../lib/birth';
+  import { risingSignForBirth } from '../../lib/arcana/ascendant';
+  import { searchCities, type CityResult } from '../../lib/arcana/geocoding';
+  import { getBirthDetails, saveBirthDetails, clearBirthDetails, type BirthCity } from '../../lib/birth';
 
   // Days-in-month, ignoring leap years (day-of-month only matters here for
   // narrowing the <select>, not for real calendar validity).
@@ -54,18 +88,28 @@ const YEARS = Array.from({ length: CURRENT_YEAR - EARLIEST_YEAR + 1 }, (_, i) =>
     const monthSelect = root.querySelector<HTMLSelectElement>('[data-birth-month]')!;
     const daySelect = root.querySelector<HTMLSelectElement>('[data-birth-day]')!;
     const yearSelect = root.querySelector<HTMLSelectElement>('[data-birth-year]')!;
+    const hourSelect = root.querySelector<HTMLSelectElement>('[data-birth-hour]')!;
+    const minuteSelect = root.querySelector<HTMLSelectElement>('[data-birth-minute]')!;
+    const cityInput = root.querySelector<HTMLInputElement>('[data-birth-city]')!;
+    const cityResultsEl = root.querySelector<HTMLElement>('[data-birth-city-results]')!;
     const result = root.querySelector<HTMLElement>('[data-birth-result]')!;
     const resultText = root.querySelector<HTMLElement>('[data-birth-result-text]')!;
     const clearBtn = root.querySelector<HTMLButtonElement>('[data-birth-clear]')!;
 
-    function locate(sunSign: string | null, moonSign: string | null) {
-      window.dispatchEvent(new CustomEvent('star-map:locate', { detail: { sunSign, moonSign } }));
+    let selectedCity: BirthCity | null = null;
+    let cityQueryTimer: ReturnType<typeof setTimeout> | undefined;
+    let cityAbort: AbortController | null = null;
+
+    function locate(sunSign: string | null, moonSign: string | null, risingSign: string | null) {
+      window.dispatchEvent(new CustomEvent('star-map:locate', { detail: { sunSign, moonSign, risingSign } }));
     }
 
-    function showResult(sunSign: string, moonSign: string) {
-      const sunLine = `Sun in ${sunSign} → ${cardNameForSign(sunSign)}`;
-      const moonLine = `Moon in ${moonSign} → ${cardNameForSign(moonSign)}`;
-      resultText.textContent = sunSign === moonSign ? sunLine : `${sunLine} · ${moonLine}`;
+    function showResult(sunSign: string, moonSign: string, risingSign: string | null) {
+      const lines = [`Sun in ${sunSign} → ${cardNameForSign(sunSign)}`];
+      if (moonSign !== sunSign) lines.push(`Moon in ${moonSign} → ${cardNameForSign(moonSign)}`);
+      else lines[0] = `Sun & Moon in ${sunSign} → ${cardNameForSign(sunSign)}`;
+      if (risingSign) lines.push(`Rising in ${risingSign} → ${cardNameForSign(risingSign)}`);
+      resultText.textContent = lines.join(' · ');
       result.hidden = false;
     }
 
@@ -86,49 +130,138 @@ const YEARS = Array.from({ length: CURRENT_YEAR - EARLIEST_YEAR + 1 }, (_, i) =>
 
     monthSelect.addEventListener('change', syncDayOptions);
 
-    // Restore a birth date saved on a previous visit, and re-locate its signs
-    // once the star-map custom element has finished connecting.
-    const saved = getBirthDate();
-    if (saved) {
-      const [year, month, day] = saved.split('-').map(Number);
+    // ─── City autocomplete ────────────────────────────────────────────────
+
+    function hideCityResults() {
+      cityResultsEl.hidden = true;
+      cityResultsEl.replaceChildren();
+    }
+
+    function renderCityResults(cities: CityResult[]) {
+      cityResultsEl.replaceChildren();
+      if (cities.length === 0) {
+        hideCityResults();
+        return;
+      }
+      for (const city of cities) {
+        const li = document.createElement('li');
+        li.className = 'birth-form__city-option';
+        li.textContent = city.label;
+        li.addEventListener('click', () => {
+          selectedCity = { label: city.label, lat: city.lat, lng: city.lng, tz: city.tz };
+          cityInput.value = city.label;
+          hideCityResults();
+        });
+        cityResultsEl.appendChild(li);
+      }
+      cityResultsEl.hidden = false;
+    }
+
+    cityInput.addEventListener('input', () => {
+      selectedCity = null; // must re-pick a suggestion — avoids submitting an unresolved city
+      clearTimeout(cityQueryTimer);
+      cityAbort?.abort();
+
+      const query = cityInput.value;
+      if (query.trim().length < 2) {
+        hideCityResults();
+        return;
+      }
+      cityQueryTimer = setTimeout(async () => {
+        cityAbort = new AbortController();
+        const cities = await searchCities(query, cityAbort.signal);
+        renderCityResults(cities);
+      }, 300);
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!root.contains(e.target as Node)) return;
+      if (!cityInput.contains(e.target as Node) && !cityResultsEl.contains(e.target as Node)) {
+        hideCityResults();
+      }
+    });
+
+    // ─── Compute + persist ──────────────────────────────────────────────────
+
+    function computeSigns(
+      year: number, month: number, day: number,
+      hour: number | null, minute: number | null, city: BirthCity | null,
+    ) {
       const sunSign = signForDate(month, day);
       const moonSign = moonSignForDate(year, month, day);
+      const risingSign =
+        hour !== null && minute !== null && city
+          ? risingSignForBirth(year, month, day, hour, minute, city)
+          : null;
+      return { sunSign, moonSign, risingSign };
+    }
+
+    // Restore birth details saved on a previous visit, and re-locate its
+    // signs once the star-map custom element has finished connecting.
+    const saved = getBirthDetails();
+    if (saved) {
+      const [year, month, day] = saved.date.split('-').map(Number);
       monthSelect.value = String(month);
       syncDayOptions();
       daySelect.value = String(day);
       yearSelect.value = String(year);
-      showResult(sunSign, moonSign);
-      customElements.whenDefined('star-map').then(() => locate(sunSign, moonSign));
+      if (saved.hour !== undefined) hourSelect.value = String(saved.hour);
+      if (saved.minute !== undefined) minuteSelect.value = String(saved.minute);
+      if (saved.city) {
+        selectedCity = saved.city;
+        cityInput.value = saved.city.label;
+      }
+
+      const { sunSign, moonSign, risingSign } = computeSigns(
+        year, month, day,
+        saved.hour ?? null, saved.minute ?? null, saved.city,
+      );
+      showResult(sunSign, moonSign, risingSign);
+      customElements.whenDefined('star-map').then(() => locate(sunSign, moonSign, risingSign));
     }
 
     form.addEventListener('submit', (e) => {
       e.preventDefault();
       if (!monthSelect.value || !daySelect.value || !yearSelect.value) return;
+
       const month = Number(monthSelect.value);
       const day = Number(daySelect.value);
       const year = Number(yearSelect.value);
-      const sunSign = signForDate(month, day);
-      const moonSign = moonSignForDate(year, month, day);
-      saveBirthDate(`${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`);
-      showResult(sunSign, moonSign);
-      locate(sunSign, moonSign);
+      const hour = hourSelect.value ? Number(hourSelect.value) : null;
+      const minute = minuteSelect.value ? Number(minuteSelect.value) : null;
+
+      const { sunSign, moonSign, risingSign } = computeSigns(year, month, day, hour, minute, selectedCity);
+
+      saveBirthDetails({
+        date: `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`,
+        hour: hour ?? 0,
+        minute: minute ?? 0,
+        city: selectedCity,
+      });
+      showResult(sunSign, moonSign, risingSign);
+      locate(sunSign, moonSign, risingSign);
     });
 
     clearBtn.addEventListener('click', () => {
-      clearBirthDate();
+      clearBirthDetails();
       monthSelect.value = '';
       daySelect.value = '';
       yearSelect.value = '';
+      hourSelect.value = '';
+      minuteSelect.value = '';
+      cityInput.value = '';
+      selectedCity = null;
       syncDayOptions();
+      hideCityResults();
       result.hidden = true;
-      locate(null, null);
+      locate(null, null, null);
     });
   }
 </script>
 
 <style>
   .birth-form {
-    max-width: 460px;
+    max-width: 520px;
     margin: 24px auto 0;
     text-align: center;
   }
@@ -146,6 +279,9 @@ const YEARS = Array.from({ length: CURRENT_YEAR - EARLIEST_YEAR + 1 }, (_, i) =>
     align-items: center;
     gap: 8px;
     flex-wrap: wrap;
+  }
+  .birth-form__row--secondary {
+    margin-top: 8px;
   }
 
   .birth-form__select-wrap {
@@ -179,6 +315,10 @@ const YEARS = Array.from({ length: CURRENT_YEAR - EARLIEST_YEAR + 1 }, (_, i) =>
   .birth-form__select--year {
     padding-right: 26px;
   }
+  .birth-form__select--time {
+    padding-right: 26px;
+    font-size: 14px;
+  }
   .birth-form__select:focus {
     border-color: rgba(167, 139, 250, 0.6);
     box-shadow: 0 0 0 3px rgba(124, 92, 255, 0.12);
@@ -188,7 +328,62 @@ const YEARS = Array.from({ length: CURRENT_YEAR - EARLIEST_YEAR + 1 }, (_, i) =>
     color: #e9e4f5;
   }
 
+  .birth-form__city-wrap {
+    position: relative;
+    flex: 1 1 220px;
+    max-width: 260px;
+  }
+  .birth-form__city-input {
+    width: 100%;
+    padding: 9px 16px;
+    border-radius: 999px;
+    border: 1px solid rgba(203, 168, 90, 0.28);
+    background: rgba(11, 7, 20, 0.55);
+    color: #e9e4f5;
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.25s, box-shadow 0.25s;
+  }
+  .birth-form__city-input::placeholder {
+    color: #5a5273;
+    font-style: italic;
+  }
+  .birth-form__city-input:focus {
+    border-color: rgba(167, 139, 250, 0.6);
+    box-shadow: 0 0 0 3px rgba(124, 92, 255, 0.12);
+  }
+
+  .birth-form__city-results {
+    position: absolute;
+    z-index: 30;
+    top: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    margin: 0;
+    padding: 6px;
+    list-style: none;
+    border-radius: 12px;
+    border: 1px solid rgba(203, 168, 90, 0.3);
+    background: #1c1526;
+    box-shadow: 0 14px 30px -10px rgba(0, 0, 0, 0.75);
+    text-align: left;
+  }
+  .birth-form__city-option {
+    padding: 8px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: 'EB Garamond', serif;
+    font-size: 14px;
+    color: #e9e4f5;
+  }
+  .birth-form__city-option:hover {
+    background: rgba(203, 168, 90, 0.15);
+  }
+
   .birth-form__submit {
+    margin-top: 14px;
     padding: 9px 20px;
     border-radius: 999px;
     cursor: pointer;
@@ -217,6 +412,7 @@ const YEARS = Array.from({ length: CURRENT_YEAR - EARLIEST_YEAR + 1 }, (_, i) =>
     font-style: italic;
     font-size: 15px;
     color: #f3dfa2;
+    max-width: 100%;
   }
   .birth-form__clear {
     display: inline-flex;
