@@ -1,5 +1,5 @@
 import { MAJOR_ARCANA_METADATA } from './tarot-metadata';
-import { MAJOR_ARCANA } from './majorArcana';
+import { MAJOR_ARCANA, MAJOR_ARCANA_POKEMON } from './majorArcana';
 
 /**
  * Simplified stick-figure asterism for each sign: `stars` are points in a
@@ -131,6 +131,25 @@ export function cardNameForSign(sign: string): string {
     throw new Error(`No Major Arcana card has astrology "${sign}" in MAJOR_ARCANA_METADATA.`);
   }
   return cardName;
+}
+
+export interface SignCardInfo {
+  cardName: string;
+  uprightMeaning: string;
+  keywords: string[];
+  pokemonName: string;
+}
+
+/** `cardNameForSign` plus the card's meaning/keywords and representative Pokémon. */
+export function cardInfoForSign(sign: string): SignCardInfo {
+  const cardName = cardNameForSign(sign);
+  const meta = MAJOR_ARCANA_METADATA[cardName];
+  return {
+    cardName,
+    uprightMeaning: meta.uprightMeaning,
+    keywords: meta.keywords,
+    pokemonName: MAJOR_ARCANA_POKEMON[cardName].name,
+  };
 }
 
 /**

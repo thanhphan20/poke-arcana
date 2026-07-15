@@ -60,3 +60,27 @@ export function majorArcanaForId(id: number): { majorNumber: number; name: strin
   const majorNumber = MAJOR_ARCANA.indexOf(name as (typeof MAJOR_ARCANA)[number]);
   return { majorNumber, name };
 }
+
+// Display names for the 22 ids in MAJOR_ARCANA_ASSIGNMENT (mirrors its
+// comments) — pokemon.json only stores lowercase slugs, and pulling in the
+// full ~1000-entry file just for these 22 isn't worth it client-side.
+const POKEMON_ID_NAMES: Record<number, string> = {
+  151: 'Mew', 149: 'Dragonite', 251: 'Celebi', 245: 'Suicune', 383: 'Groudon',
+  379: 'Registeel', 381: 'Latios', 243: 'Raikou', 244: 'Entei', 380: 'Latias',
+  385: 'Jirachi', 377: 'Regirock', 378: 'Regice', 382: 'Kyogre', 250: 'Ho-Oh',
+  150: 'Mewtwo', 145: 'Zapdos', 144: 'Articuno', 249: 'Lugia', 146: 'Moltres',
+  386: 'Deoxys', 384: 'Rayquaza',
+};
+
+export interface MajorArcanaPokemon {
+  id: number;
+  name: string;
+}
+
+/** Major Arcana card name -> its representative Pokémon (id + display name). */
+export const MAJOR_ARCANA_POKEMON: Record<string, MajorArcanaPokemon> = Object.fromEntries(
+  Object.entries(MAJOR_ARCANA_ASSIGNMENT).map(([id, cardName]) => [
+    cardName,
+    { id: Number(id), name: POKEMON_ID_NAMES[Number(id)] },
+  ]),
+);

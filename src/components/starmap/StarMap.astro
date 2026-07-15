@@ -227,9 +227,10 @@ const bgStars = Array.from({ length: 140 }, (_, i) => {
     filter: drop-shadow(0 0 6px rgba(203, 168, 90, 1));
   }
 
-  /* Persistent highlights for the visitor's own Sun/Moon signs (set via
-     BirthForm), distinct from the transient hover/open state above. Both can
-     apply to the same button when Sun and Moon share a sign. */
+  /* Persistent highlights for the visitor's own Sun/Moon/Rising signs (set via
+     BirthForm), distinct from the transient hover/open state above. Each is
+     its own ring layer (element itself, ::before, ::after) so any
+     combination stacks cleanly instead of fighting over one box-shadow. */
   .star-map__hotspot.is-natal-sun {
     background: rgba(203, 168, 90, 0.1);
     border-radius: 50%;
@@ -250,8 +251,13 @@ const bgStars = Array.from({ length: 140 }, (_, i) => {
     content: '★ ';
   }
 
-  .star-map__hotspot.is-natal-moon {
-    box-shadow: 0 0 0 1.5px rgba(167, 139, 250, 0.55), 0 0 0 4px rgba(203, 168, 90, 0.55);
+  .star-map__hotspot.is-natal-moon::before {
+    content: '';
+    position: absolute;
+    inset: -5px;
+    border-radius: 50%;
+    box-shadow: 0 0 0 1.5px rgba(167, 139, 250, 0.6);
+    pointer-events: none;
   }
   .star-map__hotspot.is-natal-moon .star-map__constellation line {
     stroke: rgba(196, 208, 250, 0.85);
@@ -263,6 +269,22 @@ const bgStars = Array.from({ length: 140 }, (_, i) => {
   .star-map__hotspot.is-natal-moon .star-map__glyph::after {
     content: ' ☾';
     color: #c4d0fa;
+  }
+
+  .star-map__hotspot.is-natal-rising::after {
+    content: '';
+    position: absolute;
+    inset: -10px;
+    border-radius: 50%;
+    box-shadow: 0 0 0 1.5px rgba(232, 145, 90, 0.65);
+    pointer-events: none;
+  }
+  .star-map__hotspot.is-natal-rising .star-map__constellation line {
+    stroke: rgba(250, 190, 150, 0.85);
+  }
+  .star-map__hotspot.is-natal-rising .star-map__constellation circle {
+    fill: #ffd9b8;
+    filter: drop-shadow(0 0 7px rgba(250, 190, 150, 1));
   }
 
   @keyframes star-map-twinkle {

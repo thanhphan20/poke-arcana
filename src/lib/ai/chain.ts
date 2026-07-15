@@ -15,13 +15,15 @@ import {
 const MAX_ATTEMPTS_PER_PROVIDER = 3;
 const BACKOFF_MS = [500, 1500, 4500];
 
-function isRetryable(err: unknown): boolean {
+// Exported so other prompt chains (e.g. natal/chain.ts) can reuse the same
+// retry/classification policy without duplicating it.
+export function isRetryable(err: unknown): boolean {
   if (err instanceof HttpError) return err.status >= 500;
   // NetworkError and TimeoutError are always retryable.
   return !(err instanceof HttpError);
 }
 
-function classifyTerminal(err: unknown): FailureReason {
+export function classifyTerminal(err: unknown): FailureReason {
   if (err instanceof HttpError) {
     if (err.status === 429) return '429';
     if (err.status === 401 || err.status === 403) return '401_403';
@@ -30,9 +32,12 @@ function classifyTerminal(err: unknown): FailureReason {
   return '5xx_retry_exhausted';
 }
 
-function sleep(ms: number): Promise<void> {
+export function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
+
+export const RETRY_BACKOFF_MS = BACKOFF_MS;
+export const MAX_PROVIDER_ATTEMPTS = MAX_ATTEMPTS_PER_PROVIDER;
 
 /**
  * Attempts a single provider with retry-on-transient-failure. Returns the
