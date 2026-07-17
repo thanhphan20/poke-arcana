@@ -1,0 +1,58 @@
+---
+export const prerender = true;
+
+import BaseLayout from '../layouts/BaseLayout.astro';
+import NumerologyForm from '../components/numerology/NumerologyForm.astro';
+---
+
+<BaseLayout title="Numerology — Poké-Arcana" description="Reduce your birth date to its Life Path number.">
+  <section class="numerology-page pa-rise">
+    <p class="numerology-page__kicker">Reduce the Date</p>
+    <h1 class="numerology-page__title">Numerology</h1>
+    <p class="numerology-page__lede">
+      Enter your birth date to find your Life Path number — the single digit (or master number) your
+      birth date reduces to.
+    </p>
+    <p class="numerology-page__method">
+      Calculated the traditional way: month, day, and year are each reduced separately, then combined
+      and reduced once more. Master numbers 11, 22, and 33 are kept whole rather than reduced further.
+    </p>
+
+    <NumerologyForm />
+  </section>
+</BaseLayout>
+
+<style>
+  .numerology-page {
+    padding: 52px 0 80px;
+  }
+  .numerology-page__kicker {
+    margin: 0;
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: #cba85a;
+  }
+  .numerology-page__title {
+    margin: 6px 0 10px;
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(32px, 5vw, 48px);
+    color: #e3cf95;
+  }
+  .numerology-page__lede {
+    max-width: 46ch;
+    margin: 0;
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 17px;
+    color: #c8bfe0;
+  }
+  .numerology-page__method {
+    max-width: 52ch;
+    margin: 10px 0 0;
+    font-family: 'EB Garamond', serif;
+    font-size: 14px;
+    color: #8f86ac;
+  }
+</style>
