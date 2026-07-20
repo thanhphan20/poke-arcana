@@ -1,0 +1,164 @@
+/* Natal/star-map reading-card styles shared by the live BirthForm result and
+   the static history detail view, so the two never drift. Selectors are
+   global on purpose: the cards are built in TypeScript (natal-render.ts),
+   not scoped markup. */
+
+.natal-reading {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.natal-reading__section-title {
+  margin: 0 0 14px;
+  font-family: 'Cinzel', serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: #cba85a;
+  text-align: center;
+}
+.natal-reading__section-title::before,
+.natal-reading__section-title::after {
+  content: '✦';
+  display: inline-block;
+  margin: 0 10px;
+  font-size: 10px;
+  color: #5a5273;
+}
+
+.natal-reading__grid {
+  display: grid;
+  gap: 14px;
+}
+.natal-reading__grid--big {
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+}
+.natal-reading__grid--compact {
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.natal-reading__card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 14px;
+  background: rgba(124, 92, 255, 0.08);
+}
+.natal-reading__card--big {
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 20px 16px;
+  border: 1px solid rgba(203, 168, 90, 0.4);
+  background: linear-gradient(160deg, rgba(203, 168, 90, 0.12), rgba(124, 92, 255, 0.08));
+}
+.natal-reading__card--compact {
+  border: 1px solid rgba(167, 139, 250, 0.24);
+}
+
+.natal-reading__card-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  gap: 2px;
+  min-width: 34px;
+  max-width: 76px;
+  min-height: 34px;
+  padding: 4px;
+  border-radius: 12px;
+  background: rgba(11, 7, 20, 0.5);
+  border: 1px solid rgba(203, 168, 90, 0.25);
+}
+.natal-reading__card--big .natal-reading__card-badge {
+  min-width: 48px;
+  min-height: 48px;
+  max-width: 96px;
+  border-radius: 50%;
+}
+.natal-reading__card-badge svg {
+  display: block;
+}
+
+.natal-reading__card-body {
+  min-width: 0;
+  flex: 1;
+}
+.natal-reading__card-head {
+  margin: 0 0 6px;
+  line-height: 1.4;
+}
+.natal-reading__card-point {
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #cba85a;
+}
+.natal-reading__card--big .natal-reading__card-point {
+  font-size: 13px;
+}
+.natal-reading__card-hint {
+  font-family: 'EB Garamond', serif;
+  font-style: italic;
+  font-size: 13px;
+  color: #8f86ac;
+}
+.natal-reading__card-sign {
+  margin: 0 0 6px;
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 15px;
+  color: #f3dfa2;
+}
+.natal-reading__card-meaning {
+  margin: 0;
+  font-family: 'EB Garamond', serif;
+  font-style: italic;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: #c8bfe0;
+}
+
+.natal-reading__synthesis {
+  margin-top: 8px;
+  padding: 20px 22px;
+  border-radius: 14px;
+  border: 1px solid rgba(203, 168, 90, 0.32);
+  background: linear-gradient(160deg, rgba(124, 92, 255, 0.1), rgba(11, 7, 20, 0.4));
+  text-align: center;
+}
+.natal-reading__synthesis-label {
+  margin: 0 0 12px;
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #cba85a;
+}
+.natal-reading__synthesis-text {
+  margin: 0;
+  font-family: 'EB Garamond', serif;
+  font-style: italic;
+  font-size: 16px;
+  line-height: 1.65;
+  color: #e9e4f5;
+  text-align: left;
+}
+.natal-reading__synthesis-attribution {
+  margin: 14px 0 0;
+  font-family: 'Cinzel', serif;
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #5a5273;
+}
+
+@media (max-width: 640px) {
+  .natal-reading__synthesis {
+    padding: 16px 18px;
+  }
+}
