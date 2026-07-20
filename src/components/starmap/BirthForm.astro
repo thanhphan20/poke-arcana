@@ -16,6 +16,21 @@ import '../../styles/natal-reading.css';
 
 <div class="birth-form" data-birth-form>
   <p class="birth-form__kicker">Find Your Signs</p>
+
+  <div class="birth-form__profile-bar">
+    <select class="birth-form__profile-select" data-profile-select aria-label="Load a saved profile">
+      <option value="">— Load a saved profile —</option>
+    </select>
+    <input
+      type="text"
+      class="birth-form__profile-name"
+      data-profile-name
+      placeholder="Name (optional, to save as a profile)"
+      autocomplete="off"
+      aria-label="Profile name"
+    />
+  </div>
+
   <form data-birth-form-el>
     <div class="birth-form__row">
       <div class="birth-form__select-wrap">
@@ -94,6 +109,7 @@ import '../../styles/natal-reading.css';
   import { getBirthDetails, saveBirthDetails, clearBirthDetails, type BirthCity, type BirthDetails } from '../../lib/birth';
   import { buildNatalPoints, renderNatalReading, PLANET_ORDER } from '../../lib/natal-render';
   import { saveNatalReading, updateNatalReading } from '../../lib/natal-history';
+  import { listProfiles, getProfile, saveProfile, profileLabel } from '../../lib/profiles';
   import type { NatalPromptPoint } from '../../lib/ai/natal/prompt';
 
   // Days-in-month, ignoring leap years (day-of-month only matters here for
@@ -119,6 +135,8 @@ import '../../styles/natal-reading.css';
     const synthesisPanel = root.querySelector<HTMLElement>('[data-synthesis-panel]')!;
     const synthesisText = root.querySelector<HTMLElement>('[data-synthesis-text]')!;
     const synthesisAttribution = root.querySelector<HTMLElement>('[data-synthesis-attribution]')!;
+    const profileSelect = root.querySelector<HTMLSelectElement>('[data-profile-select]')!;
+    const profileNameInput = root.querySelector<HTMLInputElement>('[data-profile-name]')!;
 
     let selectedCity: BirthCity | null = null;
     let cityQueryTimer: ReturnType<typeof setTimeout> | undefined;
@@ -268,6 +286,35 @@ import '../../styles/natal-reading.css';
       return { sunSign, moonSign, risingSign, planetSigns };
     }
 
+    // ─── Reusable profiles ───────────────────────────────────────────────
+
+    function refreshProfileSelect() {
+      const current = profileSelect.value;
+      profileSelect.replaceChildren(new Option('— Load a saved profile —', ''));
+      for (const profile of listProfiles()) {
+        profileSelect.appendChild(new Option(profileLabel(profile), profile.id));
+      }
+      profileSelect.value = listProfiles().some((p) => p.id === current) ? current : '';
+    }
+    refreshProfileSelect();
+
+    profileSelect.addEventListener('change', () => {
+      if (!profileSelect.value) return;
+      const profile = getProfile(profileSelect.value);
+      if (!profile) return;
+
+      const [y, m, d] = profile.date.split('-').map(Number);
+      monthSelect.value = String(m);
+      syncDayOptions();
+      daySelect.value = String(d);
+      yearSelect.value = String(y);
+      hourSelect.value = profile.hour !== null ? String(profile.hour) : '';
+      minuteSelect.value = profile.minute !== null ? String(profile.minute) : '';
+      selectedCity = profile.city;
+      cityInput.value = profile.city?.label ?? '';
+      profileNameInput.value = profile.name;
+    });
+
     // Restore birth details saved on a previous visit, and re-locate its
     // signs once the star-map custom element has finished connecting.
     const saved = getBirthDetails();
@@ -316,6 +363,13 @@ import '../../styles/natal-reading.css';
 
       // Auto-save the completed reading to this browser (no button, nothing to manage).
       currentReadingId = saveNatalReading({ birth, points: currentPoints, synthesis: null });
+
+      // Auto-save as a reusable profile too, if a name was given for it.
+      const profileName = profileNameInput.value.trim();
+      if (profileName) {
+        saveProfile({ name: profileName, date: birth.date, hour, minute, city: selectedCity });
+        refreshProfileSelect();
+      }
     });
 
     clearBtn.addEventListener('click', () => {
@@ -351,6 +405,47 @@ import '../../styles/natal-reading.css';
     text-transform: uppercase;
     color: #5a5273;
   }
+  .birth-form__profile-bar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+  }
+  .birth-form__profile-select,
+  .birth-form__profile-name {
+    padding: 8px 14px;
+    border-radius: 999px;
+    border: 1px solid rgba(203, 168, 90, 0.28);
+    background: rgba(11, 7, 20, 0.55);
+    color: #e9e4f5;
+    font-family: 'EB Garamond', serif;
+    font-size: 13.5px;
+    outline: none;
+    transition: border-color 0.25s, box-shadow 0.25s;
+  }
+  .birth-form__profile-select {
+    cursor: pointer;
+  }
+  .birth-form__profile-select option {
+    background: #1c1526;
+    color: #e9e4f5;
+  }
+  .birth-form__profile-name {
+    max-width: 200px;
+    font-style: italic;
+  }
+  .birth-form__profile-name::placeholder {
+    color: #5a5273;
+    font-style: italic;
+  }
+  .birth-form__profile-select:focus,
+  .birth-form__profile-name:focus {
+    border-color: rgba(167, 139, 250, 0.6);
+    box-shadow: 0 0 0 3px rgba(124, 92, 255, 0.12);
+  }
+
   .birth-form__row {
     display: flex;
     justify-content: center;

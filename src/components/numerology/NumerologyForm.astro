@@ -11,6 +11,13 @@ const YEARS = Array.from({ length: CURRENT_YEAR - EARLIEST_YEAR + 1 }, (_, i) =>
 
 <div class="numerology-form" data-numerology-form>
   <p class="numerology-form__kicker">Find Your Number</p>
+
+  <div class="numerology-form__profile-bar">
+    <select class="numerology-form__profile-select" data-profile-select aria-label="Load a saved profile">
+      <option value="">— Load a saved profile —</option>
+    </select>
+  </div>
+
   <form data-numerology-form-el>
     <div class="numerology-form__row">
       <div class="numerology-form__select-wrap">
@@ -109,6 +116,7 @@ const YEARS = Array.from({ length: CURRENT_YEAR - EARLIEST_YEAR + 1 }, (_, i) =>
     expressionNumber, soulUrgeNumber, personalityNumber, hasUsableLetters,
   } from '../../lib/arcana/numerology';
   import { saveNumerologyReading, updateNumerologyReading } from '../../lib/numerology-history';
+  import { listProfiles, getProfile, saveProfile, profileLabel } from '../../lib/profiles';
 
   type Domain = 'career' | 'love' | 'purpose';
   interface WeaveNumbers { lifePath: number; expression: number; soulUrge: number; personality: number }
@@ -145,6 +153,7 @@ const YEARS = Array.from({ length: CURRENT_YEAR - EARLIEST_YEAR + 1 }, (_, i) =>
     const weavePanel = root.querySelector<HTMLElement>('[data-weave-panel]')!;
     const weaveText = root.querySelector<HTMLElement>('[data-weave-text]')!;
     const weaveAttribution = root.querySelector<HTMLElement>('[data-weave-attribution]')!;
+    const profileSelect = root.querySelector<HTMLSelectElement>('[data-profile-select]')!;
 
     let selectedDomain: Domain | null = null;
     let currentNumbers: WeaveNumbers | null = null;
@@ -164,6 +173,32 @@ const YEARS = Array.from({ length: CURRENT_YEAR - EARLIEST_YEAR + 1 }, (_, i) =>
     }
 
     monthSelect.addEventListener('change', syncDayOptions);
+
+    // ─── Reusable profiles ───────────────────────────────────────────────
+
+    function refreshProfileSelect() {
+      const current = profileSelect.value;
+      profileSelect.replaceChildren(new Option('— Load a saved profile —', ''));
+      for (const profile of listProfiles()) {
+        profileSelect.appendChild(new Option(profileLabel(profile), profile.id));
+      }
+      profileSelect.value = listProfiles().some((p) => p.id === current) ? current : '';
+    }
+    refreshProfileSelect();
+
+    profileSelect.addEventListener('change', () => {
+      if (!profileSelect.value) return;
+      const profile = getProfile(profileSelect.value);
+      if (!profile) return;
+
+      const [y, m, d] = profile.date.split('-').map(Number);
+      monthSelect.value = String(m);
+      syncDayOptions();
+      daySelect.value = String(d);
+      yearSelect.value = String(y);
+      nameInput.value = profile.name;
+      nameErrorEl.hidden = true;
+    });
 
     function resetWeave() {
       selectedDomain = null;
@@ -278,6 +313,14 @@ const YEARS = Array.from({ length: CURRENT_YEAR - EARLIEST_YEAR + 1 }, (_, i) =>
       });
       resetWeave();
       result.hidden = false;
+
+      // Auto-save as a reusable profile too. Name-only: omits hour/minute/city
+      // so a birth time/place saved earlier from Star Map isn't clobbered.
+      saveProfile({
+        name: fullName,
+        date: `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`,
+      });
+      refreshProfileSelect();
     });
   }
 </script>
@@ -296,6 +339,35 @@ const YEARS = Array.from({ length: CURRENT_YEAR - EARLIEST_YEAR + 1 }, (_, i) =>
     text-transform: uppercase;
     color: #5a5273;
   }
+  .numerology-form__profile-bar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+  }
+  .numerology-form__profile-select {
+    padding: 8px 14px;
+    border-radius: 999px;
+    border: 1px solid rgba(203, 168, 90, 0.28);
+    background: rgba(11, 7, 20, 0.55);
+    color: #e9e4f5;
+    font-family: 'EB Garamond', serif;
+    font-size: 13.5px;
+    outline: none;
+    cursor: pointer;
+    transition: border-color 0.25s, box-shadow 0.25s;
+  }
+  .numerology-form__profile-select option {
+    background: #1c1526;
+    color: #e9e4f5;
+  }
+  .numerology-form__profile-select:focus {
+    border-color: rgba(167, 139, 250, 0.6);
+    box-shadow: 0 0 0 3px rgba(124, 92, 255, 0.12);
+  }
+
   .numerology-form__row {
     display: flex;
     justify-content: center;
