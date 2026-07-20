@@ -3,12 +3,13 @@ export const prerender = true;
 
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import '../../styles/reading.css';
+import '../../styles/natal-reading.css';
 ---
 
-<BaseLayout title="My Draws — Poké-Arcana" description="Revisit your past Poké-Arcana readings.">
+<BaseLayout title="My Readings — Poké-Arcana" description="Revisit your past Poké-Arcana readings.">
   <section class="history pa-rise">
     <p class="history__kicker">Kept For You</p>
-    <h1 class="history__title">My Draws</h1>
+    <h1 class="history__title">My Readings</h1>
     <p class="history__note">
       Saved only in this browser — private to you, and gone if you clear your data or switch device.
     </p>
@@ -21,20 +22,32 @@ import '../../styles/reading.css';
         <a href="/reading" class="history-empty__cta">Consult the Oracle</a>
       </div>
     </template>
+
+    <template data-empty-natal>
+      <div class="history-empty">
+        <p class="history-empty__text">You have no saved star charts yet.</p>
+        <a href="/star-map" class="history-empty__cta">Find Your Signs</a>
+      </div>
+    </template>
   </section>
 </BaseLayout>
 
 <script>
   import { listDraws, getDraw } from '../../lib/history';
   import { renderAiReading, renderTemplateReading } from '../../lib/reading-render';
+  import { listNatalReadings, getNatalReading, type NatalReadingRecord } from '../../lib/natal-history';
+  import { renderNatalReading, renderNatalSynthesis } from '../../lib/natal-render';
 
   const root = document.querySelector<HTMLElement>('[data-history-root]');
   const emptyTpl = document.querySelector<HTMLTemplateElement>('[data-empty]');
-  if (root && emptyTpl) {
+  const emptyNatalTpl = document.querySelector<HTMLTemplateElement>('[data-empty-natal]');
+  if (root && emptyTpl && emptyNatalTpl) {
     const params = new URLSearchParams(window.location.search);
     const id = params.get('id');
+    const natalId = params.get('natalId');
     if (id) renderDetail(id, root, emptyTpl);
-    else renderList(root, emptyTpl);
+    else if (natalId) renderNatalDetail(natalId, root, emptyNatalTpl);
+    else renderOverview(root, emptyTpl, emptyNatalTpl);
   }
 
   function showEmpty(root: HTMLElement, emptyTpl: HTMLTemplateElement) {
@@ -52,13 +65,48 @@ import '../../styles/reading.css';
     }
   }
 
-  function renderList(root: HTMLElement, emptyTpl: HTMLTemplateElement) {
-    const draws = listDraws();
-    if (draws.length === 0) {
-      showEmpty(root, emptyTpl);
-      return;
-    }
+  function sectionHeading(text: string): HTMLElement {
+    const h2 = document.createElement('h2');
+    h2.className = 'history-section__title';
+    h2.textContent = text;
+    return h2;
+  }
 
+  function birthSummary(birth: NatalReadingRecord['birth']): string {
+    const [y, m, d] = birth.date.split('-').map(Number);
+    let dateStr: string;
+    try {
+      dateStr = new Date(y, m - 1, d).toLocaleDateString(undefined, {
+        year: 'numeric', month: 'long', day: 'numeric',
+      });
+    } catch {
+      dateStr = birth.date;
+    }
+    return birth.city ? `${dateStr} · ${birth.city.label}` : dateStr;
+  }
+
+  function renderOverview(
+    root: HTMLElement, emptyTpl: HTMLTemplateElement, emptyNatalTpl: HTMLTemplateElement,
+  ) {
+    const draws = listDraws();
+    const readings = listNatalReadings();
+
+    const drawsSection = document.createElement('section');
+    drawsSection.className = 'history-section';
+    drawsSection.appendChild(sectionHeading('My Draws'));
+    drawsSection.appendChild(draws.length ? buildDrawsList(draws) : emptyTpl.content.cloneNode(true));
+
+    const natalSection = document.createElement('section');
+    natalSection.className = 'history-section';
+    natalSection.appendChild(sectionHeading('My Star Charts'));
+    natalSection.appendChild(
+      readings.length ? buildNatalList(readings) : emptyNatalTpl.content.cloneNode(true),
+    );
+
+    root.replaceChildren(drawsSection, natalSection);
+  }
+
+  function buildDrawsList(draws: ReturnType<typeof listDraws>): HTMLElement {
     const list = document.createElement('ul');
     list.className = 'history-list';
 
@@ -117,7 +165,65 @@ import '../../styles/reading.css';
       list.appendChild(item);
     }
 
-    root.replaceChildren(list);
+    return list;
+  }
+
+  function buildNatalList(readings: NatalReadingRecord[]): HTMLElement {
+    const list = document.createElement('ul');
+    list.className = 'history-list';
+
+    for (const reading of readings) {
+      const item = document.createElement('li');
+      item.className = 'history-item';
+
+      const link = document.createElement('a');
+      link.className = 'history-item__link';
+      link.href = `/history/?natalId=${encodeURIComponent(reading.id)}`;
+
+      const q = document.createElement('p');
+      q.className = 'history-item__question';
+      q.textContent = birthSummary(reading.birth);
+
+      const meta = document.createElement('div');
+      meta.className = 'history-item__meta';
+
+      const date = document.createElement('span');
+      date.className = 'history-item__date';
+      date.textContent = formatDate(reading.createdAt);
+      meta.appendChild(date);
+
+      if (reading.synthesis) {
+        const aiBadge = document.createElement('span');
+        aiBadge.className = 'history-item__badge history-item__badge--ai';
+        aiBadge.textContent = 'AI reading';
+        meta.appendChild(aiBadge);
+      }
+
+      const cardList = document.createElement('ul');
+      cardList.className = 'history-item__cards';
+      const bigThree = reading.points.filter((p) => p.label === 'Sun' || p.label === 'Moon' || p.label === 'Rising');
+      for (const point of bigThree) {
+        const chip = document.createElement('li');
+        chip.className = 'history-item__card-chip';
+
+        const pos = document.createElement('span');
+        pos.className = 'history-item__card-position';
+        pos.textContent = point.label;
+
+        const name = document.createElement('span');
+        name.className = 'history-item__card-name';
+        name.textContent = point.cardName;
+
+        chip.append(pos, name);
+        cardList.appendChild(chip);
+      }
+
+      link.append(q, meta, cardList);
+      item.appendChild(link);
+      list.appendChild(item);
+    }
+
+    return list;
   }
 
   function renderDetail(id: string, root: HTMLElement, emptyTpl: HTMLTemplateElement) {
@@ -145,6 +251,49 @@ import '../../styles/reading.css';
       aiPanel.className = 'ai-reading-panel';
       aiPanel.appendChild(renderAiReading(draw.ai));
       root.appendChild(aiPanel);
+    }
+  }
+
+  function renderNatalDetail(id: string, root: HTMLElement, emptyTpl: HTMLTemplateElement) {
+    const reading = getNatalReading(id);
+    if (!reading) {
+      showEmpty(root, emptyTpl);
+      return;
+    }
+
+    const back = document.createElement('a');
+    back.className = 'history-back';
+    back.href = '/history/';
+    back.textContent = '← All readings';
+
+    const header = document.createElement('div');
+    header.className = 'natal-detail-header';
+
+    const kicker = document.createElement('p');
+    kicker.className = 'natal-detail-header__kicker';
+    kicker.textContent = '✦ Your Star Chart ✦';
+
+    const summary = document.createElement('p');
+    summary.className = 'natal-detail-header__summary';
+    summary.textContent = birthSummary(reading.birth);
+
+    const saved = document.createElement('p');
+    saved.className = 'natal-detail-header__date';
+    saved.textContent = `Saved ${formatDate(reading.createdAt)}`;
+
+    header.append(kicker, summary, saved);
+
+    const panel = document.createElement('div');
+    panel.className = 'reading-panel';
+    panel.appendChild(renderNatalReading(reading.points));
+
+    root.replaceChildren(back, header, panel);
+
+    if (reading.synthesis) {
+      const synthesisPanel = document.createElement('div');
+      synthesisPanel.className = 'ai-reading-panel';
+      synthesisPanel.appendChild(renderNatalSynthesis(reading.synthesis));
+      root.appendChild(synthesisPanel);
     }
   }
 </script>
@@ -180,6 +329,53 @@ import '../../styles/reading.css';
   }
   .history__root {
     margin-top: 44px;
+  }
+
+  .history-section {
+    text-align: left;
+  }
+  .history-section + .history-section {
+    margin-top: 56px;
+    padding-top: 44px;
+    border-top: 1px solid rgba(203, 168, 90, 0.16);
+  }
+  .history-section__title {
+    margin: 0 0 22px;
+    text-align: center;
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: #cba85a;
+  }
+
+  .natal-detail-header {
+    max-width: 680px;
+    margin: 0 auto 8px;
+    text-align: center;
+  }
+  .natal-detail-header__kicker {
+    margin: 0 0 10px;
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: #a78bfa;
+  }
+  .natal-detail-header__summary {
+    margin: 0;
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(18px, 2.5vw, 24px);
+    font-weight: 700;
+    color: #f3dfa2;
+  }
+  .natal-detail-header__date {
+    margin: 10px 0 0;
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 14px;
+    color: #8f86ac;
   }
 
   .history-list {
