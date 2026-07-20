@@ -1,17 +1,5 @@
 import type { NatalPromptPoint } from './prompt';
-
-export interface ValidationError {
-  field: string;
-  message: string;
-}
-
-function isNonEmptyString(v: unknown): v is string {
-  return typeof v === 'string' && v.trim().length > 0;
-}
-
-function isStringArray(v: unknown): v is string[] {
-  return Array.isArray(v) && v.every((s) => typeof s === 'string');
-}
+import { type ValidationError, isNonEmptyString, isStringArray } from '../validation';
 
 function isValidPoint(v: unknown): v is NatalPromptPoint {
   if (typeof v !== 'object' || v === null) return false;

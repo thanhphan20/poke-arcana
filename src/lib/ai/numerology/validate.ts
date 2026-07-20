@@ -1,15 +1,7 @@
 import type { NumerologyPromptNumbers } from './prompt';
-
-export interface ValidationError {
-  field: string;
-  message: string;
-}
+import { type ValidationError, isFiniteNumber } from '../validation';
 
 const VALID_DOMAINS = new Set(['career', 'love', 'purpose']);
-
-function isFiniteNumber(v: unknown): v is number {
-  return typeof v === 'number' && Number.isFinite(v);
-}
 
 function isValidNumbers(v: unknown): v is NumerologyPromptNumbers {
   if (typeof v !== 'object' || v === null) return false;

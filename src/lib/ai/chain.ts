@@ -15,8 +15,6 @@ import {
 const MAX_ATTEMPTS_PER_PROVIDER = 3;
 const BACKOFF_MS = [500, 1500, 4500];
 
-// Exported so other prompt chains (e.g. natal/chain.ts) can reuse the same
-// retry/classification policy without duplicating it.
 export function isRetryable(err: unknown): boolean {
   if (err instanceof HttpError) return err.status >= 500;
   // NetworkError and TimeoutError are always retryable.
@@ -36,25 +34,26 @@ export function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-export const RETRY_BACKOFF_MS = BACKOFF_MS;
-export const MAX_PROVIDER_ATTEMPTS = MAX_ATTEMPTS_PER_PROVIDER;
+function isAttempt<T extends object>(x: T | Attempt): x is Attempt {
+  return 'reason' in x;
+}
 
 /**
- * Attempts a single provider with retry-on-transient-failure. Returns the
- * raw response text on success, or throws to signal the chain should
- * rotate to the next provider (recording why via the returned Attempt).
+ * Attempts a single provider with retry-on-transient-failure, validating the
+ * parsed response against the caller-supplied type guard. Returns the parsed
+ * response on success, or an Attempt describing why this provider was skipped.
  */
-async function tryProvider(
+async function tryProvider<T extends object>(
   adapter: ProviderAdapter,
   system: string,
   user: string,
-  cardCount: number,
-): Promise<ReadingResponse | Attempt> {
+  validate: (candidate: unknown) => candidate is T,
+): Promise<T | Attempt> {
   for (let attempt = 0; attempt < MAX_ATTEMPTS_PER_PROVIDER; attempt++) {
     try {
       const { raw } = await adapter.send(system, user);
       const parsed = parseJsonLoose(raw);
-      if (!parsed || !validateReadingResponse(parsed, cardCount)) {
+      if (!parsed || !validate(parsed)) {
         return { provider: adapter.name, reason: 'schema_validation_failed' };
       }
       return parsed;
@@ -75,13 +74,20 @@ async function tryProvider(
   return { provider: adapter.name, reason: '5xx_retry_exhausted' };
 }
 
-function isAttempt(x: ReadingResponse | Attempt): x is Attempt {
-  return 'reason' in x;
-}
-
-export async function generate(system: string, user: string, cardCount: number): Promise<GenerateResult> {
-  const schema = readingJsonSchema(cardCount);
-  const adapters = [createGeminiAdapter(schema), createGroqAdapter(), createOpenRouterAdapter()];
+/**
+ * Runs a caller-supplied JSON schema + type guard through the shared
+ * provider fallback chain (Gemini -> Groq -> OpenRouter), retrying transient
+ * failures and rotating providers on validation or terminal errors. Every
+ * prompt chain (reading, natal, numerology) shares this so the retry/fallback
+ * policy lives in exactly one place.
+ */
+export async function runProviderChain<T extends object>(
+  jsonSchema: object,
+  validate: (candidate: unknown) => candidate is T,
+  system: string,
+  user: string,
+): Promise<{ provider: string; response: T; attempts: Attempt[] }> {
+  const adapters = [createGeminiAdapter(jsonSchema), createGroqAdapter(), createOpenRouterAdapter()];
 
   const attempts: Attempt[] = [];
   const chain = adapters.filter((a) => a.configured);
@@ -91,7 +97,7 @@ export async function generate(system: string, user: string, cardCount: number):
   }
 
   for (const adapter of chain) {
-    const result = await tryProvider(adapter, system, user, cardCount);
+    const result = await tryProvider(adapter, system, user, validate);
     if (isAttempt(result)) {
       attempts.push(result);
       continue;
@@ -100,4 +106,14 @@ export async function generate(system: string, user: string, cardCount: number):
   }
 
   throw new ProviderChainExhausted(attempts);
+}
+
+export async function generate(system: string, user: string, cardCount: number): Promise<GenerateResult> {
+  const { provider, response, attempts } = await runProviderChain<ReadingResponse>(
+    readingJsonSchema(cardCount),
+    (candidate): candidate is ReadingResponse => validateReadingResponse(candidate, cardCount),
+    system,
+    user,
+  );
+  return { provider, response, attempts };
 }

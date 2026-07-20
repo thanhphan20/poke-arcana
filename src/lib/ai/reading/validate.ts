@@ -1,5 +1,6 @@
 import { MAJOR_ARCANA_METADATA } from '../../arcana/tarot-metadata';
 import { SUIT_META } from '../../arcana/meanings';
+import type { ValidationError } from '../validation';
 
 const RANK_NAMES = [
   'Ace', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven',
@@ -21,11 +22,6 @@ export interface RequestCardInput {
 export interface ReadingRequestInput {
   question: string;
   spread: RequestCardInput[];
-}
-
-export interface ValidationError {
-  field: string;
-  message: string;
 }
 
 export function isKnownArcanaName(name: string): boolean {

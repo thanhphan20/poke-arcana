@@ -1,4 +1,5 @@
 import type { ReadingCard, ReadingResponse } from './types';
+import { isNonEmptyString } from './validation';
 
 /** JSON Schema for the reading response, parameterized by expected card count. */
 export function readingJsonSchema(cardCount: number) {
@@ -26,8 +27,24 @@ export function readingJsonSchema(cardCount: number) {
   } as const;
 }
 
-function isNonEmptyString(v: unknown): v is string {
-  return typeof v === 'string' && v.trim().length > 0;
+export interface SynthesisResponse {
+  synthesis: string;
+}
+
+/** JSON Schema for a single-prose-paragraph response, shared by the natal and numerology chains. */
+export function synthesisJsonSchema() {
+  return {
+    type: 'object',
+    properties: {
+      synthesis: { type: 'string' },
+    },
+    required: ['synthesis'],
+  } as const;
+}
+
+export function validateSynthesisResponse(candidate: unknown): candidate is SynthesisResponse {
+  if (typeof candidate !== 'object' || candidate === null) return false;
+  return isNonEmptyString((candidate as Record<string, unknown>).synthesis);
 }
 
 function isReadingCard(v: unknown): v is ReadingCard {
