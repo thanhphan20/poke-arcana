@@ -33,7 +33,22 @@ const YEARS = Array.from({ length: CURRENT_YEAR - EARLIEST_YEAR + 1 }, (_, i) =>
       </div>
     </div>
 
-    <button type="submit" class="numerology-form__submit">Reveal My Number</button>
+    <div class="numerology-form__name-row">
+      <input
+        type="text"
+        class="numerology-form__name-input"
+        data-numerology-name
+        placeholder="Full name at birth"
+        autocomplete="off"
+        aria-label="Full birth name"
+        required
+      />
+    </div>
+    <p class="numerology-form__name-error" data-numerology-name-error hidden>
+      Please enter your name using Latin letters (A–Z).
+    </p>
+
+    <button type="submit" class="numerology-form__submit">Reveal My Numbers</button>
   </form>
 
   <div class="numerology-form__result" data-numerology-result hidden aria-live="polite">
@@ -41,12 +56,62 @@ const YEARS = Array.from({ length: CURRENT_YEAR - EARLIEST_YEAR + 1 }, (_, i) =>
     <p class="numerology-form__number" data-numerology-number></p>
     <p class="numerology-form__title" data-numerology-title></p>
     <p class="numerology-form__keywords" data-numerology-keywords></p>
-    <p class="numerology-form__description" data-numerology-description></p>
+    <p class="numerology-form__breakdown" data-numerology-breakdown></p>
+
+    <div class="numerology-form__angle">
+      <h3 class="numerology-form__angle-label numerology-form__angle-label--strengths">Strengths</h3>
+      <p class="numerology-form__angle-text" data-numerology-strengths></p>
+    </div>
+    <div class="numerology-form__angle">
+      <h3 class="numerology-form__angle-label numerology-form__angle-label--challenges">Challenges</h3>
+      <p class="numerology-form__angle-text" data-numerology-challenges></p>
+    </div>
+
+    <div class="numerology-form__extra-numbers" data-numerology-extra-numbers>
+      <div class="numerology-form__extra-number">
+        <span class="numerology-form__extra-label">Expression</span>
+        <span class="numerology-form__extra-value" data-numerology-expression-number></span>
+        <span class="numerology-form__extra-title" data-numerology-expression-title></span>
+      </div>
+      <div class="numerology-form__extra-number">
+        <span class="numerology-form__extra-label">Soul Urge</span>
+        <span class="numerology-form__extra-value" data-numerology-soulurge-number></span>
+        <span class="numerology-form__extra-title" data-numerology-soulurge-title></span>
+      </div>
+      <div class="numerology-form__extra-number">
+        <span class="numerology-form__extra-label">Personality</span>
+        <span class="numerology-form__extra-value" data-numerology-personality-number></span>
+        <span class="numerology-form__extra-title" data-numerology-personality-title></span>
+      </div>
+    </div>
+
+    <div class="numerology-form__weave-section" data-weave-section>
+      <p class="numerology-form__weave-cue">✧ See how your numbers work together ✧</p>
+      <div class="numerology-form__domain-row" role="radiogroup" aria-label="Choose a focus for your reading">
+        <button type="button" class="numerology-form__domain-chip" data-domain-chip="career">Career</button>
+        <button type="button" class="numerology-form__domain-chip" data-domain-chip="love">Love</button>
+        <button type="button" class="numerology-form__domain-chip" data-domain-chip="purpose">Life Purpose</button>
+      </div>
+      <button type="button" class="numerology-form__weave-btn" data-weave-btn disabled>Weave My Numbers Together</button>
+      <p class="numerology-form__weave-error" data-weave-error hidden></p>
+    </div>
+    <div class="numerology-form__weave-panel" data-weave-panel hidden aria-live="polite">
+      <p class="numerology-form__weave-label">✦ Your Numbers, Woven Together ✦</p>
+      <p class="numerology-form__weave-text" data-weave-text></p>
+      <p class="numerology-form__weave-attribution" data-weave-attribution></p>
+    </div>
   </div>
 </div>
 
 <script>
-  import { lifePathNumber, getLifePathInfo } from '../../lib/arcana/numerology';
+  import {
+    lifePathNumber, lifePathBreakdown, getLifePathInfo, getArchetypeTitle,
+    expressionNumber, soulUrgeNumber, personalityNumber, hasUsableLetters,
+  } from '../../lib/arcana/numerology';
+  import { saveNumerologyReading, updateNumerologyReading } from '../../lib/numerology-history';
+
+  type Domain = 'career' | 'love' | 'purpose';
+  interface WeaveNumbers { lifePath: number; expression: number; soulUrge: number; personality: number }
 
   // Days-in-month, ignoring leap years (day-of-month only matters here for
   // narrowing the <select>, not for real calendar validity).
@@ -58,11 +123,32 @@ const YEARS = Array.from({ length: CURRENT_YEAR - EARLIEST_YEAR + 1 }, (_, i) =>
     const monthSelect = root.querySelector<HTMLSelectElement>('[data-numerology-month]')!;
     const daySelect = root.querySelector<HTMLSelectElement>('[data-numerology-day]')!;
     const yearSelect = root.querySelector<HTMLSelectElement>('[data-numerology-year]')!;
+    const nameInput = root.querySelector<HTMLInputElement>('[data-numerology-name]')!;
+    const nameErrorEl = root.querySelector<HTMLElement>('[data-numerology-name-error]')!;
     const result = root.querySelector<HTMLElement>('[data-numerology-result]')!;
     const numberEl = root.querySelector<HTMLElement>('[data-numerology-number]')!;
     const titleEl = root.querySelector<HTMLElement>('[data-numerology-title]')!;
     const keywordsEl = root.querySelector<HTMLElement>('[data-numerology-keywords]')!;
-    const descriptionEl = root.querySelector<HTMLElement>('[data-numerology-description]')!;
+    const breakdownEl = root.querySelector<HTMLElement>('[data-numerology-breakdown]')!;
+    const strengthsEl = root.querySelector<HTMLElement>('[data-numerology-strengths]')!;
+    const challengesEl = root.querySelector<HTMLElement>('[data-numerology-challenges]')!;
+    const expressionNumberEl = root.querySelector<HTMLElement>('[data-numerology-expression-number]')!;
+    const expressionTitleEl = root.querySelector<HTMLElement>('[data-numerology-expression-title]')!;
+    const soulUrgeNumberEl = root.querySelector<HTMLElement>('[data-numerology-soulurge-number]')!;
+    const soulUrgeTitleEl = root.querySelector<HTMLElement>('[data-numerology-soulurge-title]')!;
+    const personalityNumberEl = root.querySelector<HTMLElement>('[data-numerology-personality-number]')!;
+    const personalityTitleEl = root.querySelector<HTMLElement>('[data-numerology-personality-title]')!;
+    const weaveSection = root.querySelector<HTMLElement>('[data-weave-section]')!;
+    const domainChips = Array.from(root.querySelectorAll<HTMLButtonElement>('[data-domain-chip]'));
+    const weaveBtn = root.querySelector<HTMLButtonElement>('[data-weave-btn]')!;
+    const weaveError = root.querySelector<HTMLElement>('[data-weave-error]')!;
+    const weavePanel = root.querySelector<HTMLElement>('[data-weave-panel]')!;
+    const weaveText = root.querySelector<HTMLElement>('[data-weave-text]')!;
+    const weaveAttribution = root.querySelector<HTMLElement>('[data-weave-attribution]')!;
+
+    let selectedDomain: Domain | null = null;
+    let currentNumbers: WeaveNumbers | null = null;
+    let currentReadingId: string | null = null;
 
     function syncDayOptions() {
       const max = DAYS_IN_MONTH[Number(monthSelect.value) - 1] ?? 31;
@@ -79,9 +165,76 @@ const YEARS = Array.from({ length: CURRENT_YEAR - EARLIEST_YEAR + 1 }, (_, i) =>
 
     monthSelect.addEventListener('change', syncDayOptions);
 
+    function resetWeave() {
+      selectedDomain = null;
+      for (const chip of domainChips) chip.classList.remove('is-active');
+      weaveBtn.disabled = true;
+      weaveBtn.textContent = 'Weave My Numbers Together';
+      weaveError.hidden = true;
+      weavePanel.hidden = true;
+      weaveSection.hidden = false;
+    }
+
+    async function requestWeave() {
+      if (!currentNumbers || !selectedDomain) return;
+      weaveBtn.disabled = true;
+      weaveBtn.textContent = 'The numbers are aligning…';
+      weaveError.hidden = true;
+
+      try {
+        const res = await fetch('/api/numerology-reading', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ numbers: currentNumbers, domain: selectedDomain }),
+        });
+        if (!res.ok) throw new Error('request failed');
+
+        const data = (await res.json()) as { provider: string; synthesis: string };
+        weaveText.textContent = data.synthesis;
+        weaveAttribution.textContent = `✦ read by ${data.provider} ✦`;
+        weavePanel.hidden = false;
+        weaveSection.hidden = true;
+
+        if (currentReadingId) {
+          updateNumerologyReading(currentReadingId, {
+            weave: { domain: selectedDomain, provider: data.provider, synthesis: data.synthesis },
+          });
+        }
+      } catch {
+        weaveBtn.disabled = false;
+        weaveBtn.textContent = 'Weave My Numbers Together';
+        weaveError.textContent = 'The numbers are quiet — try again in a moment.';
+        weaveError.hidden = false;
+      }
+    }
+
+    for (const chip of domainChips) {
+      chip.addEventListener('click', () => {
+        selectedDomain = chip.dataset.domainChip as Domain;
+        for (const c of domainChips) c.classList.toggle('is-active', c === chip);
+        weaveBtn.disabled = false;
+      });
+    }
+
+    weaveBtn.addEventListener('click', () => { void requestWeave(); });
+
+    nameInput.addEventListener('input', () => {
+      nameErrorEl.hidden = true;
+    });
+
     form.addEventListener('submit', (e) => {
       e.preventDefault();
       if (!monthSelect.value || !daySelect.value || !yearSelect.value) return;
+
+      currentReadingId = null;
+
+      const fullName = nameInput.value;
+      if (!hasUsableLetters(fullName)) {
+        nameErrorEl.hidden = false;
+        result.hidden = true;
+        return;
+      }
+      nameErrorEl.hidden = true;
 
       const month = Number(monthSelect.value);
       const day = Number(daySelect.value);
@@ -89,11 +242,41 @@ const YEARS = Array.from({ length: CURRENT_YEAR - EARLIEST_YEAR + 1 }, (_, i) =>
 
       const number = lifePathNumber(year, month, day);
       const info = getLifePathInfo(number);
+      const breakdown = lifePathBreakdown(year, month, day);
 
       numberEl.textContent = String(number);
-      titleEl.textContent = info.title;
+      titleEl.textContent = getArchetypeTitle(number);
       keywordsEl.textContent = info.keywords.join(' · ');
-      descriptionEl.textContent = info.description;
+
+      const breakdownParts = [
+        `${breakdown.reducedMonth} + ${breakdown.reducedDay} + ${breakdown.reducedYear}`,
+        String(breakdown.componentSum),
+      ];
+      if (breakdown.sumWasReduced) breakdownParts.push(String(breakdown.finalNumber));
+      breakdownEl.textContent = breakdownParts.join(' → ');
+
+      strengthsEl.textContent = info.strengths;
+      challengesEl.textContent = info.challenges;
+
+      const expression = expressionNumber(fullName);
+      const soulUrge = soulUrgeNumber(fullName);
+      const personality = personalityNumber(fullName);
+
+      expressionNumberEl.textContent = String(expression);
+      expressionTitleEl.textContent = getArchetypeTitle(expression);
+      soulUrgeNumberEl.textContent = String(soulUrge);
+      soulUrgeTitleEl.textContent = getArchetypeTitle(soulUrge);
+      personalityNumberEl.textContent = String(personality);
+      personalityTitleEl.textContent = getArchetypeTitle(personality);
+
+      currentNumbers = { lifePath: number, expression, soulUrge, personality };
+      currentReadingId = saveNumerologyReading({
+        name: fullName,
+        birth: { year, month, day },
+        numbers: currentNumbers,
+        weave: null,
+      });
+      resetWeave();
       result.hidden = false;
     });
   }
@@ -161,6 +344,43 @@ const YEARS = Array.from({ length: CURRENT_YEAR - EARLIEST_YEAR + 1 }, (_, i) =>
     color: #e9e4f5;
   }
 
+  .numerology-form__name-row {
+    margin-top: 12px;
+    display: flex;
+    justify-content: center;
+  }
+  .numerology-form__name-input {
+    width: 100%;
+    max-width: 320px;
+    padding: 9px 16px;
+    border-radius: 999px;
+    border: 1px solid rgba(203, 168, 90, 0.28);
+    background: rgba(11, 7, 20, 0.55);
+    color: #e9e4f5;
+    font-family: 'EB Garamond', serif;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.25s, box-shadow 0.25s;
+  }
+  .numerology-form__name-input::placeholder {
+    color: #5a5273;
+    font-style: italic;
+  }
+  .numerology-form__name-input:focus {
+    border-color: rgba(167, 139, 250, 0.6);
+    box-shadow: 0 0 0 3px rgba(124, 92, 255, 0.12);
+  }
+  .numerology-form__name-error {
+    margin: 10px 0 0;
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 13px;
+    color: #e8915a;
+  }
+  .numerology-form__name-error[hidden] {
+    display: none;
+  }
+
   .numerology-form__submit {
     margin-top: 14px;
     padding: 9px 20px;
@@ -214,12 +434,181 @@ const YEARS = Array.from({ length: CURRENT_YEAR - EARLIEST_YEAR + 1 }, (_, i) =>
     font-size: 13.5px;
     color: #8f86ac;
   }
-  .numerology-form__description {
+  .numerology-form__breakdown {
+    margin: 0 0 18px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(203, 168, 90, 0.18);
+    font-family: 'Cinzel', serif;
+    font-size: 12.5px;
+    letter-spacing: 0.04em;
+    color: #8f86ac;
+  }
+
+  .numerology-form__angle {
+    text-align: left;
+  }
+  .numerology-form__angle + .numerology-form__angle {
+    margin-top: 16px;
+  }
+  .numerology-form__angle-label {
+    margin: 0 0 6px;
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+  .numerology-form__angle-label--strengths {
+    color: #cba85a;
+  }
+  .numerology-form__angle-label--challenges {
+    color: #8f86ac;
+  }
+  .numerology-form__angle-text {
     margin: 0;
     font-family: 'EB Garamond', serif;
     font-size: 15.5px;
     line-height: 1.65;
     color: #c8bfe0;
+  }
+
+  .numerology-form__extra-numbers {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    margin-top: 22px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(203, 168, 90, 0.18);
+  }
+  .numerology-form__extra-number {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 12px 8px;
+    border-radius: 12px;
+    background: rgba(21, 14, 43, 0.5);
+    text-align: center;
+  }
+  .numerology-form__extra-label {
+    font-family: 'Cinzel', serif;
+    font-size: 10.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #8f86ac;
+  }
+  .numerology-form__extra-value {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 28px;
+    color: #f3dfa2;
+  }
+  .numerology-form__extra-title {
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 13px;
+    color: #c8bfe0;
+  }
+
+  .numerology-form__weave-section {
+    margin-top: 22px;
+    padding-top: 18px;
+    border-top: 1px solid rgba(203, 168, 90, 0.18);
+    text-align: center;
+  }
+  .numerology-form__weave-cue {
+    margin: 0 0 14px;
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 14px;
+    color: #8f86ac;
+  }
+  .numerology-form__domain-row {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+  .numerology-form__domain-chip {
+    padding: 8px 18px;
+    border-radius: 999px;
+    cursor: pointer;
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #c8bfe0;
+    background: transparent;
+    border: 1px solid rgba(203, 168, 90, 0.28);
+    transition: all 0.25s;
+  }
+  .numerology-form__domain-chip.is-active {
+    color: #0b0714;
+    background: linear-gradient(160deg, #e3cf95, #c39a45);
+    border-color: transparent;
+  }
+  .numerology-form__weave-btn {
+    padding: 11px 26px;
+    border-radius: 999px;
+    cursor: pointer;
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #0b0714;
+    border: none;
+    background: linear-gradient(160deg, #e3cf95, #c39a45);
+    transition: opacity 0.25s, transform 0.2s;
+  }
+  .numerology-form__weave-btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+  }
+  .numerology-form__weave-btn:disabled {
+    cursor: default;
+    opacity: 0.5;
+  }
+  .numerology-form__weave-error {
+    margin: 10px 0 0;
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 13.5px;
+    color: #c8bfe0;
+  }
+  .numerology-form__weave-error[hidden] {
+    display: none;
+  }
+
+  .numerology-form__weave-panel[hidden] {
+    display: none;
+  }
+  .numerology-form__weave-panel {
+    margin-top: 22px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(203, 168, 90, 0.18);
+    text-align: center;
+  }
+  .numerology-form__weave-label {
+    margin: 0 0 12px;
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #cba85a;
+  }
+  .numerology-form__weave-text {
+    margin: 0;
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 16px;
+    line-height: 1.65;
+    color: #e9e4f5;
     text-align: left;
+  }
+  .numerology-form__weave-attribution {
+    margin: 14px 0 0;
+    font-family: 'Cinzel', serif;
+    font-size: 10.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #5a5273;
   }
 </style>
