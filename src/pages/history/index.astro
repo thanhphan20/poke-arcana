@@ -4,6 +4,7 @@ export const prerender = true;
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import '../../styles/reading.css';
 import '../../styles/natal-reading.css';
+import '../../styles/numerology-reading.css';
 ---
 
 <BaseLayout title="My Readings — Poké-Arcana" description="Revisit your past Poké-Arcana readings.">
@@ -29,6 +30,13 @@ import '../../styles/natal-reading.css';
         <a href="/star-map" class="history-empty__cta">Find Your Signs</a>
       </div>
     </template>
+
+    <template data-empty-numerology>
+      <div class="history-empty">
+        <p class="history-empty__text">You have no saved numerology readings yet.</p>
+        <a href="/numerology" class="history-empty__cta">Find Your Numbers</a>
+      </div>
+    </template>
   </section>
 </BaseLayout>
 
@@ -37,17 +45,22 @@ import '../../styles/natal-reading.css';
   import { renderAiReading, renderTemplateReading } from '../../lib/reading-render';
   import { listNatalReadings, getNatalReading, type NatalReadingRecord } from '../../lib/natal-history';
   import { renderNatalReading, renderNatalSynthesis } from '../../lib/natal-render';
+  import { listNumerologyReadings, getNumerologyReading, type NumerologyReadingRecord } from '../../lib/numerology-history';
+  import { renderNumerologyReading, renderNumerologyWeave } from '../../lib/numerology-render';
 
   const root = document.querySelector<HTMLElement>('[data-history-root]');
   const emptyTpl = document.querySelector<HTMLTemplateElement>('[data-empty]');
   const emptyNatalTpl = document.querySelector<HTMLTemplateElement>('[data-empty-natal]');
-  if (root && emptyTpl && emptyNatalTpl) {
+  const emptyNumerologyTpl = document.querySelector<HTMLTemplateElement>('[data-empty-numerology]');
+  if (root && emptyTpl && emptyNatalTpl && emptyNumerologyTpl) {
     const params = new URLSearchParams(window.location.search);
     const id = params.get('id');
     const natalId = params.get('natalId');
+    const numerologyId = params.get('numerologyId');
     if (id) renderDetail(id, root, emptyTpl);
     else if (natalId) renderNatalDetail(natalId, root, emptyNatalTpl);
-    else renderOverview(root, emptyTpl, emptyNatalTpl);
+    else if (numerologyId) renderNumerologyDetail(numerologyId, root, emptyNumerologyTpl);
+    else renderOverview(root, emptyTpl, emptyNatalTpl, emptyNumerologyTpl);
   }
 
   function showEmpty(root: HTMLElement, emptyTpl: HTMLTemplateElement) {
@@ -85,11 +98,23 @@ import '../../styles/natal-reading.css';
     return birth.city ? `${dateStr} · ${birth.city.label}` : dateStr;
   }
 
+  function numerologyBirthSummary(birth: NumerologyReadingRecord['birth']): string {
+    try {
+      return new Date(birth.year, birth.month - 1, birth.day).toLocaleDateString(undefined, {
+        year: 'numeric', month: 'long', day: 'numeric',
+      });
+    } catch {
+      return `${birth.year}-${birth.month}-${birth.day}`;
+    }
+  }
+
   function renderOverview(
     root: HTMLElement, emptyTpl: HTMLTemplateElement, emptyNatalTpl: HTMLTemplateElement,
+    emptyNumerologyTpl: HTMLTemplateElement,
   ) {
     const draws = listDraws();
     const readings = listNatalReadings();
+    const numerologyReadings = listNumerologyReadings();
 
     const drawsSection = document.createElement('section');
     drawsSection.className = 'history-section';
@@ -103,7 +128,16 @@ import '../../styles/natal-reading.css';
       readings.length ? buildNatalList(readings) : emptyNatalTpl.content.cloneNode(true),
     );
 
-    root.replaceChildren(drawsSection, natalSection);
+    const numerologySection = document.createElement('section');
+    numerologySection.className = 'history-section';
+    numerologySection.appendChild(sectionHeading('My Numerology Readings'));
+    numerologySection.appendChild(
+      numerologyReadings.length
+        ? buildNumerologyList(numerologyReadings)
+        : emptyNumerologyTpl.content.cloneNode(true),
+    );
+
+    root.replaceChildren(drawsSection, natalSection, numerologySection);
   }
 
   function buildDrawsList(draws: ReturnType<typeof listDraws>): HTMLElement {
@@ -226,6 +260,50 @@ import '../../styles/natal-reading.css';
     return list;
   }
 
+  function buildNumerologyList(readings: NumerologyReadingRecord[]): HTMLElement {
+    const list = document.createElement('ul');
+    list.className = 'history-list';
+
+    for (const reading of readings) {
+      const item = document.createElement('li');
+      item.className = 'history-item';
+
+      const link = document.createElement('a');
+      link.className = 'history-item__link';
+      link.href = `/history/?numerologyId=${encodeURIComponent(reading.id)}`;
+
+      const q = document.createElement('p');
+      q.className = 'history-item__question';
+      q.textContent = reading.name;
+
+      const meta = document.createElement('div');
+      meta.className = 'history-item__meta';
+
+      const date = document.createElement('span');
+      date.className = 'history-item__date';
+      date.textContent = numerologyBirthSummary(reading.birth);
+      meta.appendChild(date);
+
+      const lifePathBadge = document.createElement('span');
+      lifePathBadge.className = 'history-item__badge';
+      lifePathBadge.textContent = `Life Path ${reading.numbers.lifePath}`;
+      meta.appendChild(lifePathBadge);
+
+      if (reading.weave) {
+        const aiBadge = document.createElement('span');
+        aiBadge.className = 'history-item__badge history-item__badge--ai';
+        aiBadge.textContent = 'AI reading';
+        meta.appendChild(aiBadge);
+      }
+
+      link.append(q, meta);
+      item.appendChild(link);
+      list.appendChild(item);
+    }
+
+    return list;
+  }
+
   function renderDetail(id: string, root: HTMLElement, emptyTpl: HTMLTemplateElement) {
     const draw = getDraw(id);
     if (!draw) {
@@ -294,6 +372,49 @@ import '../../styles/natal-reading.css';
       synthesisPanel.className = 'ai-reading-panel';
       synthesisPanel.appendChild(renderNatalSynthesis(reading.synthesis));
       root.appendChild(synthesisPanel);
+    }
+  }
+
+  function renderNumerologyDetail(id: string, root: HTMLElement, emptyTpl: HTMLTemplateElement) {
+    const reading = getNumerologyReading(id);
+    if (!reading) {
+      showEmpty(root, emptyTpl);
+      return;
+    }
+
+    const back = document.createElement('a');
+    back.className = 'history-back';
+    back.href = '/history/';
+    back.textContent = '← All numerology readings';
+
+    const header = document.createElement('div');
+    header.className = 'natal-detail-header';
+
+    const kicker = document.createElement('p');
+    kicker.className = 'natal-detail-header__kicker';
+    kicker.textContent = '✦ Your Numbers ✦';
+
+    const summary = document.createElement('p');
+    summary.className = 'natal-detail-header__summary';
+    summary.textContent = `${reading.name} — ${numerologyBirthSummary(reading.birth)}`;
+
+    const saved = document.createElement('p');
+    saved.className = 'natal-detail-header__date';
+    saved.textContent = `Saved ${formatDate(reading.createdAt)}`;
+
+    header.append(kicker, summary, saved);
+
+    const panel = document.createElement('div');
+    panel.className = 'reading-panel';
+    panel.appendChild(renderNumerologyReading(reading));
+
+    root.replaceChildren(back, header, panel);
+
+    if (reading.weave) {
+      const weavePanel = document.createElement('div');
+      weavePanel.className = 'ai-reading-panel';
+      weavePanel.appendChild(renderNumerologyWeave(reading.weave));
+      root.appendChild(weavePanel);
     }
   }
 </script>
